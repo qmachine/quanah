@@ -22,9 +22,24 @@
   <!--
     Chrome Web Store Link
   -->
-    <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/ipbnldbdhfajobjlnoeemdjidnpifcgc">
+    <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/ipbnldbdhfajobjlnoeemdjidnpifcgc"/>
   <!--
-    JavaScript
+    Open Graph Protocol
+  -->
+    <meta property="og:title" content="Quanah" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://qmachine.org/" />
+    <meta property="og:image" content="https://quanah.couchone.com/logo.png" />
+    <meta property="og:site_name" content="Quanah" />
+    <meta property="fb:app_id" content="177366332351884" />
+    <meta property="og:description"
+           content="The World's Most Relaxed Supercomputer :-)" />
+  <!--
+    Google web search stuff [http://goo.gl/xZPhG]
+  -->
+    <link rel="canonical" href="https://qmachine.org/"/>
+  <!--
+    Scripts
   -->
     <script src="./web-chassis.js"></script>
   </head>
@@ -41,7 +56,44 @@
         <a href="http://goo.gl/tRxfM">Source</a>
       </li>
     </ul>
+  <!--
+    Facebook "Like" button [http://goo.gl/VngKO]
+  -->
+    <div class="fb-like" data-href="https://qmachine.org" data-send="false" data-layout="button_count" data-width="80" data-show-faces="true"></div>
+  <!--
+    Google +1 button [http://goo.gl/MTd95]
+  -->
+    <div class="g-plusone" data-size="medium"></div>
+  <!--
+    Scripts
+  -->
     <script src="./quanah.js"></script>
     <script src="./fs.js"></script>
+    <div id="fb-root"></div>
+    <script>
+        (function(d, s, id) {
+            'use strict';
+            var fjs, js;
+            fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <script>
+        (function() {
+            //'use strict';
+            var po, s;
+            po = document.createElement('script');
+            po.type = 'text/javascript';
+            po.async = true;
+            po.src = 'https://apis.google.com/js/plusone.js';
+            s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(po, s);
+        }());
+    </script>
   </body>
 </html>

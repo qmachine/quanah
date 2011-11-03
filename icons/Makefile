@@ -136,7 +136,7 @@ $(IPHONE4): $(REF_JPG)
 	@   $(CONVERT) $(call IMGOPTS,114) $< $@
 
 $(LOGO): $(REF_PNG)
-	@   $(CONVERT) $(call IMGOPTS_REF,128) $< $@
+	@   $(CONVERT) $(call IMGOPTS_REF,256) $< $@
 
 ###
 

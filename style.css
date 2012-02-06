@@ -1,81 +1,117 @@
 /*  CSS style sheet  */
 
 /*  style.css ~~
- *                                                      ~~ (c) SRW, 03 Sep 2011
+ *                                                      ~~ (c) SRW, 06 Feb 2012
  */
 
 body {
+
     background-color: #CCCCCC;
     color: black;
     font-family: Georgia, serif;
-    font-size: 12pt;
-    margin-top: 0.5in;
-    margin-left: 1in;
-    margin-right: 1in;
-    margin-bottom: 0.5in;
+    font-size: 100%;
+    margin: 1in;
     text-align: center;
+
 }
 
 a {
+
     border-bottom: 1px dotted;
     color: black;
     text-decoration: none;
+
 }
 
 a:hover {
+
     color: blue;
+
 }
 
-a:visited {}
+canvas {
+
+    border: 1px solid black;
+
+}
 
 div {
-    margin-bottom: 1em;                 /** skip a line after each end tag */
+
+    margin-bottom: 1em;
+    margin-top: 1em;
+    text-align: justify;
+
 }
 
-li {
-    background-color: inherit;
-    color: black;
-    display: inline;
-    margin: 0;
-    padding: 0;
+figcaption {
+
+    font-weight: bold;
+
+}
+
+figure {
+
     text-align: center;
+
 }
 
-li a {
-    background-color: navy;
-    border-bottom: none;
-    color: white;
-    margin: 0em;
-    padding-bottom: 0.2em;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 0.2em;
+figure img[src$=".png"] {
+
+    background-color: white;
+
 }
 
-li a:hover {
-    background-color: yellow;
-    color: black;
+figure img[src$=".svg"] {
+
+    background-color: white;
+
+}
+
+footer {}
+
+header {}
+
+iframe {
+
+    height: 75%;
+    width: 100%;
+
 }
 
 noscript {
+
     color: red;
     font-size: 200%;
-    font-weight: bold;
     text-align: center;
+
 }
 
 pre {
-    font-family: Menlo, AndaleMono, Courier, monospace;
-    font-size: 8pt;
-    margin-bottom: -1em;
+
+    text-align: left;
+
+}
+
+textarea {
+
+    font-family: Courier, monospace;
+    font-size: 100%;
+    text-align: left;
+
 }
 
 ul {
-    font-size: 200%;
+
     list-style-type: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
+    padding: 0px;
+    margin: 0px;
+
+}
+
+.mono {
+
+    font-family: Courier, monospace;
+
 }
 
 /*  vim:set syntax=css:  */

@@ -10,7 +10,7 @@ about Quanah and applications that use it, but I promise I will write more
 documentation here soon!
 
 There are several "mirrors" available on
-[GitHub](https://github.com/wilkinson/quanah),
-[Bitbucket](https://bitbucket.org/wilkinson/quanah), and
+[Bitbucket](https://bitbucket.org/wilkinson/quanah),
+[GitHub](https://github.com/wilkinson/quanah), and
 [Google Code](https://quanah.googlecode.com).
 

@@ -1,7 +1,10 @@
 /*  CSS style sheet  */
 
 /*  screen.css ~~
- *                                                      ~~ (c) SRW, 06 Feb 2012
+ *
+ *  NOTE: I need to figure out some fallbacks for IE ...
+ *
+ *                                                      ~~ (c) SRW, 07 Feb 2012
  */
 
 body {
@@ -97,6 +100,48 @@ textarea {
     font-family: Courier, monospace;
     font-size: 12pt;
     text-align: left;
+
+}
+
+#github_ribbon {
+
+    border-bottom: none;
+    left: -65px;
+    height: 30px;
+    top: 40px;
+    position: absolute;
+    text-decoration: none;
+    width: 250px;
+
+    -moz-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+
+}
+
+#github_ribbon :hover {
+
+    background: blue;
+
+}
+
+#github_ribbon span {
+
+    background: black;
+    color: white;
+    font-size: 14px;
+    left: 0;
+    padding: 5px 0;
+    position: absolute;
+    text-align: center;
+    width: 250px;
+
+    -moz-box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 10px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 10px;
+    -o-box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 10px;
+    box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 10px;
 
 }
 

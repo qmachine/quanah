@@ -9,10 +9,12 @@
 include $(PWD)/../tools/macros.make
 
 APP         :=  qmachine
+PROTOCOL    :=  http
 URL         :=  http://localhost/
 DB          :=  127.0.0.1:5984/app
-#URL         :=  http://quanah-testing.couchone.com
-#DB          :=  quanah-testing.iriscouch.com:5984/app
+#PROTOCOL    :=  https
+#URL         :=  http://qmachine.org
+#DB          :=  qmachine.couchone.com:6984/app     # (uses SSL on this port)
 APPRC       :=  $(PWD)/$(APP)/.couchapprc
 
 COUCHAPP    :=  $(call contingent, couchapp)
@@ -87,10 +89,10 @@ $(APP): | webpage
 
 $(APPRC): $(APP)
 	@   $(strip $(call hilite, "Deploying to $(DB) ...")            ;   \
-            printf '%s' '{"env": {"default": {"db": "http://' > $@      ;   \
+            printf '%s' '{"env": {"default": {"db": "$(PROTOCOL)' > $@  ;   \
             $(call read-prompt, "Username: ") && USERNAME="$${REPLY}"   ;   \
             $(call read-secure, "Password: ") && PASSWORD="$${REPLY}"   ;   \
-            printf '%s' "$${USERNAME}:$${PASSWORD}@$(DB)" '"}}}' >> $@  )
+            printf '%s' "://$${USERNAME}:$${PASSWORD}@$(DB)" '"}}}' >> $@  )
 
 ###
 

@@ -9,12 +9,12 @@
 include $(PWD)/../tools/macros.make
 
 APP         :=  qmachine
-PROTOCOL    :=  http
-URL         :=  http://localhost/
-DB          :=  127.0.0.1:5984/app
-#PROTOCOL    :=  https
-#URL         :=  http://qmachine.org
-#DB          :=  qmachine.couchone.com:6984/app     # (uses SSL on this port)
+#PROTOCOL    :=  http
+#URL         :=  http://localhost/
+#DB          :=  127.0.0.1:5984/app
+PROTOCOL    :=  https
+URL         :=  http://qmachine.org
+DB          :=  qmachine.couchone.com:6984/app
 APPRC       :=  $(PWD)/$(APP)/.couchapprc
 
 COUCHAPP    :=  $(call contingent, couchapp)

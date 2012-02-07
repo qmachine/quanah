@@ -105,6 +105,8 @@ textarea {
 
 #github_ribbon {
 
+ /* There is a much fancier version available at http://goo.gl/CSWv3. */
+
     border-bottom: none;
     left: -65px;
     height: 30px;

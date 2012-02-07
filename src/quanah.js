@@ -34,7 +34,7 @@
 //  -   Could Quanah actually support ActionScript?
 //  -   Could Quanah solve nested 'when' dependencies? (see: 'demos[6]')
 //
-//                                                      ~~ (c) SRW, 05 Feb 2012
+//                                                      ~~ (c) SRW, 07 Feb 2012
 
 (function (global) {
     'use strict';

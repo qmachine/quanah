@@ -345,22 +345,38 @@
     };
 
     deserialize = function ($x) {
-     // This function is a JSON-based deserialization utility that pairs with
-     // the 'serialize' function provided herein. Read more documentation in
-     // that function's definition, especially regarding UTF-8 conversions.
-        return JSON.parse($x, function revive(key, val) {
-         // This function needs documentation.
+     // This function is a JSON-based deserialization utility that can invert
+     // the 'serialize' function provided herein. Unfortunately, no 'fromJSON'
+     // equivalent exists for obvious reasons -- it would have to be a String
+     // prototype method, and it would have to be extensible for all types.
+     // NOTE: This definition could stand to be optimized, but I recommend
+     // leaving it as-is until improving performance is absolutely critical.
+        return JSON.parse($x, function (key, val) {
+         // This function is provided to 'JSON.parse' as the optional second
+         // parameter that its documentation refers to as a 'revive' function.
+         // NOTE: This is not the same kind of function as Quanah's 'revive'!
             var f, pattern;
             pattern = /^\[FUNCTION ([A-z0-9\+\/\=]+) ([A-z0-9\+\/\=]+)\]$/;
             if ((typeof val === 'string') || (val instanceof String)) {
                 if (pattern.test(val)) {
                     val.replace(pattern, function ($0, code, props) {
-                     // This function needs documentation.
+                     // This function is provided to the String prototype's
+                     // 'replace' method and uses references to the enclosing
+                     // scope to return results. I wrote things this way in
+                     // order to avoid changing the type of 'val' and thereby
+                     // confusing the JIT compilers, but I'm not certain that
+                     // using nested closures is any faster anyway. For that
+                     // matter, calling the regular expression twice may be
+                     // slower than calling it once and processing its output
+                     // conditionally, and that way might be clearer, too ...
                         /*jslint evil: true */
                         var obj = deserialize(atob(props));
                         f = ((new Function('return ' + atob(code)))());
                         ply(obj).by(function (key, val) {
-                         // This function is a "map" ==> 'ply' is justified.
+                         // This function copies methods and properties from
+                         // the "object-only" representation of a function back
+                         // onto the newly created function 'f'. Because order
+                         // isn't important, the use of 'ply' is justified.
                             f[key] = val;
                             return;
                         });
@@ -444,19 +460,28 @@
                 } else if (isFunction(x.toString)) {
                     $f = x.toString();
                 } else {
-                 // Hope for the best?
-                    $f = x;
+                 // If we fall this far, we're probably in trouble anyway, but
+                 // we aren't out of options yet. We could try to coerce to a
+                 // string by adding an empty string or calling the String
+                 // constructor without the 'new' keyword, but I'm not sure if
+                 // either would cause Quanah itself to fail JSLINT. Of course,
+                 // we can always just play it safe and return 'true' early to
+                 // induce local execution of the function -- let's do that!
+                    return true;
                 }
-             // Remove leading and trailing parentheses to appease JSLINT ...
+             // By this point, '$f' must be defined, and it must be a string
+             // or else the next line will fail when we try to remove leading
+             // and trailing parentheses in order to appease JSLINT.
                 $f = left + $f.replace(/^[(]|[)]$/g, '') + right;
-             // Here, we use JSLINT to analyze the function's "source code".
-             // We disable all options that do not directly pertain to the
-             // exact problem of determining whether the function will run
-             // correctly in a remote JavaScript environment or not. JSLINT
-             // returns 'false' if the scan fails, but that corresponds to a
-             // 'true' flag for our problem; thus, we negate JSLINT's output.
+             // Now, we send our function's serialized form '$f' into JSLINT
+             // for analysis, taking care to disable all options that are not
+             // directly relevant to determining if the function is suitable
+             // for running in some remote JavaScript environment. If JSLINT
+             // returns 'false' because the scan fails for some reason, the
+             // answer to our question would be 'true', which is why we have
+             // to negate JSLINT's output.
                 flag = (false === JSLINT($f, {
-                 // JSLINT configuration options (version 2012-02-03):
+                 // JSLINT configuration options, as of version 2012-02-03:
                     anon:       true,   //- ???
                     bitwise:    true,   //- bitwise operators are allowed?
                     browser:    false,  //- assume a browser as JS environment?
@@ -494,7 +519,9 @@
                 }));
             }
             ply(x).by(function (key, val) {
-             // This function has an "all" pattern ==> 'ply' is justified.
+             // This function examines all methods and properties of 'x'
+             // recursively to make sure none of those are closed, either.
+             // Because order isn't important, use of 'ply' is justified.
                 if (flag === false) {
                     flag = isClosed(val);
                 }
@@ -505,19 +532,21 @@
     };
 
     isFunction = function (f) {
-     // This function returns 'true' only if and only if 'f' is a Function.
-     // The second condition is necessary to return 'false' for a RegExp.
+     // This function returns 'true' only if and only if the input argument
+     // 'f' is a function. The second condition is necessary to avoid a false
+     // positive when 'f' is a regular expression. Please note that an avar
+     // whose 'val' property is a function will still return 'false'.
         return ((typeof f === 'function') && (f instanceof Function));
     };
 
     local_call = function (obj) {
      // This function applies the transformation 'f' to 'x' for method 'f' and
-     // property 'x' of the input object 'obj' by calling 'f' with an input
-     // argument 'evt' and a 'this' value 'x'. The advantage of performing the
-     // transformation as shown, rather than simply computing 'f(x)', is that
-     // the user can explicitly indicate the program's logic even when the
-     // program's control is difficult or impossible to predict, as is commonly
-     // the case in JavaScript when using AJAX calls, for example.
+     // property 'x' of the input object 'obj' by calling 'f' with 'evt' as an
+     // input argument and 'x' as the 'this' value. The advantage of performing
+     // transformations this way versus computing 'f(x)' directly is that it
+     // allows the user to indicate the program's logic explicitly even when
+     // the program's control is difficult or impossible to predict, as is
+     // commonly the case in JavaScript when working with callback functions.
         if ((obj.x instanceof AVar) === false) {
          // I'm not sure if this condition is still necessary to check because
          // it may actually be unreachable ...
@@ -569,7 +598,7 @@
                     return;
                 }
             };
-         // After all the setup, the actual invocation is anticlimactic, huh?
+         // After all the setup, the actual invocation is anticlimactic ;-)
             obj.f.call(obj.x, evt);
         } catch (err) {
          // In early versions of Quanah, 'stay' threw a special Error type as
@@ -614,9 +643,8 @@
                         }
                     }
                 } else {
-                 // I'm never quit sure if this is a good fallback definition,
-                 // but hopefully I'll get around to showing that this arm is
-                 // unnecessary anyway. In that case, I'll just remove it.
+                 // I've never really liked this as a fallback definition, but
+                 // it still helps to have it here, just in case.
                     f(undefined, x);
                 }
                 return;
@@ -679,8 +707,8 @@
                     return evt.fail(message);
                 };
                 temp.onready = function (temp_evt) {
-                    var val = deserialize(temp.val).val;
                  // This function needs documentation.
+                    var val = deserialize(temp.val).val;
                     switch (val.status) {
                     case 'done':
                         task.val = val;
@@ -861,7 +889,7 @@
             return evt.fail(message);
         };
         temp.onready = function (temp_evt) {
-         // This function needs documentation.
+         // This function just releases execution for the "outer" avar.
             temp_evt.exit();
             return evt.exit();
         };
@@ -1001,7 +1029,10 @@
     when = function () {
      // This function needs documentation because it has been completely
      // rewritten in terms of a "phantom" AVar to which I have added some
-     // custom instance methods.
+     // custom instance methods. I'm getting the results I expect, but I'm
+     // still a little nervous about its error capture abilities, and I think
+     // that some minor massaging of the logic here could enable support for
+     // correct solution of nested dependencies at least partially ...
         var args, phantom;
         args = Array.prototype.slice.call(arguments);
         phantom = avar({val: args});
@@ -1020,16 +1051,13 @@
             configurable: false,
             enumerable: false,
             get: function () {
-             // This function needs documentation.
+             // This getter needs documentation.
                 var temp = {};
                 phantom.comm({get_onready: temp, secret: secret});
                 return temp.onready;
             },
             set: function (f) {
-             // This function needs documentation.
-                if (isFunction(f) === false) {
-                    throw new TypeError('Assigned value must be a function.');
-                }
+             // This setter needs documentation.
                 var count, egress, g, n, ready;
                 count = function () {
                  // This function needs documentation.
@@ -1045,6 +1073,9 @@
                  // This function needs documentation.
                     if (ready === false) {
                         return evt.stay('Acquiring "lock" ...');
+                    }
+                    if (isFunction(f) === false) {
+                        return evt.fail('Assigned value must be a function');
                     }
                     f.call(this, {
                         exit: function (message) {
@@ -1118,13 +1149,13 @@
         configurable: false,
         enumerable: false,
         get: function () {
-         // This function needs documentation.
+         // This getter needs documentation.
             var temp = {};
             this.comm({get_onerror: temp, secret: secret});
             return temp.onerror;
         },
         set: function (f) {
-         // This function needs documentation.
+         // This setter needs documentation.
             if (isFunction(f)) {
                 this.comm({set_onerror: f, secret: secret});
             } else {
@@ -1141,13 +1172,13 @@
         configurable: false,
         enumerable: false,
         get: function () {
-         // This function needs documentation.
+         // This getter needs documentation.
             var temp = {};
             this.comm({get_onready: temp, secret: secret});
             return temp.onready;
         },
         set: function (f) {
-         // This function needs documentation.
+         // This setter needs documentation.
             if (isFunction(f)) {
                 this.comm({set_onready: f, secret: secret});
             } else {

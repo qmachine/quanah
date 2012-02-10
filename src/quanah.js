@@ -22,11 +22,9 @@
 //  To-do list:
 //
 //  -   finish documenting all functions and "placeholders"
-//  -   optimize 'ply' for use with Arrays and Objects _only_, since it is no
-//      longer used as a duck-typed generic "fallback" function
 //  -   remove type-checks in user-unreachable functions where appropriate
 //  -   replace 'throw' statements with 'fail' statements for robustness
-//  -   rewrite 'onready' assignments as 'comm' invocations for performance
+//  -   rewrite 'onready' assignments as 'comm' invocations (optional)
 //
 //  Open questions:
 //
@@ -122,13 +120,15 @@
         };
         that = this;
         defineProperty(that, 'comm', {
-         // NOTE: We have to "hide" this method or else the avar cannot be
-         // serialized ==> we cannot simply assign it by 'that.comm = ...'!
             configurable: false,
             enumerable: false,
             writable: false,
             value: function (obj) {
-             // This function needs documentation.
+             // This function is a "hidden" instance method that forwards the
+             // messages it receives to 'comm' along with the internal 'state'
+             // of the avar that received the message. We "hide" this method
+             // by making it non-enumerable, which not only makes iteration
+             // over avars faster but also allows avars to be serialized :-)
                 comm.call(this, state, obj);
                 return;
             }

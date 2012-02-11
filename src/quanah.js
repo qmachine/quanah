@@ -30,7 +30,6 @@
 //
 //  -   Can Quanah return a remotely distributed memoized function?
 //  -   Could Quanah actually support ActionScript?
-//  -   Could Quanah solve nested 'when' dependencies? (see: 'demos[6]')
 //
 //                                                      ~~ (c) SRW, 10 Feb 2012
 
@@ -54,10 +53,10 @@
 
  // Declarations
 
-    var atob, AVar, avar, btoa, comm, defineProperty, deserialize, init,
-        isArrayLike, isClosed, isFunction, local_call, ply, puts, remote_call,
-        revive, secret, serialize, stack1, stack2, sys, update_local,
-        update_remote, uuid, volunteer, when;
+    var atob, AVar, avar, btoa, comm, defineProperty, deserialize,
+        init, isArrayLike, isClosed, isFunction, local_call, ply, puts,
+        remote_call, revive, secret, serialize, stack1, stack2, sys,
+        update_local, update_remote, uuid, volunteer, when;
 
  // Definitions
 
@@ -1033,12 +1032,62 @@
      // still a little nervous about its error capture abilities, and I think
      // that some minor massaging of the logic here could enable support for
      // correct solution of nested dependencies at least partially ...
-        var args, phantom;
+        var args, x, y;
         args = Array.prototype.slice.call(arguments);
-        phantom = avar({val: args});
-        phantom.onerror = function (message) {
+        x = (function union(x) {
          // This function needs documentation.
-            ply(args).by(function (key, val) {
+            var y = [];
+            ply(x).by(function (i, xi) {
+             // This function needs documentation.
+                var flag;
+                if ((xi instanceof AVar) &&
+                        (xi.hasOwnProperty('isready') ||
+                        (xi.hasOwnProperty('areready')))) {
+                 // This arms "flattens" dependencies using recursion.
+                    y = union(y.concat(xi.val));
+                } else {
+                 // This arm ensures elements are unique.
+                    flag = true;
+                    ply(y).by(function (j, yj) {
+                     // This function needs documentation.
+                        if (flag === true) {
+                            flag = (xi !== yj);
+                        }
+                        return;
+                    });
+                    if (flag === true) {
+                        y.push(xi);
+                    }
+                }
+                return;
+            });
+         /*
+         // Since I haven't decided if the above definition is actually more
+         // lucid to the casual observer and it is definitely slower, I will
+         // preserve the original "inlined" definition for a little while ...
+            for (i = 0; i < x.length; i += 1) {
+                if ((x[i] instanceof AVar) &&
+                        (x[i].hasOwnProperty('isready') ||
+                        (x[i].hasOwnProperty('areready')))) {
+                 // This arm "flattens" dependencies using recursion.
+                    y = union(y.concat(x[i].val));
+                } else {
+                    flag = true;
+                    for (j = 0; (flag === true) && (j < y.length); j += 1) {
+                        flag = (x[i] !== y[j]);
+                    }
+                    if (flag === true) {
+                        y.push(x[i]);
+                    }
+                }
+            }
+         */
+            return y;
+        }(args));
+        y = avar({val: args});
+        y.onerror = function (message) {
+         // This function needs documentation.
+            ply(x).by(function (key, val) {
              // This function needs documentation.
                 if (val instanceof AVar) {
                     val.comm({fail: message, secret: secret});
@@ -1047,13 +1096,13 @@
             });
             return;
         };
-        defineProperty(phantom, 'onready', {
+        defineProperty(y, 'onready', {
             configurable: false,
             enumerable: false,
             get: function () {
              // This getter needs documentation.
                 var temp = {};
-                phantom.comm({get_onready: temp, secret: secret});
+                y.comm({get_onready: temp, secret: secret});
                 return temp.onready;
             },
             set: function (f) {
@@ -1105,9 +1154,9 @@
                     });
                     return;
                 };
-                n = args.length;
+                n = x.length;
                 ready = false;
-                ply(args).by(function (key, val) {
+                ply(x).by(function (key, val) {
                  // This function is a "forEach" ==> 'ply' is justified.
                     if (val instanceof AVar) {
                         val.onready = function (evt) {
@@ -1121,26 +1170,26 @@
                     }
                     return;
                 });
-                phantom.comm({set_onready: g, secret: secret});
+                y.comm({set_onready: g, secret: secret});
                 return;
             }
         });
-        defineProperty(phantom, ((args.length < 2) ? 'is' : 'are') + 'ready', {
+        defineProperty(y, ((args.length < 2) ? 'is' : 'are') + 'ready', {
             configurable: false,
             enumerable: false,
             get: function () {
              // This getter "forwards" to the avar's 'onready' handler as a
              // means to let the code read more idiomatically in English.
-                return phantom.onready;
+                return y.onready;
             },
             set: function (f) {
              // This setter "forwards" to the avar's 'onready' handler as a
              // means to let the code read more idiomatically in English.
-                phantom.onready = f;
+                y.onready = f;
                 return;
             }
         });
-        return phantom;
+        return y;
     };
 
  // Prototype definitions

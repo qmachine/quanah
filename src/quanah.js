@@ -698,7 +698,7 @@
             task.onready = update_remote;
             task.onready = function (evt) {
              // This function polls for changes in the 'status' property using
-             // a variation on the 'update_local' function as an asynchronous
+             // a variation on the 'update_local' function as a non-blocking
              // 'while' loop -- hooray for disposable avars!
                 var temp = sys.read(task.key);
                 temp.onerror = function (message) {
@@ -706,7 +706,8 @@
                     return evt.fail(message);
                 };
                 temp.onready = function (temp_evt) {
-                 // This function needs documentation.
+                 // This function analyzes the results of the 'read' operation
+                 // to determine if the 'task' computation is ready to proceed.
                     var val = deserialize(temp.val).val;
                     switch (val.status) {
                     case 'done':
@@ -1026,12 +1027,7 @@
     };
 
     when = function () {
-     // This function needs documentation because it has been completely
-     // rewritten in terms of a "phantom" AVar to which I have added some
-     // custom instance methods. I'm getting the results I expect, but I'm
-     // still a little nervous about its error capture abilities, and I think
-     // that some minor massaging of the logic here could enable support for
-     // correct solution of nested dependencies at least partially ...
+     // This function needs documentation.
         var args, x, y;
         args = Array.prototype.slice.call(arguments);
         x = (function union(x) {
@@ -1072,6 +1068,10 @@
                  // This arm "flattens" dependencies using recursion.
                     y = union(y.concat(x[i].val));
                 } else {
+                 // This arm ensures that elements of 'y' are either unique
+                 // values or else unique object references. Note that unique
+                 // object references may still have the same value and/or the
+                 // same serialized value but are actually separate objects.
                     flag = true;
                     for (j = 0; (flag === true) && (j < y.length); j += 1) {
                         flag = (x[i] !== y[j]);

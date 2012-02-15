@@ -27,11 +27,23 @@ RM      :=  $(call contingent, rm) -rf
 TIME    :=  $(call contingent, time)
 TOUCH   :=  $(call contingent, touch)
 WEBPAGE :=  $(call contingent, ruby jruby) ./tools/webpage.rb
+YUICOMP :=  $(call contingent, yuicompressor)
+
+define compile-with-google-closure
+    $(CLOSURE) --compilation_level SIMPLE_OPTIMIZATIONS \
+        $(1:%=--js %) --js_output_file $(2)
+endef
+
+define compile-with-yuicompressor
+    JS_TEMP_FILE="$${RANDOM}-$(strip $(2))"                             ;   \
+    $(CAT) $(1) > $${JS_TEMP_FILE}                                      ;   \
+    $(YUICOMP) --type js $${JS_TEMP_FILE} -o $(2)                       ;   \
+    $(RM) $${JS_TEMP_FILE}
+endef
 
 define compile-js
-    $(call aside, "Processing $(2) ...")                                ;   \
-    $(CLOSURE) --compilation_level SIMPLE_OPTIMIZATIONS \
-        --js $(1) --js_output_file $(2)
+    $(call aside, "Optimizing scripts: $(1) --> $(2)")                  ;   \
+    $(call compile-with-yuicompressor, $(1), $(2))
 endef
 
 define fetch-url
@@ -109,15 +121,29 @@ check: $(EXEJS)
             done
 
 fast: $(EXEJS)
-	@   QUICK_OUTFILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
-            $(call compile-js, $(EXEJS), $${QUICK_OUTFILE})             ;   \
-            $(call aside, "$(USEJS) $${QUICK_OUTFILE}")                 ;   \
-            $(TIME) $(USEJS) $${QUICK_OUTFILE}                          ;   \
+	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
+            $(call compile-js, $(EXEJS), $${QUICK_JS_FILE})             ;   \
+            $(call aside, "$(USEJS) $${QUICK_JS_FILE}")                 ;   \
+            $(TIME) $(USEJS) $${QUICK_JS_FILE}                          ;   \
             if [ $$? -eq 0 ]; then                                          \
                 $(call hilite, 'Success.')                              ;   \
             else                                                            \
                 $(call alert, 'Failure.')                               ;   \
-            fi
+            fi                                                          ;   \
+            $(RM) $${QUICK_JS_FILE}
+
+faster:
+	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
+            $(call compile-js,                                              \
+                $(filter-out $(JSLIBS), $(SRCJS)), $${QUICK_JS_FILE})   ;   \
+            $(call aside, "$(USEJS) $${QUICK_JS_FILE}")                 ;   \
+            $(TIME) $(USEJS) $${QUICK_JS_FILE}                          ;   \
+            if [ $$? -eq 0 ]; then                                          \
+                $(call hilite, 'Success.')                              ;   \
+            else                                                            \
+                $(call alert, 'Failure.')                               ;   \
+            fi                                                          ;   \
+            $(RM) $${QUICK_JS_FILE}
 
 quick:
 	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \

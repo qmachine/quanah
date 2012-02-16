@@ -51,8 +51,8 @@
 
     var atob, AVar, avar, btoa, comm, defineProperty, deserialize,
         init, isArrayLike, isClosed, isFunction, local_call, ply,
-        puts, remote_call, revive, secret, serialize, stack1, stack2,
-        sys, update_local, update_remote, uuid, volunteer, when;
+        puts, remote_call, revive, secret, serialize, stack, sys,
+        update_local, update_remote, uuid, volunteer, when;
 
  // Definitions
 
@@ -230,7 +230,7 @@
                 inside.ready = true;
                 if (inside.queue.length > 0) {
                     inside.ready = false;
-                    stack1.unshift({
+                    stack.unshift({
                         f: inside.queue.shift(),
                         x: x
                     });
@@ -620,7 +620,7 @@
                  // that explain why leaving execution guarantees to chance is
                  // perfectly acceptable when the probability approachs 1 :-)
                     obj.x.comm({stay: message, secret: secret});
-                    stack2.push(obj);
+                    stack.push(obj);
                     return;
                 }
             };
@@ -778,20 +778,22 @@
     };
 
     revive = function () {
-     // This function contains the execution center for Quanah. It works by
-     // running the first available task in its primary queue, subject to some
-     // constraints, and then moving all tasks from a secondary queue into the
-     // primary before exiting. The secondary queue contains tasks that have
-     // been rescheduled. Then, our strategy is simply to ensure that 'revive'
-     // will be called as many times as necessary to progress through the
-     // entire queue. Because 'revive' makes no attempt to run every single
-     // task in the queue during a single invocation, the queue can be shared
-     // by multiple "contexts" that each invoke 'revive' at the same time, and
-     // it makes no difference if the separate contexts are due to recursion or
-     // to special object such as Web Workers. The constraints mentioned above
-     // are implemented as conditional tests that determine whether a given
-     // computation can be distributed to external resources for execution.
-        var task = stack1.shift();
+     // This function contains the execution center for Quanah. It's pretty
+     // simple, really -- it just runs the first available task in its queue
+     // ('stack'), and it selects an execution context conditionally. That's
+     // all it does. It makes no attempt to run every task in the queue every
+     // time it is called, because instead Quanah uses a strategy in which it
+     // tries to call 'revive' as many times as necessary to process an entire
+     // program correctly. For example, every time an avar receives a 'comm'
+     // message, 'revive' will run. Because 'revive' only runs a single task
+     // from the queue for each invocation, its queue can be shared safely
+     // across multiple execution "contexts" simultaneously, and it makes no
+     // difference if the separate contexts are due to recursion or to special
+     // objects such as Web Workers. The 'revive' function selects a context
+     // for execution using conditional tests that determine whether a given
+     // computation can be distributed to external resources for execution, but
+     // it can always fall back to executing on the invoking machine :-)
+        var task = stack.shift();
         if (task !== undefined) {
             if (typeof JSON === 'undefined') {
              // We can't serialize the computation anyway.
@@ -810,7 +812,6 @@
                 remote_call(task);
             }
         }
-        stack1.push.apply(stack1, stack2.splice(0, stack2.length));
         return;
     };
 
@@ -867,9 +868,7 @@
         });
     };
 
-    stack1 = [];
-
-    stack2 = [];
+    stack = [];
 
     sys = {
      // This object contains stubs for methods and properties that can be

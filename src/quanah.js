@@ -1461,6 +1461,6 @@
 
     }
 
-}).call(null, this));
+}.call(null, this)));
 
 //- vim:set syntax=javascript:

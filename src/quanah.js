@@ -1428,7 +1428,7 @@
 
     return;
 
-}(function (outer_scope) {
+}([function (outer_scope) {
     'use strict';
 
  // This strict anonymous closure encapsulates the logic for detecting which
@@ -1460,6 +1460,6 @@
 
     }
 
-}.call(null, this)));
+}][0].call(null, this)));
 
 //- vim:set syntax=javascript:

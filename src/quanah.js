@@ -649,8 +649,8 @@
      // my "generic.js" for a more careful treatment of "basic" iteration :-)
         return {
             by: function (f) {
-             // NOTE: I probably can't optimize this for Arrays and Objects
-             // after all because I use it on Functions in 'serialize' ...
+             // NOTE: I probably can't optimize this function for use only on
+             // arrays and objects because 'serialize' uses it on functions.
                 if (isFunction(f) === false) {
                     throw new TypeError('"ply..by" expects a function');
                 }
@@ -1042,8 +1042,6 @@
      // execution we want, and the 'when' statements block and release the
      // two variables simultaneously. There are a number of other solutions
      // out there, but I prefer this one at the moment.
-     //
-     // NOTE: Will Quanah try to distribute the 'when' statements remotely?
      //
         when(f, x).areready = function (evt) {
          // This function is the first half of the "sandwich" pattern.

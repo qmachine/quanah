@@ -26,6 +26,8 @@
 //  -   Can Quanah return a remotely distributed memoized function?
 //  -   Could Quanah actually support ActionScript?
 //  -   Can I prevent users' own JSLINT pragmas from circumventing 'isClosed'?
+//  -   Is Quanah a kernel?
+//      -   If so, is it "re-entrant"? See http://goo.gl/985r.
 //
 //                                                      ~~ (c) SRW, 17 Feb 2012
 

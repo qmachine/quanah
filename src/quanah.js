@@ -29,7 +29,7 @@
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.
 //
-//                                                      ~~ (c) SRW, 17 Feb 2012
+//                                                      ~~ (c) SRW, 22 Feb 2012
 
 (function (global) {
     'use strict';
@@ -988,7 +988,7 @@
          // can retrieve that task's full description. If no tasks are found,
          // we will simply check back later :-)
             if (sys.queue === null) {
-                return evt.stay('Waiting for a "queue" definition ...');
+                return evt.fail('Waiting for a "queue" definition ...');
             }
             var temp = sys.queue();
             temp.onerror = function (message) {
@@ -1001,14 +1001,18 @@
              // current form simply chooses the first available, but I could
              // just as easily choose randomly by assigning weights to the
              // elements of the queue.
-                if (temp.val.length === 0) {
+                if ((temp.val instanceof Array) === false) {
+                 // This seems like a common problem that will occur whenever
+                 // users begin implementing custom storage mechanisms.
+                    return temp_evt.fail('"queue" should return an array');
+                } else if (temp.val.length === 0) {
                  // Here, we choose to 'fail' not because this is a dreadful
                  // occurrence or something, but because this decision allows
                  // us to avoid running subsequent functions whose assumptions
                  // depend precisely on having found a task to run. If we were
                  // instead to 'stay' and wait for something to do, it would
                  // be much harder to tune Quanah externally.
-                    evt.fail('Nothing to do ...');
+                    return temp_evt.fail('Nothing to do ...');
                 } else {
                     task.key = temp.val[0];
                     evt.exit();
@@ -1372,7 +1376,7 @@
              // use a disposable avar ('temp') to stand for 'x' and assign the
              // appropriate value of 'f' as an 'onready' handler which can run
              // remotely if 'f' and 'x' were distributable to begin with :-)
-                var temp = avar({val: x.val});
+                var temp = avar({key: x.key, val: x.val});
                 temp.onerror = function (message) {
                  // This function sends the 'message' along to 'f' and 'x'.
                     return evt.fail(message);

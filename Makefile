@@ -14,7 +14,7 @@ ALLJS   :=  $(call available, $(sort $(JS)))
 USEJS   :=  $(strip $(call contingent, $(JS)))
 JSLIBS  :=  libs.js
 QUANAH  :=  src/quanah.js
-SRCJS   :=  $(JSLIBS) $(QUANAH) tests/demo.js
+SRCJS   :=  $(JSLIBS) $(QUANAH) $(wildcard tests/*.js)
 EXEJS   :=  main.js
 HTML    :=  index.html
 

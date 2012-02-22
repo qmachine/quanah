@@ -101,7 +101,7 @@
              // Here, we're going to crash an avar deliberately to see if
              // Quanah can handle it. The twist, of course, is that we won't
              // define the 'onerror' handler beforehand.
-                return evt.fail('Oops.');
+                return evt.fail('deliberate oops');
             };
             x.onerror = function (message) {
              // This function needs documentation.
@@ -276,7 +276,7 @@
             }).Q(function (evt) {
              // This function needs documentation.
                 if (isNaN(this.val) === false) {
-                    return evt.fail('Oops again!');
+                    return evt.fail('deliberate oops (again)');
                 }
                 return evt.exit();
             }).onerror = function (message) {

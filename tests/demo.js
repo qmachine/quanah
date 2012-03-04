@@ -6,9 +6,9 @@
 //  be triggered by simply invoking 'x.comm()' for some avar 'x'. It may be
 //  useful to take advantage of this new "hack" in this program.
 //
-//                                                      ~~ (c) SRW, 15 Feb 2012
+//                                                      ~~ (c) SRW, 03 Mar 2012
 
-(function () {
+(function (global) {
     'use strict';
 
  // Pragmas
@@ -23,7 +23,7 @@
 
  // Declarations
 
-    var Q, avar, demos, global, ply, puts, when;
+    var Q, avar, demos, ply, puts, when;
 
  // Definitions
 
@@ -327,8 +327,6 @@
 
     ];
 
-    global = Q.global;
-
     ply = function () {
      // This function is a generalized "zippered" iterator that also works
      // extremely well for key-value pairs, and it serves as the "fallback"
@@ -500,6 +498,14 @@
 
     return;
 
-}());
+}(Function.prototype.call.call(function (outer_scope) {
+    'use strict';
+    /*jslint indent: 4, maxlen: 80 */
+    /*global global: true */
+    if (this === null) {
+        return (typeof global === 'object') ? global : outer_scope;
+    }
+    return (typeof this.global === 'object') ? this.global : this;
+}, null, this)));
 
 //- vim:set syntax=javascript:

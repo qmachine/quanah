@@ -323,6 +323,40 @@
                 return evt.exit();
             };
             return;
+        },
+
+        function () {
+         // This function corresponds to 'demos[9]'.
+            var f, x;
+            f = avar({
+                val: function (evt) {
+                 // This function needs documentation.
+                    puts('AFunc?');
+                    return evt.exit();
+                }
+            });
+            x = avar({val: Math.PI});
+            f.onerror = x.onerror = function (message) {
+             // This function needs documentation.
+                puts('Error:', message);
+                return;
+            };
+            f.onready = function (evt) {
+             // This function needs documentation.
+                f.val = function (evt) {
+                 // This function needs documentation.
+                    puts('[afunc]:', this);
+                    return evt.exit();
+                };
+                return evt.exit();
+            };
+            x.onready = f;
+            f.onready = function (evt) {
+             // This function needs documentation.
+                puts('Demo 9 is finished.');
+                return evt.exit();
+            };
+            return;
         }
 
     ];

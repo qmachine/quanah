@@ -262,7 +262,7 @@
 
     (function () {
 
-        var demo, disp, sum, x;
+        var demo, disp, sum;
 
         demo = function (obj) {
          // This function needs documentation.
@@ -298,41 +298,9 @@
             return a + b;
         });
 
-        x = avar({val: [1, 2, 3, 4, 5]});
-
-        x.onerror = function (message) {
-         // This function needs documentation.
-            puts('Error:', message);
-            return;
-        };
-
-        x.onready = function (evt) {
-         // This function needs documentation.
-            puts('Running "ply" demo ...');
-            return evt.exit();
-        };
-
-        x.onready = ply(function (key, val) {
-         // This function needs documentation.
-            puts(key, val);
-            return;
-        });
-
-        when(x).isready = ply(function (key, val) {
-         // This function needs documentation.
-            puts('when', key, val);
-            return;
-        });
-
         demo({val: [1, 2, 3, 4, 5]});
 
         demo({val: {a: 5, b: 6, c: 7, d: 8}});
-
-        x.onready = function (evt) {
-         // This function needs documentation.
-            puts('Done with "ply" demo.');
-            return evt.exit();
-        };
 
         return;
 

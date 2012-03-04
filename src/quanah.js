@@ -17,10 +17,12 @@
 //
 //  To-do list:
 //
-//  -   add support for 'x.onready = f' when 'f' is an avar
+//  -   add definitions for the new avar "methods" 'map', 'ply', and 'reduce'
+//  -   enable 'when(x).isready = f' for avars f
 //  -   remove type-checks in user-unreachable functions where appropriate
 //  -   replace 'throw' statements with 'fail' statements for robustness
 //  -   rewrite 'onready' assignments as 'comm' invocations (optional)
+//  -   rewrite 'remote_call' in terms of a single avar to be like 'volunteer'
 //
 //  Open questions:
 //
@@ -30,7 +32,7 @@
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.
 //
-//                                                      ~~ (c) SRW, 03 Mar 2012
+//                                                      ~~ (c) SRW, 04 Mar 2012
 
 (function (global) {
     'use strict';
@@ -133,8 +135,9 @@
              // messages it receives to 'comm' along with the internal 'state'
              // of the avar that received the message. We "hide" this method
              // by making it non-enumerable so that avars can be serialized,
-             // and unfortunately this means we have to require ECMAScript 5
-             // metaprogramming features in order to support remote execution.
+             // and unfortunately this means that old JavaScript engines that
+             // lack support for ECMAScript 5 metaprogramming cannot execute
+             // code remotely.
                 comm.call(this, state, obj);
                 return;
             }
@@ -288,6 +291,15 @@
                     if (inside.ready === true) {
                         x.comm({done: [], secret: secret});
                     }
+                } else if (args[0] instanceof AVar) {
+                    when(args[0], x).areready = function (evt) {
+                     // This function needs documentation.
+                        var f, x;
+                        f = this.val[0].val;
+                        x = this.val[1];
+                        f.call(x, evt);
+                        return;
+                    };
                 } else {
                     x.comm({
                         fail: 'Assigned value must be a function',

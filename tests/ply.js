@@ -18,7 +18,7 @@
 
  // Declarations
 
-    var Q, avar, global, isArrayLike, map, ply, puts, reduce, when;
+    var Q, avar, global, isArrayLike, map, ply, puts, when;
 
  // Definitions
 
@@ -54,24 +54,19 @@
              // This function needs documentation.
                 return evt.fail(message);
             };
-            y.onready = ply(function (key, val, evt) {
+            y.onready = ply(function (key, val) {
              // This function needs documentation.
-                var temp = avar({val: {f: f, x: val}});
-                temp.onerror = function (message) {
-                 // This function needs documentation.
-                    return evt.fail(message);
-                };
-                temp.onready = function (evt) {
-                 // This function needs documentation.
-                    this.val.y = this.val.f(this.val.x);
-                    return evt.exit();
-                };
-                temp.onready = function (temp_evt) {
-                 // This function needs documentation.
-                    x.val[key] = this.val.y;
-                    temp_evt.exit();
-                    return evt.exit();
-                };
+                y.val[key] = {f: f, x: val};
+                return;
+            });
+            y.onready = ply(function (key, val) {
+             // This function needs documentation.
+                val.y = val.f(val.x);
+                return;
+            });
+            y.onready = ply(function (key, val) {
+             // This function needs documentation.
+                x.val[key] = val.y;
                 return;
             });
             y.onready = function (y_evt) {
@@ -97,8 +92,8 @@
                 };
                 temp.onready = function (evt) {
                  // This function needs documentation.
-                    this.val.f(this.val.key, this.val.val, evt);
-                    return;
+                    this.val.f(this.val.key, this.val.val);
+                    return evt.exit();
                 };
                 return temp;
             };
@@ -189,15 +184,6 @@
         return;
     };
 
-    reduce = function (f) {
-     // This function needs documentation.
-        return function (evt) {
-         // This function needs documentation.
-            // ...
-            return evt.exit();
-        };
-    };
-
     when = Q.when;
 
  // Demonstrations
@@ -241,11 +227,6 @@
             return evt.exit();
         };
 
-        sum = reduce(function (a, b) {
-         // This function needs documentation.
-            return a + b;
-        });
-
         x = avar({val: [1, 2, 3, 4, 5]});
 
         x.onerror = function (message) {
@@ -260,16 +241,16 @@
             return evt.exit();
         };
 
-        x.onready = ply(function (key, val, evt) {
+        x.onready = ply(function (key, val) {
          // This function needs documentation.
             puts(key, val);
-            return evt.exit();
+            return;
         });
 
-        when(x).isready = ply(function (key, val, evt) {
+        when(x).isready = ply(function (key, val) {
          // This function needs documentation.
             puts('when', key, val);
-            return evt.exit();
+            return;
         });
 
         demo({val: [1, 2, 3, 4, 5]});

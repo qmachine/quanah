@@ -500,6 +500,7 @@
 
 }(Function.prototype.call.call(function (outer_scope) {
     'use strict';
+ // See the bottom of "quanah.js" for documentation.
     /*jslint indent: 4, maxlen: 80 */
     /*global global: true */
     if (this === null) {

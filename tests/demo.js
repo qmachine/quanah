@@ -6,7 +6,7 @@
 //  be triggered by simply invoking 'x.comm()' for some avar 'x'. It may be
 //  useful to take advantage of this new "hack" in this program.
 //
-//                                                      ~~ (c) SRW, 03 Mar 2012
+//                                                      ~~ (c) SRW, 07 Mar 2012
 
 (function (global) {
     'use strict';
@@ -327,7 +327,7 @@
 
         function () {
          // This function corresponds to 'demos[9]'.
-            var f, x;
+            var f, x, y;
             f = avar({
                 val: function (evt) {
                  // This function needs documentation.
@@ -336,7 +336,8 @@
                 }
             });
             x = avar({val: Math.PI});
-            f.onerror = x.onerror = function (message) {
+            y = avar({val: [5, 6, 7, 8]});
+            f.onerror = x.onerror = y.onerror = function (message) {
              // This function needs documentation.
                 puts('Error:', message);
                 return;
@@ -350,7 +351,9 @@
                 };
                 return evt.exit();
             };
-            x.onready = f;
+            x.onready = y.onready = f;
+            when(x).isready = when(y).isready = f;
+            when(x, y).areready = f;
             f.onready = function (evt) {
              // This function needs documentation.
                 puts('Demo 9 is finished.');

@@ -1,11 +1,6 @@
 //- JavaScript source code
 
 //- demo.js ~~
-//
-//  NOTE: Thanks to recent updates in Quanah's 'comm' function, a 'revive' can
-//  be triggered by simply invoking 'x.comm()' for some avar 'x'. It may be
-//  useful to take advantage of this new "hack" in this program.
-//
 //                                                      ~~ (c) SRW, 07 Mar 2012
 
 (function (global) {
@@ -23,7 +18,7 @@
 
  // Declarations
 
-    var Q, avar, demos, ply, puts, when;
+    var Q, avar, demos, map, ply, reduce, puts, when;
 
  // Definitions
 
@@ -34,7 +29,7 @@
     demos = [
 
         function () {
-         // This function corresponds to demos[0].
+         // This function corresponds to 'demos[0]'.
             var x = avar({val: 2});
             x.onready = function (evt) {
              // This function needs documentation.
@@ -65,37 +60,7 @@
         },
 
         function () {
-         // This function corresponds to demos[1].
-            var map, x;
-            map = Q.generic();
-            map(Array, Function).def = function (x, f) {
-             // This function needs documentation.
-                var y = [];
-                ply(x).by(function (key, val) {
-                 // This function has a "map" pattern ==> 'ply' is justified.
-                    y[key] = f(val);
-                    return;
-                });
-                return y;
-            };
-            x = avar({val: [1, 2, 3, 4, 5]});
-            x.onready = function (evt) {
-             // This function needs documentation.
-                this.val = map(this.val, function (each) {
-                    return 3 * each;
-                });
-                return evt.exit();
-            };
-            x.onready = function (evt) {
-             // This function needs documentation.
-                puts(this);
-                return evt.exit();
-            };
-            return;
-        },
-
-        function () {
-         // This function corresponds to demos[2].
+         // This function corresponds to 'demos[1]'.
             var x = avar();
             x.onready = function (evt) {
              // Here, we're going to crash an avar deliberately to see if
@@ -117,7 +82,7 @@
         },
 
         function () {
-         // This function corresponds to demos[3].
+         // This function corresponds to 'demos[2]'.
             var x, y;
             x = avar({val: [1, 2, 3, 4, 5]});
             y = avar({val: [5, 6, 7]});
@@ -128,80 +93,18 @@
             };
             x.onerror = y.onerror = function (message) {
              // This function needs documentation.
-                puts(message);
+                puts('Error:', message);
                 return;
             };
             return;
         },
 
         function () {
-         // This function corresponds to demos[4].
-            var map, x, y;
-            map = function (x, f) {
-             // This function needs documentation.
-                var y = avar();
-                when(x, y).areready = function (evt) {
-                 // This function needs documentation.
-                    var temp = (x instanceof (y.constructor)) ? x.val : x;
-                    y.val = (temp instanceof Array) ? [] : {};
-                    return evt.exit();
-                };
-                when(x, y).areready = function (evt) {
-                 // This function needs documentation.
-                    var elements, index;
-                    elements = [];
-                    index = {};
-                    ply(x).by(function (key, val) {
-                     // This function needs documentation.
-                        var temp;
-                        temp = avar({val: val});
-                        temp.onerror = function (message) {
-                         // This function needs documentation.
-                            return evt.fail(message);
-                        };
-                        temp.onready = f;
-                        index[key] = (elements.push(temp) - 1);
-                        return;
-                    });
-                    when.apply(this, elements).onready = function (when_evt) {
-                     // This function needs documentation.
-                        ply(index).by(function (key, i) {
-                         // This function needs documentation.
-                            y.val[key] = elements[i].val;
-                            return;
-                        });
-                        when_evt.exit();
-                        return evt.exit();
-                    };
-                    return;
-                };
-                return y;
-            };
-            x = avar({val: [1, 2, 3, 4, 5]});
-            y = map(x, function (evt) {
-             // This function needs documentation.
-                this.val *= 3;
-                return evt.exit();
-            });
-            when(x, y).areready = function (evt) {
-             // This function needs documentation.
-                puts('map:', x, '-->', y);
-                return evt.exit();
-            };
-            y.onerror = function (message) {
-             // This function needs documentation.
-                puts('ERROR:', message);
-                return;
-            };
-            return;
-        },
-
-        function () {
-         // This function corresponds to demos[5].
+         // This function corresponds to 'demos[3]'.
             var x = avar({val: 0});
             x.onerror = function (message) {
              // This function needs documentation.
-                puts("D'oh! " + message);
+                puts('Error:', message);
                 return;
             };
             x.onready = function (evt) {
@@ -221,7 +124,7 @@
         },
 
         function () {
-         // This function corresponds to demos[6]. It tests the ability to
+         // This function corresponds to 'demos[4]'. It tests the ability to
          // store the result of a 'when' statement for repeated uses. It also
          // tests the ability to "nest" 'when' statements -- versions before
          // February 10 could not run this function correctly.
@@ -231,7 +134,7 @@
             z = when(x, y);
             x.onerror = y.onerror = z.onerror = function (message) {
              // This function needs documentation.
-                puts('ERROR:', message);
+                puts('Error:', message);
                 return;
             };
             z.onready = function (evt) {
@@ -258,7 +161,7 @@
         },
 
         function () {
-         // This function corresponds to demos[7]. It tests Quanah's ability
+         // This function corresponds to 'demos[5]'. It tests Quanah's ability
          // to chain a bunch of 'onready' handlers using Method Q and to end
          // the chain with an 'onerror' handler.
             (5).Q(function (evt) {
@@ -276,7 +179,7 @@
             }).Q(function (evt) {
              // This function needs documentation.
                 if (isNaN(this.val) === false) {
-                    return evt.fail('deliberate oops (again)');
+                    return evt.fail('deliberate oops (#2)');
                 }
                 return evt.exit();
             }).onerror = function (message) {
@@ -288,7 +191,7 @@
         },
 
         function () {
-         // This function corresponds to demos[8]. Currently, Quanah won't
+         // This function corresponds to 'demos[6]'. Currently, Quanah won't
          // allow you to assign an avar to an 'onready' handler, but it's not
          // hard to do -- I just need to move most of Method Q's code directly
          // into 'comm'. I haven't finished considering its consequences yet,
@@ -308,7 +211,7 @@
             };
             x.onerror = function (message) {
              // This function needs documentation.
-                puts('ERROR:', message);
+                puts('Error:', message);
                 return;
             };
             x.onready = function (evt) {
@@ -326,7 +229,7 @@
         },
 
         function () {
-         // This function corresponds to 'demos[9]'.
+         // This function corresponds to 'demos[7]'.
             var f, x, y;
             f = avar({
                 val: function (evt) {
@@ -360,9 +263,36 @@
                 return evt.exit();
             };
             return;
+        },
+
+        function () {
+         // This function corresponds to 'demos[8]'.
+            var sum, triple, x;
+            sum = reduce(function (a, b) {
+             // This function needs documentation.
+                return a + b;
+            });
+            triple = map(function (each) {
+             // This function needs documentation.
+                return 3 * each;
+            });
+            x = ([5, 6, 7, 8]).Q(triple).Q(sum);
+            x.onerror = function (message) {
+             // This function needs documentation.
+                puts('Error:', message);
+                return;
+            };
+            when(x).isready = function (evt) {
+             // This function needs documentation.
+                puts(this.val[0].val);
+                return evt.exit();
+            };
+            return;
         }
 
     ];
+
+    map = Q.map;
 
     ply = function () {
      // This function is a generalized "zippered" iterator that also works
@@ -466,6 +396,8 @@
         return;
     };
 
+    reduce = Q.reduce;
+
     when = Q.when;
 
  // Out-of-scope definitions ("exports")
@@ -478,7 +410,7 @@
 
         var excludes, i, n;
 
-        excludes = [1, 5, 8];
+        excludes = [3, 6];
 
         n = demos.length;
 

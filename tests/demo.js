@@ -288,6 +288,34 @@
                 return evt.exit();
             };
             return;
+        },
+
+        function () {
+         // This function corresponds to 'demo[9]'. This one is NASTY!
+            (10).Q(function countdown(evt) {
+             // This function needs documentation.
+                var x = (this.hasOwnProperty('isready')) ? this.val[0] : this;
+                if (x.val <= 0) {
+                    x.val = 'Blastoff!';
+                    return evt.exit();
+                }
+                (x.val - 1).Q(countdown).Q(function (temp_evt) {
+                 // This function needs documentation.
+                    x.val += (' ... ' + this.val);
+                    temp_evt.exit();
+                    return evt.exit();
+                }).onerror = evt.fail;
+                return;
+            }).Q(function (evt) {
+             // This function needs documentation.
+                puts(this);
+                return evt.exit();
+            }).onerror = function (message) {
+             // This function needs documentation.
+                puts('Error:', message);
+                return;
+            };
+            return;
         }
 
     ];

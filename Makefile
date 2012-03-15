@@ -188,7 +188,7 @@ json2.js:
             if [ -f $(CODEBANK)/lib/JavaScript/json2.js ]; then             \
                 $(CP) $(CODEBANK)/lib/JavaScript/json2.js $@            ;   \
             else                                                            \
-                $(CURL) -o $@ $${CROCKFORD}/JSON-js/master/json2.js     ;   \
+                $(CURL) -o $@ $${CROCKHUB}/JSON-js/master/json2.js      ;   \
             fi 
 
 ###

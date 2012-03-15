@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for testing JavaScript programs :-)
 #
-#                                                       ~~ (c) SRW, 15 Feb 2012
+#                                                       ~~ (c) SRW, 15 Mar 2012
 
 include ./tools/macros.make
 

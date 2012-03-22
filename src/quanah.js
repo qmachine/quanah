@@ -1641,8 +1641,8 @@
 
     }
 
-     // Strict mode isn't supported in this environment, but we still need to
-     // make sure we don't get fooled by Rhino's 'global' function.
+ // Strict mode isn't supported in this environment, but we need to make sure
+ // we don't get fooled by Rhino's 'global' function.
 
     return (typeof this.global === 'object') ? this.global : this;
 

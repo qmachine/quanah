@@ -1,7 +1,7 @@
 //- JavaScript source code
 
 //- demo.js ~~
-//                                                      ~~ (c) SRW, 07 Mar 2012
+//                                                      ~~ (c) SRW, 22 Mar 2012
 
 (function (global) {
     'use strict';
@@ -486,6 +486,10 @@
         global.demo();
 
     } else if (global.hasOwnProperty('system')) {
+
+        global.demo();
+
+    } else if (global.location.protocol === 'file:') {
 
         global.demo();
 

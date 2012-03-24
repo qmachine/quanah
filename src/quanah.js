@@ -30,7 +30,7 @@
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.
 //
-//                                                      ~~ (c) SRW, 22 Mar 2012
+//                                                      ~~ (c) SRW, 24 Mar 2012
 
 (function (global) {
     'use strict';
@@ -1606,7 +1606,7 @@
 
     return;
 
-}(Function.prototype.call.call(function (outer_scope) {
+}(Function.prototype.call.call(function (that) {
     'use strict';
 
  // This strict anonymous closure encapsulates the logic for detecting which
@@ -1637,7 +1637,7 @@
 
      // Strict mode has captured us, but we already passed a reference :-)
 
-        return (typeof global === 'object') ? global : outer_scope;
+        return (typeof global === 'object') ? global : that;
 
     }
 

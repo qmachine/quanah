@@ -1579,12 +1579,12 @@
 
     (function () {
 
-     // This function constructs a temporary 'namespace' object and then
-     // copies its methods and properties onto Method Q for "export".
+     // This function constructs a temporary "namespace" object 'obj' and
+     // then copies its methods and properties onto Method Q for "export".
 
-        var namespace;
+        var obj;
 
-        namespace = {
+        obj = {
             avar:       avar,
             init:       init,
             map:        dmap,
@@ -1595,10 +1595,10 @@
             when:       when
         };
 
-        ply(namespace).by(function (key, val) {
-         // This function copies the methods and properties of 'namespace'
-         // onto Method Q as a simple means for "export". Because order is
-         // not important, the use of 'ply' here is justified.
+        ply(obj).by(function (key, val) {
+         // This function copies the methods and properties of 'obj' onto
+         // Method Q as a simple means for "export". Because order is not
+         // important, the use of 'ply' here is justified.
             defineProperty(Object.prototype.Q, key, {
                 configurable: false,
                 enumerable: true,

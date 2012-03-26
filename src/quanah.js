@@ -213,28 +213,25 @@
     comm = function (inside, outside) {
      // This function provides a simple messaging system for avars that uses
      // mutual closure over the 'secret' variable to restrict access to each
-     // avar's private state. This function could easily use a test such as
-     //
-     //     if ((outside instanceof Object) === false) {
-     //         this.comm({fail: ..., secret: secret});
-     //         return;
-     //     }
-     //
-     // but I have chosen not to use one because 'ply' will handle any input
-     // anyway, and unless certain flags are present, only 'revive' runs. 
-        var args, message, special, x;
+     // avar's private state. I don't use 'ply' inside this function anymore
+     // because this function is called so frequently and edited so rarely
+     // that the convenience/performance tradeoff now favors performance.
+        var args, key, message, special, x;
         special = false;
         x = this;
-        ply(outside).by(function (key, val) {
-         // This function has a "forEach" pattern ==> 'ply' is justified.
-            if ((key === 'secret') && (val === secret)) {
-                special = true;
-            } else {
-                message = key;
-                args = [].concat(val);
+        if (outside instanceof Object) {
+         // First, we need to inspect the object.
+            for (key in outside) {
+                if (outside.hasOwnProperty(key)) {
+                    if ((key === 'secret') && (outside[key] === secret)) {
+                        special = true;
+                    } else {
+                        message = key;
+                        args = [].concat(outside[key]);
+                    }
+                }
             }
-            return;
-        });
+        }
         if (special === true) {
             switch (message) {
             case 'done':
@@ -244,10 +241,7 @@
                 inside.ready = true;
                 if (inside.queue.length > 0) {
                     inside.ready = false;
-                    stack.unshift({
-                        f: inside.queue.shift(),
-                        x: x
-                    });
+                    stack.unshift({f: inside.queue.shift(), x: x});
                 }
                 break;
             case 'fail':
@@ -293,11 +287,15 @@
             case 'set_onready':
              // A computation has defined an 'onready' handler for this avar,
              // and to avoid overwriting the current handler, we will push it
-             // onto the avar's individual queue and re-trigger execution.
+             // onto the avar's individual queue and re-trigger execution. I
+             // used to send a 'done' message recursively if appropriate, but
+             // that strategy requires a _lot_ of overhead and is only one
+             // line shorter than re-triggering execution directly.
                 if (isFunction(args[0])) {
                     inside.queue.push(args[0]);
                     if (inside.ready === true) {
-                        x.comm({done: [], secret: secret});
+                        inside.ready = false;
+                        stack.unshift({f: inside.queue.shift(), x: x});
                     }
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
@@ -772,8 +770,7 @@
              // without affecting the execution of computations :-)
                 exit: function (message) {
                  // This function indicates successful completion.
-                    obj.x.comm({done: message, secret: secret});
-                    return;
+                    return obj.x.comm({done: message, secret: secret});
                 },
                 fail: function (message) {
                  // This function indicates a failure, and it is intended to
@@ -788,8 +785,7 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace 'throw' with 'fail' in
                  // their programs to solve the remote error capture problem.
-                    obj.x.comm({fail: message, secret: secret});
-                    return;
+                    return obj.x.comm({fail: message, secret: secret});
                 },
                 stay: function (message) {
                  // This function allows a user to postpone execution, and it
@@ -804,9 +800,8 @@
                  // longer answer, you'll have to wait for my upcoming papers
                  // that explain why leaving execution guarantees to chance is
                  // perfectly acceptable when the probability approachs 1 :-)
-                    obj.x.comm({stay: message, secret: secret});
                     stack.push(obj);
-                    return;
+                    return obj.x.comm({stay: message, secret: secret});
                 }
             };
          // After all the setup, the actual invocation is anticlimactic ;-)
@@ -1133,23 +1128,12 @@
     };
 
     uuid = function () {
-     // This function generates random hexadecimal UUIDs of length 32.
-        var y = Math.random().toString(16);
-        if (y.length === 1) {
-         // This arm shouldn't ever be used in JavaScript, but the Tamarin
-         // environment has some weird quirks that derive from ActionScript.
-         // I'll remove this when I confirm that Quanah cannot support AS.
-            y = '';
-            while (y.length < 32) {
-                y += (Math.random() * 1e16).toString(16);
-            }
-            y = y.slice(0, 32);
-        } else {
-         // Every JavaScript implementation I have tried chooses this arm.
-            y = y.slice(2, 32);
-            while (y.length < 32) {
-                y += Math.random().toString(16).slice(2, 34 - y.length);
-            }
+     // This function generates random hexadecimal UUIDs of length 32. It will
+     // not work correctly in ActionScript, but I have written such a function
+     // before and will include it again here if ever it is needed.
+        var y = '';
+        while (y.length < 32) {
+            y += Math.random().toString(16).slice(2, 34 - y.length);
         }
         return y;
     };
@@ -1418,8 +1402,7 @@
                     }
                     return;
                 });
-                y.comm({set_onready: g, secret: secret});
-                return;
+                return y.comm({set_onready: g, secret: secret});
             }
         });
         defineProperty(y, ((args.length < 2) ? 'is' : 'are') + 'ready', {
@@ -1458,8 +1441,7 @@
          // that it can be stored as a handler for 'this.onerror'. We don't
          // actually need to use 'isFunction' because if it's not a function,
          // it will never run anyway -- see the 'comm' definition.
-            this.comm({set_onerror: f, secret: secret});
-            return;
+            return this.comm({set_onerror: f, secret: secret});
         }
     });
 
@@ -1481,8 +1463,7 @@
          // the 'comm' definition. Because there's only one place in the code
          // that can manipulate an avar's queue, assumptions about that queue
          // should be located as near there as possible to avoid oversight.
-            this.comm({set_onready: f, secret: secret});
-            return;
+            return this.comm({set_onready: f, secret: secret});
         }
     });
 
@@ -1497,10 +1478,7 @@
          // Thus, providing this function allows Quanah to use its own format
          // for serialization without making it impossibly hard for users to
          // implement the abstract filesystem routines.
-            return JSON.parse(serialize({
-                key: this.key,
-                val: this.val
-            }));
+            return JSON.parse(serialize({key: this.key, val: this.val}));
         }
     });
 

@@ -25,12 +25,22 @@
 //  Open questions:
 //
 //  -   Can Quanah return a remotely distributed memoized function?
-//  -   Could Quanah actually support ActionScript?
 //  -   Can users' own JSLINT pragmas circumvent the 'isClosed' function?
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.
 //
-//                                                      ~~ (c) SRW, 24 Mar 2012
+//  Recently solved:
+//
+//  ->  Q:  Could Quanah actually support ActionScript?
+//      A:  Yes, but probably not without a pretty significant amount of work.
+//          I had conjectured it would be easy, since replacing
+//              x.onready = f;
+//          with
+//              x.comm({secret: secret, set_onready: f});
+//          is pretty trivial, but I had overlooked the fact that the AVar
+//          prototype definitions use ES5 getters and setters, too.
+//
+//                                                      ~~ (c) SRW, 25 Mar 2012
 
 (function (global) {
     'use strict';
@@ -128,7 +138,7 @@
             configurable: false,
             enumerable: false,
             writable: false,
-            value: function (obj) {
+            value: function (message) {
              // This function is a "hidden" instance method that forwards the
              // messages it receives to 'comm' along with the internal 'state'
              // of the avar that received the message. We "hide" this method
@@ -136,7 +146,7 @@
              // and unfortunately this means that old JavaScript engines that
              // lack support for ECMAScript 5 metaprogramming cannot execute
              // code remotely.
-                comm.call(this, state, obj);
+                comm.call(this, state, message);
                 return;
             }
         });

@@ -40,7 +40,7 @@
 //          is pretty trivial, but I had overlooked the fact that the AVar
 //          prototype definitions use ES5 getters and setters, too.
 //
-//                                                      ~~ (c) SRW, 25 Mar 2012
+//                                                      ~~ (c) SRW, 26 Mar 2012
 
 (function (global) {
     'use strict';
@@ -146,7 +146,7 @@
              // and unfortunately this means that old JavaScript engines that
              // lack support for ECMAScript 5 metaprogramming cannot execute
              // code remotely.
-                comm.call(this, state, message);
+                comm.call(that, state, message);
                 return;
             }
         });

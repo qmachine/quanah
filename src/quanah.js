@@ -116,7 +116,7 @@
         return atob(input);
     };
 
-    AVar = function AVar(obj) {
+    AVar = function AVar(spec) {
      // This function is a constructor for the fundamental building block of
      // Quanah itself -- the AVar "type". An avar has its own mutable 'key' and
      // 'val' properties as well as an immutable 'comm' method for simple
@@ -150,20 +150,25 @@
                 return;
             }
         });
-        if ((obj !== null) && (obj !== undefined)) {
-            that.key = (obj.hasOwnProperty('key')) ? obj.key : uuid();
-            that.val = (obj.hasOwnProperty('val')) ? obj.val : null;
-        } else {
+        if ((spec === null) || (spec === undefined)) {
             that.key = uuid();
             that.val = null;
+        } else if ((typeof spec === 'string') || (spec instanceof String)) {
+            that.tmp = deserialize(spec);
+            that.key = that.tmp.key;
+            that.val = that.tmp.val;
+            delete that.tmp;
+        } else {
+            that.key = (spec.hasOwnProperty('key')) ? spec.key : uuid();
+            that.val = (spec.hasOwnProperty('val')) ? spec.val : null;
         }
         return that;
     };
 
-    avar = function (obj) {
+    avar = function (spec) {
      // This function enables the user to avoid the 'new' keyword, which is
      // useful because OOP in JS is not typically well-understood by users.
-        return new AVar(obj);
+        return new AVar(spec);
     };
 
     btoa = function () {
@@ -335,8 +340,7 @@
      // prevent a situation in which the progression through a non-empty queue
      // halts because no events remain to trigger execution. Another advantage
      // is that I can externally trigger a 'revive' by invoking 'x.comm()'.
-        revive();
-        return;
+        return revive();
     };
 
     defineProperty = function (obj, name, params) {
@@ -615,8 +619,7 @@
             }
             return;
         });
-        revive();
-        return;
+        return revive();
     };
 
     isArrayLike = function (x) {
@@ -800,8 +803,14 @@
                  // longer answer, you'll have to wait for my upcoming papers
                  // that explain why leaving execution guarantees to chance is
                  // perfectly acceptable when the probability approachs 1 :-)
+                 //
+                 // NOTE: Don't push back onto the stack until _after_ you send
+                 // the 'stay' message. Invoking 'comm' also invokes 'revive',
+                 // which consequently exhausts the recursion stack depth limit
+                 // immediately if there's only one task to be run.
+                    obj.x.comm({stay: message, secret: secret});
                     stack.push(obj);
-                    return obj.x.comm({stay: message, secret: secret});
+                    return;
                 }
             };
          // After all the setup, the actual invocation is anticlimactic ;-)
@@ -920,14 +929,13 @@
                 temp.onready = function (temp_evt) {
                  // This function analyzes the results of the 'read' operation
                  // to determine if the 'task' computation is ready to proceed.
-                    var val = deserialize(temp.val).val;
-                    switch (val.status) {
+                    switch (temp.val.status) {
                     case 'done':
-                        task.val = val;
+                        task.val = temp.val;
                         evt.exit();
                         break;
                     case 'failed':
-                        evt.fail(val.epitaph);
+                        evt.fail(temp.val.epitaph);
                         break;
                     default:
                         evt.stay('Waiting for results ...');
@@ -1099,7 +1107,7 @@
         };
         temp.onready = function (temp_evt) {
          // Here, we copy the remote representation into the local one.
-            local.val = deserialize(temp.val).val;
+            local.val = temp.val;
             temp_evt.exit();
             return evt.exit();
         };
@@ -1114,7 +1122,7 @@
         if (sys.write === null) {
             return evt.stay('Waiting for a "write" definition ...');
         }
-        var temp = sys.write(this.key, serialize(this));
+        var temp = sys.write(this.key, this.val);
         temp.onerror = function (message) {
          // This tells the local avar ('this') that something has gone awry.
             return evt.fail(message);
@@ -1333,8 +1341,7 @@
                     if (n === 0) {
                         ready = true;
                     }
-                    revive();
-                    return;
+                    return revive();
                 };
                 egress = [];
                 g = function (evt) {

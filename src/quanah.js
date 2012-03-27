@@ -1243,6 +1243,7 @@
                 f.val.call(x, evt);
                 return;
             };
+/*
             when(f, x).areready = function (evt) {
              // This function checks 'f' and 'x' using 'isClosed' to ensure
              // that the results it returns to the invoking machine are the
@@ -1251,11 +1252,12 @@
              // of the results to the invoking machine. I will work more on
              // this part soon, because I want the invoking machine to respond
              // to this message by executing the "offending" task itself.
-                if (isClosed(f) || isClosed(x)) {
+                if (isClosed(f.val) || isClosed(x.val)) {
                     return evt.fail('Results were not serializable.');
                 }
                 return evt.exit();
             };
+*/
             f.onready = x.onready = update_remote;
             when(f, x).areready = function (temp_evt) {
              // This function needs documentation.
@@ -1511,7 +1513,7 @@
          // Thus, providing this function allows Quanah to use its own format
          // for serialization without making it impossibly hard for users to
          // implement the abstract filesystem routines.
-            return JSON.parse(serialize(this));
+            return JSON.parse(serialize({key: this.key, val: this.val}));
         }
     });
 

@@ -24,12 +24,24 @@
 //
 //  Open questions:
 //
-//  -   Can Quanah return a remotely distributed memoized function?
 //  -   Can users' own JSLINT pragmas circumvent the 'isClosed' function?
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.
 //
 //  Recently solved:
+//
+//  ->  Q:  Can Quanah return remotely distributed memoized functions?
+//      A:  Yes, but only for a subset. It is, in fact, possible to construct
+//          serializable functions that, after transformations are applied on
+//          a remote machine, can no longer be serialized.
+//
+//              function f(x) {
+//                  var cache = {};
+//                  f.g = function (x) {
+//                      return cache;
+//                  };
+//                  return;
+//              }
 //
 //  ->  Q:  Could Quanah actually support ActionScript?
 //      A:  Yes, but probably not without a pretty significant amount of work.
@@ -38,9 +50,10 @@
 //          with
 //              x.comm({secret: secret, set_onready: f});
 //          is pretty trivial, but I had overlooked the fact that the AVar
-//          prototype definitions use ES5 getters and setters, too.
+//          prototype definitions use ES5 getters and setters, too. I would
+//          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 26 Mar 2012
+//                                                      ~~ (c) SRW, 27 Mar 2012
 
 (function (global) {
     'use strict';
@@ -1036,7 +1049,6 @@
      // problem, but if I do, I will follow the post at http://goo.gl/cciXV.
         return JSON.stringify(x, function replacer(key, val) {
             var obj, $val;
-            obj = {};
             if (isFunction(val)) {
              // If the input argument 'x' was actually a function, we have to
              // perform two steps to serialize the function because functions
@@ -1047,6 +1059,7 @@
              // that must be preserved as source code also. (We can assume that
              // scope need not be preserved because 'serialize' is only called
              // when 'isClosed' returns 'false'.)
+                obj = {};
                 $val = '[FUNCTION ';
                 if (isFunction(val.toJSON)) {
                     $val += btoa(val.toJSON());
@@ -1064,9 +1077,9 @@
                  // This function copies methods and properties from the
                  // function stored in 'val' onto an object 'obj' so they can
                  // be serialized separately from the function itself, but it
-                 // only transfers the ones a function wouldn't normally have.
-                 // As comparison, we reuse this function itself for reference.
-                 // Because order isn't important, use of 'ply' is justified.
+                 // only transfers the ones a function wouldn't normally have,
+                 // using this function ('f') itself as a reference. Because
+                 // order isn't important, the use of 'ply' is justified here.
                     if (f.hasOwnProperty(key) === false) {
                         obj[key] = val;
                     }
@@ -1229,6 +1242,19 @@
              // This function needs documentation.
                 f.val.call(x, evt);
                 return;
+            };
+            when(f, x).areready = function (evt) {
+             // This function checks 'f' and 'x' using 'isClosed' to ensure
+             // that the results it returns to the invoking machine are the
+             // same as the results it computed. Specifically, if the results
+             // are not serializable, we cannot return a true representation
+             // of the results to the invoking machine. I will work more on
+             // this part soon, because I want the invoking machine to respond
+             // to this message by executing the "offending" task itself.
+                if (isClosed(f) || isClosed(x)) {
+                    return evt.fail('Results were not serializable.');
+                }
+                return evt.exit();
             };
             f.onready = x.onready = update_remote;
             when(f, x).areready = function (temp_evt) {
@@ -1485,7 +1511,7 @@
          // Thus, providing this function allows Quanah to use its own format
          // for serialization without making it impossibly hard for users to
          // implement the abstract filesystem routines.
-            return JSON.parse(serialize({key: this.key, val: this.val}));
+            return JSON.parse(serialize(this));
         }
     });
 

@@ -367,7 +367,7 @@
                      // could occur, that JavaScript implementation would have
                      // had a native 'Object.defineProperty' anyway :-P
                         delete obj[name];
-                        obj[name] = params[key];
+                        obj[name] = val;
                         break;
                     default:
                      // This arm matches ES5 property attributes ...

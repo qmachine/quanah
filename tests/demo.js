@@ -1,7 +1,7 @@
 //- JavaScript source code
 
 //- demo.js ~~
-//                                                      ~~ (c) SRW, 22 Mar 2012
+//                                                      ~~ (c) SRW, 26 Mar 2012
 
 (function (global) {
     'use strict';
@@ -395,7 +395,8 @@
                 return;
             };
         } else if (hOP(global, 'print') && isFunction(global.print)) {
-         // JavaScriptCore, Rhino, Spidermonkey (==> 'couchjs' also), D8/V8
+         // JavaScriptCore, Rhino, Spidermonkey (==> 'couchjs' also), D8/V8,
+         // and 'mongo' (the interactive shell for MongoDB)
             puts = function () {
                 global.print(join.call(arguments, ' '));
                 return;

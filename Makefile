@@ -4,12 +4,12 @@
 #
 #   This contains live instructions for testing JavaScript programs :-)
 #
-#                                                       ~~ (c) SRW, 15 Mar 2012
+#                                                       ~~ (c) SRW, 26 Mar 2012
 
 include ./tools/macros.make
 
 JS      :=  v8 js jsc d8 node nodejs narwhal-jsc rhino ringo narwhal    \
-                couchjs phantomjs #avmshell
+                couchjs phantomjs js-1.8.0 #avmshell
 ALLJS   :=  $(call available, $(sort $(JS)))
 USEJS   :=  $(strip $(call contingent, $(JS)))
 JSLIBS  :=  libs.js

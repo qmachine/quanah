@@ -30,7 +30,7 @@
 //
 //  Recently solved:
 //
-//  ->  Q:  Can Quanah return remotely distributed memoized functions?
+//  ->  Q:  Can Quanah return remotely distributed [memoized] functions?
 //      A:  Yes, but only for a subset. It is, in fact, possible to construct
 //          serializable functions that, after transformations are applied on
 //          a remote machine, can no longer be serialized.
@@ -40,7 +40,7 @@
 //                  f.g = function (x) {
 //                      return cache;
 //                  };
-//                  return;
+//                  return f.g(x);
 //              }
 //
 //  ->  Q:  Could Quanah actually support ActionScript?
@@ -53,7 +53,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 27 Mar 2012
+//                                                      ~~ (c) SRW, 29 Mar 2012
 
 (function (global) {
     'use strict';
@@ -312,9 +312,14 @@
                 if (isFunction(args[0])) {
                     inside.queue.push(args[0]);
                     if (inside.ready === true) {
+                        x.comm({done: [], secret: secret});
+                    }
+/*
+                    if (inside.ready === true) {
                         inside.ready = false;
                         stack.unshift({f: inside.queue.shift(), x: x});
                     }
+*/
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
                      // This function needs documentation.
@@ -333,10 +338,12 @@
                 break;
             case 'stay':
              // A computation that depends on this avar has been postponed,
-             // and we will set its 'ready' property to 'true' so we can try
-             // again during the next trip through 'revive'. Note that we will
-             // not touch the avar's individual queue.
-                inside.ready = true;
+             // but that computation will be put back into the stack directly
+             // by 'local_call'. Thus, nothing actually needs to happen here;
+             // we just need to wait. For consistency with 'exit' and 'fail',
+             // I allow 'stay' to take a message argument, but right now it
+             // doesn't actually do anything. In the future, however, I may
+             // enable a verbose mode for debugging that outputs the message.
                 break;
             default:
              // When this arm is chosen, an error must exist in Quanah itself.

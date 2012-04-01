@@ -53,7 +53,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 29 Mar 2012
+//                                                      ~~ (c) SRW, 01 Apr 2012
 
 (function (global) {
     'use strict';
@@ -77,8 +77,8 @@
 
     var atob, AVar, avar, btoa, comm, defineProperty, deserialize,
         dmap, dply, dreduce, init, isArrayLike, isClosed, isFunction,
-        local_call, ply, puts, remote_call, revive, secret, serialize,
-        stack, sys, update_local, update_remote, uuid, volunteer, when;
+        local_call, ply, remote_call, revive, secret, serialize, stack,
+        sys, update_local, update_remote, uuid, volunteer, when;
 
  // Definitions
 
@@ -312,14 +312,10 @@
                 if (isFunction(args[0])) {
                     inside.queue.push(args[0]);
                     if (inside.ready === true) {
-                        x.comm({done: [], secret: secret});
-                    }
-/*
-                    if (inside.ready === true) {
                         inside.ready = false;
                         stack.unshift({f: inside.queue.shift(), x: x});
                     }
-*/
+
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
                      // This function needs documentation.
@@ -885,13 +881,6 @@
                 return;
             }
         };
-    };
-
-    puts = function () {
-     // This function is just a placeholder for testing purposes. It can be
-     // useful for logging to a console, but to justify its inclusion here, I
-     // have also used it in 'volunteer' to induce local execution :-)
-        return;
     };
 
     remote_call = function (obj) {

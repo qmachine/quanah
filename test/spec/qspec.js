@@ -90,6 +90,38 @@
     });
 
   });
+
+  describe("Quanah Avars", function(){
+
+    it("should allow creation of Avars with no spec", function(){
+      var x = Q.avar();
+      expect(x).toBeAObject();
+      expect(x.key).toBeAUuid();
+      expect(x.val).toBeNull();
+    });
+
+    it("should allow creation of Avars with only a key", function(){
+      var x = Q.avar({ key : "a" });
+      expect(x).toBeAObject();
+      expect(x.key).toEqual("a");
+      expect(x.val).toBeNull();
+    });
+
+    it("should allow creation of Avars with only a val", function(){
+      var x = Q.avar({ val : "a" });
+      expect(x).toBeAObject();
+      expect(x.key).toBeAUuid();
+      expect(x.val).toEqual("a");
+    });
+
+    it("should allow creation of Avars with a key and val", function(){
+      var x = Q.avar({ key : "a", val : 12345 });
+      expect(x).toBeAObject();
+      expect(x.key).toEqual("a");
+      expect(x.val).toEqual(12345);
+    });
+
   });
+
 
 }());

@@ -65,12 +65,31 @@
 
   });
 
+  // The Overall Spec
   describe("Quanah", function(){
 
     it("should be awesome", function(){
       expect(true).toBeTruthy();
     });
 
+    it("should place function Q on the Object prototype", function(){
+      expect(Object.prototype.hasOwnProperty('Q')).toBeTruthy();
+    });
+
+    it("shoud provide the quanah API", function(){
+      //Needs a better "should" string...
+      var api, thing;
+      api = {
+        avar : 'function'
+      };
+      for ( thing in api ){
+        if (api.hasOwnProperty(thing)){
+          expect(typeof Q[thing]).toBe(api[thing]);
+        }
+      }
+    });
+
+  });
   });
 
 }());

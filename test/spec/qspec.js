@@ -135,7 +135,33 @@
       expect(x.val).toEqual(12345);
     });
 
-  });
+    it("should be retrievable as JSON", function(){
+      var x, spec;
+      spec = { key : "a", val : "12345"};
+      x = Q.avar(spec);
+      expect(x.toJSON()).toEqual(spec);
+    });
 
+    it("should allow the value to be retrieved as a string", function(){
+      var avars, vals, i;
+      vals = [1234, "1234", [1,2,3,4], {a:1, b:2}];
+      avars = getAvars(vals);
+      for ( i in vals ){
+        if ( vals.hasOwnProperty(i) === false ) continue;
+        expect(avars[i].toString()).toEqual(vals[i].toString());
+      };
+    });
+
+    it("should allow the value to be retrieved", function(){
+      var avars, vals, i;
+      vals = [1234, "1234", [1,2,3,4], {a:1, b:2}];
+      avars = getAvars(vals);
+      for ( i in vals ){
+        if ( vals.hasOwnProperty(i) === false ) continue;
+        expect(avars[i].valueOf()).toEqual(vals[i]);
+      };
+    });
+
+  });
 
 }());

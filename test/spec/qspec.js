@@ -162,7 +162,39 @@
       for ( i in vals ){
         if ( vals.hasOwnProperty(i) === false ) continue;
         expect(avars[i].valueOf()).toEqual(vals[i]);
+      }
+    });
+
+    it("should allow computations to be run with Avar.onready", function(){
+      var x = Q.avar({ val:0 });
+      x.onready = function (evt) {
+        this.val += 1;
+        evt.exit();
       };
+      expect(x.val).toEqual(1);
+    });
+
+    it("should apply Avar.onready's sequentially", function(){
+      var x = Q.avar();
+      x.onready = function (evt) {
+        this.val = "dogs";
+        evt.exit();
+      };
+      x.onready = function (evt) {
+        expect(this.val).toEqual("dogs");
+        evt.exit();
+      };
+      x.onready = function (evt) {
+        this.val = "cats";
+        evt.exit();
+      };
+      x.onready = function (evt) {
+        expect(this.val).toEqual("cats");
+        evt.exit();
+      };
+    });
+
+    it("should ", function(){
     });
 
   });

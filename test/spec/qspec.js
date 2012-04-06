@@ -16,6 +16,55 @@
   // Pragmas for JSHint
   /*globals describe:false it:false beforeEach:false expect:false*/
 
+  // Utility Additions
+  beforeEach(function(){
+
+    var toType, customMatchers, setMatcherMessage;
+
+    toType = function toType(obj) {
+          return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+    };
+
+    setMatcherMessage = function(message, matcher_context){
+          matcher_context.message = function(){return message;};
+    };
+
+    customMatchers = {};
+
+    customMatchers.toBeA = function toBeA(expected_type){
+      return toType(this.actual) === expected_type;
+    };
+
+    customMatchers.toBeAFunction = function toBeAFunction(){
+      return toType(this.actual) === 'function';
+    };
+
+    customMatchers.toBeAObject = function toBeAObject(){
+      return toType(this.actual) === 'object';
+    };
+
+    customMatchers.toBeAUuid = function toBeAUuid(){
+      return (this.actual.match(/[0-9abcdef]{32}/)) !== null;
+    };
+
+    customMatchers.toContainPrefixes = function toContainPrefixes(expected){
+      var key;
+      for (key in expected){
+        if (expected.hasOwnProperty(key) && this.actual[key] !== expected[key]){
+          setMatcherMessage(
+              "Expected "+this.actual[key]+" to be "+expected[key]+", with prefix "+key+".",
+              this
+          );
+          return false;
+        }
+      }
+      return true;
+    };
+
+    this.addMatchers(customMatchers);
+
+  });
+
   describe("Quanah", function(){
 
     it("should be awesome", function(){

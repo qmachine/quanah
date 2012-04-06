@@ -12,18 +12,32 @@
 
 (function(){
   "use strict";
+  var getAvars, toType;
 
   // Pragmas for JSHint
   /*globals describe:false it:false beforeEach:false expect:false Q:false*/
 
-  // Utility Additions
+  // Utility Additions and functions
+  getAvars = function getAvars(){
+    // Returns an array with each of the arguments as the val of an avar
+    var avars = [], arg, args, i;
+    if ( toType(arguments[0]) === "array" ) args = arguments[0];
+    else args = arguments;
+    for ( i in args) {
+      if ( args.hasOwnProperty(i) === false ) continue;
+      arg = args[i];
+      avars.push( Q.avar({ val:arg }) );
+    }
+    return avars;
+  };
+
+  toType = function toType(obj) {
+        return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+  };
+
   beforeEach(function(){
 
-    var toType, customMatchers, setMatcherMessage;
-
-    toType = function toType(obj) {
-          return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
-    };
+    var customMatchers, setMatcherMessage;
 
     setMatcherMessage = function(message, matcher_context){
           matcher_context.message = function(){return message;};

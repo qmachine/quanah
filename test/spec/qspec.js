@@ -8,6 +8,9 @@
 //    * Learn the damn thing
 //    * Provide a way to catch changes made in Quanah's API
 //
+//  The actually interesting, expressive of Quanah's use code takes place in
+//  the describe(...) blocks; everything prior is just helpers.
+//
 //                                                      ~~ (c) DER, 6 Apr 2012
 
 (function(){
@@ -149,7 +152,7 @@
       for ( i in vals ){
         if ( vals.hasOwnProperty(i) === false ) continue;
         expect(avars[i].toString()).toEqual(vals[i].toString());
-      };
+      }
     });
 
     it("should allow the value to be retrieved", function(){

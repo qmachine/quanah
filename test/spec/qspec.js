@@ -14,7 +14,7 @@
   "use strict";
 
   // Pragmas for JSHint
-  /*globals describe:false it:false beforeEach:false expect:false*/
+  /*globals describe:false it:false beforeEach:false expect:false Q:false*/
 
   // Utility Additions
   beforeEach(function(){

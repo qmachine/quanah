@@ -182,9 +182,6 @@
       };
       x.onready = function (evt) {
         expect(this.val).toEqual("dogs");
-        evt.exit();
-      };
-      x.onready = function (evt) {
         this.val = "cats";
         evt.exit();
       };

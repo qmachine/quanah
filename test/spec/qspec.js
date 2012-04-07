@@ -191,7 +191,50 @@
       };
     });
 
-    it("should ", function(){
+    it("should allow an onready to pause execution using evt.stay()", function(){
+      var x, spy;
+      x = Q.avar();
+      spy = jasmine.createSpy();
+      x.onready = function (evt) {
+        this.val = "before";
+        evt.exit()
+      };
+      x.onready = function (evt) {
+        evt.stay();
+      }
+      x.onready = function (evt) {
+        spy();
+        evt.exit();
+      };
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should not execute the next onready block if evt.exit() is not called", function(){
+      var x, spy;
+      x = Q.avar();
+      spy = jasmine.createSpy();
+      x.onready = function (evt) {
+        this.val = "value";
+      }
+      x.onready = function (evt) {
+        spy();
+        evt.exit();
+      }
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should execute the onerror block if evt.fail() is called", function(){
+      var x, spy;
+      x = Q.avar();
+      spy = jasmine.createSpy();
+      x.onerror = function (msg) {
+        expect(msg).toEqual("Oh Noes!!");
+        spy();
+      };
+      x.onready = function (evt) {
+        evt.fail("Oh Noes!!");
+      };
+      expect(spy).toHaveBeenCalled();
     });
 
   });

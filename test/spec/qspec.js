@@ -8,7 +8,7 @@
 //    * Learn the damn thing
 //    * Provide a way to catch changes made in Quanah's API
 //
-//  The actually interesting, expressive of Quanah's use code takes place in
+//  The actually interesting, i.e. expressive of Quanah's use, code takes place in
 //  the describe(...) blocks; everything prior is just helpers.
 //
 //                                                      ~~ (c) DER, 6 Apr 2012
@@ -19,6 +19,7 @@
 
   // Pragmas for JSHint
   /*globals describe:false it:false beforeEach:false expect:false Q:false*/
+  /*globals jasmine:false */
 
   // Utility Additions and functions
   getAvars = function getAvars(){
@@ -110,131 +111,161 @@
 
   describe("Quanah Avars", function(){
 
-    it("should allow creation of Avars with no spec", function(){
-      var x = Q.avar();
-      expect(x).toBeAObject();
-      expect(x.key).toBeAUuid();
-      expect(x.val).toBeNull();
+    describe("Avar Creation", function(){
+
+      it("should allow creation of Avars with no spec", function(){
+        var x = Q.avar();
+        expect(x).toBeAObject();
+        expect(x.key).toBeAUuid();
+        expect(x.val).toBeNull();
+      });
+
+      it("should allow creation of Avars with only a key", function(){
+        var x = Q.avar({ key : "a" });
+        expect(x).toBeAObject();
+        expect(x.key).toEqual("a");
+        expect(x.val).toBeNull();
+      });
+
+      it("should allow creation of Avars with only a val", function(){
+        var x = Q.avar({ val : "a" });
+        expect(x).toBeAObject();
+        expect(x.key).toBeAUuid();
+        expect(x.val).toEqual("a");
+      });
+
+      it("should allow creation of Avars with a key and val", function(){
+        var x = Q.avar({ key : "a", val : 12345 });
+        expect(x).toBeAObject();
+        expect(x.key).toEqual("a");
+        expect(x.val).toEqual(12345);
+      });
+
     });
 
-    it("should allow creation of Avars with only a key", function(){
-      var x = Q.avar({ key : "a" });
-      expect(x).toBeAObject();
-      expect(x.key).toEqual("a");
-      expect(x.val).toBeNull();
-    });
+    describe("Avar Access", function(){
 
-    it("should allow creation of Avars with only a val", function(){
-      var x = Q.avar({ val : "a" });
-      expect(x).toBeAObject();
-      expect(x.key).toBeAUuid();
-      expect(x.val).toEqual("a");
-    });
-
-    it("should allow creation of Avars with a key and val", function(){
-      var x = Q.avar({ key : "a", val : 12345 });
-      expect(x).toBeAObject();
-      expect(x.key).toEqual("a");
-      expect(x.val).toEqual(12345);
-    });
-
-    it("should be retrievable as JSON", function(){
-      var x, spec;
-      spec = { key : "a", val : "12345"};
-      x = Q.avar(spec);
-      expect(x.toJSON()).toEqual(spec);
-    });
-
-    it("should allow the value to be retrieved as a string", function(){
       var avars, vals, i;
-      vals = [1234, "1234", [1,2,3,4], {a:1, b:2}];
-      avars = getAvars(vals);
-      for ( i in vals ){
-        if ( vals.hasOwnProperty(i) === false ) continue;
-        expect(avars[i].toString()).toEqual(vals[i].toString());
-      }
+
+      beforeEach(function(){
+        vals = [1234, "1234", [1,2,3,4], {a:1, b:2}];
+        avars = getAvars(vals);
+      });
+
+      it("should be retrievable as JSON with toJSON()", function(){
+        var x, spec;
+        spec = { key : "a", val : "12345"};
+        x = Q.avar(spec);
+        expect(x.toJSON()).toEqual(spec);
+        for ( i in vals ){
+          if ( vals.hasOwnProperty(i) === false ) continue;
+          expect(avars[i].toJSON().val).toEqual(vals[i]);
+        }
+      });
+
+      it("should allow the value to be retrieved as a string with toString()", function(){
+        for ( i in vals ){
+          if ( vals.hasOwnProperty(i) === false ) continue;
+          expect(avars[i].toString()).toEqual(vals[i].toString());
+        }
+      });
+
+      it("should allow the value to be retrieved with valueOf()", function(){
+        for ( i in vals ){
+          if ( vals.hasOwnProperty(i) === false ) continue;
+          expect(avars[i].valueOf()).toEqual(vals[i]);
+        }
+      });
+
     });
 
-    it("should allow the value to be retrieved", function(){
-      var avars, vals, i;
-      vals = [1234, "1234", [1,2,3,4], {a:1, b:2}];
-      avars = getAvars(vals);
-      for ( i in vals ){
-        if ( vals.hasOwnProperty(i) === false ) continue;
-        expect(avars[i].valueOf()).toEqual(vals[i]);
-      }
-    });
+    describe("Avar execution", function(){
 
-    it("should allow computations to be run with Avar.onready", function(){
-      var x = Q.avar({ val:0 });
-      x.onready = function (evt) {
-        this.val += 1;
-        evt.exit();
-      };
-      expect(x.val).toEqual(1);
-    });
-
-    it("should apply Avar.onready's sequentially", function(){
-      var x = Q.avar();
-      x.onready = function (evt) {
-        this.val = "dogs";
-        evt.exit();
-      };
-      x.onready = function (evt) {
-        expect(this.val).toEqual("dogs");
-        this.val = "cats";
-        evt.exit();
-      };
-      x.onready = function (evt) {
-        expect(this.val).toEqual("cats");
-        evt.exit();
-      };
-    });
-
-    it("should allow an onready to pause execution using evt.stay()", function(){
       var x, spy;
-      x = Q.avar();
-      spy = jasmine.createSpy();
-      x.onready = function (evt) {
-        this.val = "before";
-        evt.exit()
-      };
-      x.onready = function (evt) {
-        evt.stay();
-      }
-      x.onready = function (evt) {
-        spy();
-        evt.exit();
-      };
-      expect(spy).not.toHaveBeenCalled();
-    });
 
-    it("should not execute the next onready block if evt.exit() is not called", function(){
-      var x, spy;
-      x = Q.avar();
-      spy = jasmine.createSpy();
-      x.onready = function (evt) {
-        this.val = "value";
-      }
-      x.onready = function (evt) {
-        spy();
-        evt.exit();
-      }
-      expect(spy).not.toHaveBeenCalled();
-    });
+      beforeEach(function(){
+        x = Q.avar();
+        spy = jasmine.createSpy();
+      });
 
-    it("should execute the onerror block if evt.fail() is called", function(){
-      var x, spy;
-      x = Q.avar();
-      spy = jasmine.createSpy();
-      x.onerror = function (msg) {
-        expect(msg).toEqual("Oh Noes!!");
-        spy();
-      };
-      x.onready = function (evt) {
-        evt.fail("Oh Noes!!");
-      };
-      expect(spy).toHaveBeenCalled();
+      it("should allow computations to be run with Avar.onready", function(){
+        x = Q.avar({ val:0 });
+        x.onready = function (evt) {
+          this.val += 1;
+          evt.exit();
+        };
+        expect(x.val).toEqual(1);
+      });
+
+      it("should apply Avar.onready's sequentially", function(){
+        x.onready = function (evt) {
+          this.val = "dogs";
+          evt.exit();
+        };
+        x.onready = function (evt) {
+          expect(this.val).toEqual("dogs");
+          this.val = "cats";
+          evt.exit();
+        };
+        x.onready = function (evt) {
+          expect(this.val).toEqual("cats");
+          evt.exit();
+        };
+      });
+
+      it("should allow an onready to pause execution using evt.stay()", function(){
+        x.onready = function (evt) {
+          this.val = "before";
+          evt.exit();
+        };
+        x.onready = function (evt) {
+          evt.stay();
+        };
+        x.onready = function (evt) {
+          spy();
+          evt.exit();
+        };
+        expect(spy).not.toHaveBeenCalled();
+      });
+
+      it("should not execute the next onready block if evt.exit() is not called", function(){
+        x.onready = function (evt) {
+          this.val = "value";
+        };
+        x.onready = function (evt) {
+          spy();
+          evt.exit();
+        };
+        expect(spy).not.toHaveBeenCalled();
+      });
+
+      it("should execute the onerror block if evt.fail() is called", function(){
+        x.onerror = function (msg) {
+          expect(msg).toEqual("Oh Noes!!");
+          spy();
+        };
+        x.onready = function (evt) {
+          evt.fail("Oh Noes!!");
+        };
+        expect(spy).toHaveBeenCalled();
+      });
+
+      it("should allow iteration over iterable avars with Q.ply", function(){
+        var vals, avars, afterVals, i, doubleIt;
+        vals = [[1,2,3,4], {a:1,b:2,c:3,d:4}];
+        afterVals = [[2,4,6,8], {a:2,b:4,c:6,d:8}];
+        avars = getAvars(vals);
+        doubleIt = function (k,v) { this.val *= 2; };
+        for ( i in vals ){
+          if ( vals.hasOwnProperty(i) === false ) continue;
+          avars[i].onready = Q.ply(doubleIt);
+          avars[i].onready = function (evt) {
+            expect(this.val).toEqual(afterVals[i]);
+            evt.exit();
+          }
+        }
+      });
+
     });
 
   });

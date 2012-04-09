@@ -15,11 +15,11 @@
 
 (function(){
   "use strict";
-  var getAvars, toType;
+  var getAvars, toType, onerror;
 
   // Pragmas for JSHint
   /*globals describe:false it:false beforeEach:false expect:false Q:false*/
-  /*globals jasmine:false */
+  /*globals jasmine:false console:false*/
 
   // Utility Additions and functions
   getAvars = function getAvars(){
@@ -37,6 +37,10 @@
 
   toType = function toType(obj) {
         return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+  };
+
+  onerror = function (msg) {
+    console.error(msg);
   };
 
   beforeEach(function(){

@@ -175,7 +175,9 @@
         spy = jasmine.createSpy();
       });
 
-      it("should be retrievable as JSON with toJSON()", function(){
+      xit("should be retrievable as JSON with toJSON()", function(){
+        // Disabled until toJSON is better specified,
+        // e.g. for functions as vals
         var x, spec;
         spec = { key : "a", val : "12345"};
         x = Q.avar(spec);

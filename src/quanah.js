@@ -53,7 +53,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 08 Apr 2012
+//                                                      ~~ (c) SRW, 09 Apr 2012
 
 (function (global) {
     'use strict';
@@ -714,24 +714,24 @@
              // answer to our question would be 'true', which is why we have
              // to negate JSLINT's output.
                 flag = (false === JSLINT($f, {
-                 // JSLINT configuration options, as of version 2012-02-03:
-                    anon:       true,   //- ???
-                    bitwise:    true,   //- bitwise operators are allowed?
-                    browser:    false,  //- assume a browser as JS environment?
-                    cap:        true,   //- uppercase HTML is allowed?
-                    //confusion:  true,   //- types can be used inconsistently?
+                 // JSLINT configuration options, as of version 2012-03-29:
+                    anon:       true,   //- allow 'function()'?
+                    bitwise:    true,   //- allow use of bitwise operators?
+                    browser:    false,  //- assume browser as JS environment?
+                    cap:        true,   //- allow uppercase HTML?
+                    //confusion:  true, //- allow inconsistent type usage?
                     'continue': true,   //- allow continuation statement?
                     css:        true,   //- allow CSS workarounds?
                     debug:      false,  //- allow debugger statements?
                     devel:      false,  //- allow output logging?
-                    eqeq:       true,   //- allow '==' (instead of '===')?
-                    es5:        true,   //- allow ES5 syntax?
+                    eqeq:       true,   //- allow '==' instead of '==='?
+                    es5:        true,   //- allow ECMAScript 5 syntax?
                     evil:       false,  //- allow the 'eval' statement?
                     forin:      true,   //- allow unfiltered 'for .. in'?
                     fragment:   true,   //- allow HTML fragments?
                     //indent:     4,
-                    //maxlen:     80,
                     //maxerr:     1,
+                    //maxlen:     80,
                     newcap:     true,   //- constructors must be capitalized?
                     node:       false,  //- assume Node.js as JS environment?
                     nomen:      true,   //- allow names' dangling underscores?
@@ -744,6 +744,7 @@
                     undef:      false,  //- allow out-of-order definitions?
                     unparam:    true,   //- allow unused parameters?
                     sloppy:     true,   //- ES5 strict mode pragma is optional?
+                    stupid:     true,   //- allow '*Sync' calls in Node.js?
                     sub:        true,   //- allow all forms of subset notation?
                     vars:       true,   //- allow multiple 'var' statements?
                     white:      true,   //- allow sloppy whitespace?

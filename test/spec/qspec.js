@@ -155,6 +155,14 @@
         expect(x.val).toEqual(12345);
       });
 
+      it("should allow creation of Avars with a stringified avar", function(){
+        var x, y, z;
+        x = Q.avar({ key : "a", val : 12345 });
+        y = JSON.stringify(x);
+        z = Q.avar(y);
+        expect(x).toEqual(z);
+      });
+
     });
 
     describe("Avar Access", function(){

@@ -298,6 +298,29 @@
         }
         expect(spy.callCount).toBe(2);
       });
+
+      it("should properly handle long-running onready functions", function(){
+        var done, tic, x;
+        tic = Date.now();
+        done = false;
+        x = Q.avar();
+        x.onerror = onerror;
+        x.onready = function(evt){
+          if ((Date.now() - tic) < 2000) {
+            return evt.stay();
+          }
+          done = true;
+          this.val = "finished";
+          return evt.exit();
+        };
+        x.onready = function(evt){
+          done = true;
+          return evt.exit();
+        };
+        waitsFor(function(){x.comm(); return done;}, "Never finished.", 3000);
+        runs(function(){
+          expect(x.val).toEqual("finished");
+        });
       });
 
     });

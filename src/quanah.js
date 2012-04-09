@@ -53,7 +53,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 01 Apr 2012
+//                                                      ~~ (c) SRW, 08 Apr 2012
 
 (function (global) {
     'use strict';
@@ -1495,6 +1495,19 @@
          // that can manipulate an avar's queue, assumptions about that queue
          // should be located as near there as possible to avoid oversight.
             return this.comm({set_onready: f, secret: secret});
+        }
+    });
+
+    defineProperty(AVar.prototype, 'revive', {
+        configurable: false,
+        enumerable: true,
+        writable: false,
+        value: function () {
+         // This function is syntactic sugar for triggering a 'revive' from
+         // code external to this giant anonymous closure. Currently, the same
+         // effect can be achieved by invoking 'x.comm()' for some avar 'x',
+         // but that technique is deprecated now.
+            return revive();
         }
     });
 

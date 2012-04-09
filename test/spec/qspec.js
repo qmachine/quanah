@@ -170,7 +170,7 @@
       var avars, vals, i;
 
       beforeEach(function(){
-        vals = [1234, "1234", [1,2,3,4], {a:1, b:2}];
+        vals = [1234, "1234", [1,2,3,4], {a:1, b:2}, function(){}];
         avars = getAvars(vals);
       });
 

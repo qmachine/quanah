@@ -108,7 +108,11 @@
       //Needs a better "should" string...
       var api, thing;
       api = {
-        avar : 'function'
+        avar : 'function',
+        ply : 'function',
+        map : 'function',
+        reduce : 'function',
+        when : 'function'
       };
       for ( thing in api ){
         if (api.hasOwnProperty(thing)){

@@ -23,16 +23,22 @@
 
   // Utility Additions and functions
   getAvars = function getAvars(){
-    // Returns an array with each of the arguments as the val of an avar
-    var avars = [], arg, args, i;
+    // Returns an avar whose val is an array of avars, with one for each
+    // of the arguments (or each element of the first argument if it is
+    // an array.
+    var avars = [], arg, args, i, temp;
     if ( toType(arguments[0]) === "array" ) args = arguments[0];
     else args = arguments;
     for ( i in args) {
       if ( args.hasOwnProperty(i) === false ) continue;
       arg = args[i];
-      avars.push( Q.avar({ val:arg }) );
+      temp = Q.avar({ val:arg });
+      temp.onerror = onerror;
+      avars.push(temp);
     }
-    return avars;
+    temp = Q.avar({ val:avars });
+    temp.onerror = onerror;
+    return temp;
   };
 
   toType = function toType(obj) {

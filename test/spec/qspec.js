@@ -167,11 +167,12 @@
 
     describe("Avar Access", function(){
 
-      var avars, vals, i;
+      var avars, vals, i, spy;
 
       beforeEach(function(){
         vals = [1234, "1234", [1,2,3,4], {a:1, b:2}, function(){}];
         avars = getAvars(vals);
+        spy = jasmine.createSpy();
       });
 
       it("should be retrievable as JSON with toJSON()", function(){
@@ -179,24 +180,27 @@
         spec = { key : "a", val : "12345"};
         x = Q.avar(spec);
         expect(x.toJSON()).toEqual(spec);
-        for ( i in vals ){
-          if ( vals.hasOwnProperty(i) === false ) continue;
-          expect(avars[i].toJSON().val).toEqual(vals[i]);
-        }
+        avars.onready = Q.ply(function(k,v){
+          expect(v.toJSON().val).toEqual(vals[k]);
+          spy();
+        });
+        expect(spy.callCount).toEqual(5);
       });
 
       it("should allow the value to be retrieved as a string with toString()", function(){
-        for ( i in vals ){
-          if ( vals.hasOwnProperty(i) === false ) continue;
-          expect(avars[i].toString()).toEqual(vals[i].toString());
-        }
+        avars.onready = Q.ply(function(k,v){
+          expect(v.toString()).toEqual(vals[k].toString());
+          spy();
+        });
+        expect(spy.callCount).toEqual(5);
       });
 
       it("should allow the value to be retrieved with valueOf()", function(){
-        for ( i in vals ){
-          if ( vals.hasOwnProperty(i) === false ) continue;
-          expect(avars[i].valueOf()).toEqual(vals[i]);
-        }
+        avars.onready = Q.ply(function(k,v){
+          expect(v.valueOf()).toEqual(vals[k]);
+          spy();
+        });
+        expect(spy.callCount).toEqual(5);
       });
 
     });

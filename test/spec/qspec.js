@@ -279,19 +279,25 @@
       });
 
       it("should allow iteration over iterable avars with Q.ply", function(){
-        var vals, avars, afterVals, i, doubleIt;
+        var vals, avars, afterVals, i, doubleIt, checkIt;
         vals = [[1,2,3,4], {a:1,b:2,c:3,d:4}];
         afterVals = [[2,4,6,8], {a:2,b:4,c:6,d:8}];
-        avars = getAvars(vals);
+        avars = getAvars(vals).val;
         doubleIt = function (k,v) { this.val *= 2; };
-        for ( i in vals ){
+        checkIt = function (i) {
+          return function (evt) {
+            expect(this.val).toEqual(afterVals[i]);
+            spy();
+            evt.exit();
+          };
+        };
+        for ( i in vals ){ // Could be replaced with ply...but that would be cheating?
           if ( vals.hasOwnProperty(i) === false ) continue;
           avars[i].onready = Q.ply(doubleIt);
-          avars[i].onready = function (evt) {
-            expect(this.val).toEqual(afterVals[i]);
-            evt.exit();
-          }
+          avars[i].onready = checkIt(i);
         }
+        expect(spy.callCount).toBe(2);
+      });
       });
 
     });

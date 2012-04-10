@@ -2,9 +2,9 @@
 
 #-  Makefile ~~
 #
-#   This contains live instructions for testing JavaScript programs :-)
+#   This contains live instructions for development on Quanah.
 #
-#                                                       ~~ (c) SRW, 26 Mar 2012
+#                                                       ~~ (c) SRW, 09 Apr 2012
 
 include ./tools/macros.make
 
@@ -73,7 +73,7 @@ run: quick
 
 ###
 
-.PHONY: benchmark browse browser check quick
+.PHONY: benchmark browse browser check check-jasmine check-old quick
 
 benchmark: $(EXEJS)
 	@   $(RM) time-data.out                                         ;   \
@@ -92,7 +92,12 @@ browse: browser
 
 browser: $(EXEJS) $(HTML)
 
-check: $(EXEJS)
+check: check-old check-jasmine
+
+check-jasmine: $(QUANAH)
+	@   if [ -f test/test.html ]; then $(OPEN) test/test.html; fi
+
+check-old: $(EXEJS)
 	@   $(RM) results1.out results2.out                             ;   \
             for each in $(ALLJS); do                                        \
                 $(call aside, $${each})                                 ;   \

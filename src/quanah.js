@@ -53,7 +53,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 09 Apr 2012
+//                                                      ~~ (c) SRW, 12 Apr 2012
 
 (function (global) {
     'use strict';
@@ -1561,7 +1561,7 @@
      // have added the new method using "defineProperty" instead of by
      // assigning directly because then I can edit ES5 meta-properties.
         configurable: false,
-        enumerable: true,
+        enumerable: false,
         writable: false,
         value: function (f) {
          // This function is globally available as "Object.prototype.Q", and

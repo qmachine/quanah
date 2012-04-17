@@ -73,12 +73,29 @@
         return;
     }
 
+    if (Object.hasOwnProperty('defineProperty') === false) {
+     //
+     // Why should I require platform support for getters and setters?
+     // Some compelling arguments can be found here: http://goo.gl/e9rhh.
+     // In the future, I may rewrite Quanah without getters and setters
+     // to increase performance, but for now, it's probably a better idea
+     // for you just to update your platform -- especially if you want to
+     // use Quanah to distribute your computations for you. Because each
+     // avar has a 'comm' method that must be "hidden" (non-enumerable) or
+     // else the avar cannot be serialized, your programs will always be
+     // run serially unless you use a reasonably modern platform!
+     //
+     // For more information, see the documentation at http://goo.gl/xXHKr.
+     //
+        throw new Error('Platform lacks support for getters and setters.');
+    }
+
  // Declarations
 
-    var atob, AVar, avar, btoa, comm, defineProperty, deserialize,
-        dmap, dply, dreduce, init, isArrayLike, isClosed, isFunction,
-        local_call, ply, remote_call, revive, secret, serialize, stack,
-        sys, update_local, update_remote, uuid, volunteer, when;
+    var atob, AVar, avar, btoa, comm, deserialize, defineProperty, init,
+        isClosed, isFunction, local_call, ply, remote_call, revive, secret,
+        serialize, stack, sys, update_local, update_remote, uuid, volunteer,
+        when;
 
  // Definitions
 
@@ -139,7 +156,7 @@
      // order to data. For each avar, such a sequence is stored as a first-in,
      // first-out (FIFO) queue and executed according to messages the avar
      // receives through its 'comm' method.
-        var state, that;
+        var key, state, temp, that;
         state = {
             epitaph:    null,
             onerror:    null,
@@ -164,17 +181,19 @@
             }
         });
         if ((spec === null) || (spec === undefined)) {
-            that.key = uuid();
-            that.val = null;
+            temp = {};
         } else if ((typeof spec === 'string') || (spec instanceof String)) {
-            that.tmp = deserialize(spec);
-            that.key = that.tmp.key;
-            that.val = that.tmp.val;
-            delete that.tmp;
+            temp = deserialize(spec);
         } else {
-            that.key = (spec.hasOwnProperty('key')) ? spec.key : uuid();
-            that.val = (spec.hasOwnProperty('val')) ? spec.val : null;
+            temp = spec;
         }
+        for (key in temp) {
+            if (temp.hasOwnProperty(key)) {
+                that[key] = temp[key];
+            }
+        }
+        that.key = (temp.hasOwnProperty('key')) ? temp.key : uuid();
+        that.val = (temp.hasOwnProperty('val')) ? temp.val : null;
         return that;
     };
 
@@ -315,7 +334,6 @@
                         inside.ready = false;
                         stack.unshift({f: inside.queue.shift(), x: x});
                     }
-
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
                      // This function needs documentation.
@@ -359,57 +377,7 @@
         return revive();
     };
 
-    defineProperty = function (obj, name, params) {
-     // This function wraps the ES5 'Object.defineProperty' function so that
-     // it degrades gracefully in crusty old browsers. I would like to improve
-     // my implementation eventually so that the fallback definition will more
-     // closely simulate the ES5 specification, but for now, this works well.
-     // For more information, see the documentation at http://goo.gl/xXHKr.
-        if (Object.hasOwnProperty('defineProperty')) {
-            defineProperty = Object.defineProperty;
-        } else if (Object.prototype.hasOwnProperty('__defineGetter__')) {
-            defineProperty = function (obj, name, params) {
-             // This function is a pseudo-implementation of the new ES5
-             // 'Object.defineProperty' function (see http://goo.gl/xXHKr).
-                ply(params).by(function (key, val) {
-                 // This function is a "forEach" ==> 'ply' is justified.
-                    /*jslint nomen: true */
-                    switch (key) {
-                    case 'get':
-                        obj.__defineGetter__(name, val);
-                        break;
-                    case 'set':
-                        obj.__defineSetter__(name, val);
-                        break;
-                    case 'value':
-                     // NOTE: This would fail if the property's "configurable"
-                     // attribute were set to 'false', but if such an error
-                     // could occur, that JavaScript implementation would have
-                     // had a native 'Object.defineProperty' anyway :-P
-                        delete obj[name];
-                        obj[name] = val;
-                        break;
-                    default:
-                     // This arm matches ES5 property attributes ...
-                    }
-                    return;
-                });
-                return obj;
-            };
-        } else {
-         // Why should I require platform support for getters and setters?
-         // Some compelling arguments can be found here: http://goo.gl/e9rhh.
-         // In the future, I may rewrite Quanah without getters and setters
-         // to increase performance, but for now, it's probably a better idea
-         // for you just to update your platform -- especially if you want to
-         // use Quanah to distribute your computations for you. Because each
-         // avar has a 'comm' method that must be "hidden" (non-enumerable) or
-         // else the avar cannot be serialized, your programs will always be
-         // run serially unless you use a reasonably modern platform!
-            throw new Error('platform lacks support for getters and setters.');
-        }
-        return defineProperty(obj, name, params);
-    };
+    defineProperty = Object.defineProperty;
 
     deserialize = function ($x) {
      // This function is a JSON-based deserialization utility that can invert
@@ -455,168 +423,6 @@
         });
     };
 
-    dmap = function (f) {
-     // This function needs documentation.
-        return function (evt) {
-         // This function needs documentation.
-            var x, y;
-            x = (this.hasOwnProperty('isready')) ? this.val[0] : this;
-            y = avar({val: x.val});
-            y.onerror = function (message) {
-             // This function needs documentation.
-                return evt.fail(message);
-            };
-            y.onready = function (evt) {
-             // This function needs documentation.
-                ply(y.val).by(function (key, val) {
-                 // This function needs documentation.
-                    y.val[key] = {f: f, x: val};
-                    return;
-                });
-                return evt.exit();
-            };
-            y.onready = dply(function (key, val) {
-             // This function needs documentation.
-                val.y = val.f(val.x);
-                return;
-            });
-            y.onready = function (y_evt) {
-             // This function needs documentation.
-                ply(y.val).by(function (key, val) {
-                 // This function needs documentation.
-                    x.val[key] = val.y;
-                    return;
-                });
-                y_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-    };
-
-    dply = function (f) {
-     // This function needs documentation.
-        return function (evt) {
-         // This function needs documentation.
-            var elements, g, key, n, x;
-            g = function (f, key, val) {
-             // This function needs documentation.
-                var temp = avar({val: {f: f, key: key, val: val}});
-                temp.onerror = function (message) {
-                 // This function needs documentation.
-                    return evt.fail(message);
-                };
-                temp.onready = function (evt) {
-                 // This function needs documentation.
-                    this.val.f(this.val.key, this.val.val);
-                    return evt.exit();
-                };
-                temp.onready = function (evt) {
-                 // This function needs documentation.
-                    x.val[key] = this.val.val;
-                    return evt.exit();
-                };
-                return temp;
-            };
-            elements = [];
-            x = (this.hasOwnProperty('isready')) ? this.val[0] : this;
-            if (isArrayLike(x.val)) {
-                n = x.val.length;
-                for (key = 0; key < n; key += 1) {
-                    elements.push(g(f, key, x.val[key]));
-                }
-            } else if (x.val instanceof Object) {
-                for (key in x.val) {
-                    if (x.val.hasOwnProperty(key)) {
-                        elements.push(g(f, key, x.val[key]));
-                    }
-                }
-            } else {
-                return evt.fail('Cannot "ply" this value (' + x.val + ')');
-            }
-            when.apply(this, elements).onready = function (when_evt) {
-             // This function needs documentation.
-                when_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-    };
-
-    dreduce = function (f) {
-     // This function needs documentation.
-        return function (evt) {
-         // This function needs documentation.
-            var x, y;
-            x = (this.hasOwnProperty('isready')) ? this.val[0] : this;
-            y = avar({val: x.val});
-            y.onerror = function (message) {
-             // This function needs documentation.
-                return evt.fail(message);
-            };
-            y.onready = function (evt) {
-             // This function needs documentation.
-                var flag, key, n, pairs, x;
-                flag = true;
-                pairs = [];
-                x = y.val;
-                if (isArrayLike(x)) {
-                    n = x.length;
-                    if ((n % 2) === 1) {
-                        pairs.push(x[0]);
-                        for (key = 1; key < n; key += 2) {
-                            pairs.push([x[key], x[key + 1]]);
-                        }
-                    } else {
-                        for (key = 0; key < n; key += 2) {
-                            pairs.push([x[key], x[key + 1]]);
-                        }
-                    }
-                } else if (x instanceof Object) {
-                    for (key in x) {
-                        if (x.hasOwnProperty(key)) {
-                            if (flag) {
-                                pairs.push([x[key]]);
-                            } else {
-                                (pairs[pairs.length - 1]).push(x[key]);
-                            }
-                            flag = (!flag);
-                        }
-                    }
-                } else {
-                    pairs.push([x]);
-                }
-                y.val = pairs;
-                return evt.exit();
-            };
-            y.onready = dmap(function (each) {
-             // This function needs documentation.
-                return (each instanceof Array) ? {f: f, x: each} : each;
-            });
-            y.onready = dmap(function (each) {
-             // This function needs documentation.
-                var flag;
-                flag = ((each !== null) &&
-                        (each !== undefined) &&
-                        (each.hasOwnProperty('f')) &&
-                        (each.hasOwnProperty('x')));
-                return (flag) ? each.f(each.x[0], each.x[1]) : each;
-            });
-            y.onready = function (y_evt) {
-             // This function needs documentation.
-                if (y.val.length > 1) {
-                    x.val = y.val;
-                    y_evt.exit();
-                    return evt.stay('Re-reducing ...');
-                }
-                x.val = y.val[0];
-                y_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-    };
-
     init = function (obj) {
      // This function enables the user to redefine "internal" functions from
      // outside the giant anonymous closure. In particular, this allows users
@@ -636,21 +442,6 @@
             return;
         });
         return revive();
-    };
-
-    isArrayLike = function (x) {
-     // This function is useful for identifying an "Array-Like Object", which
-     // is an object whose 'length' property represents its maximum numerical
-     // property key. Such objects may use Array methods generically, and for
-     // iteration this can be especially useful. The two surprises here are
-     // functions and strings. A function has a 'length' property representing
-     // its arity (number of input arguments), unfortunately, so it cannot be
-     // considered an Array-Like Object. A string is actually a primitive, not
-     // an object, but it can still be used as an Array-Like Object :-)
-        return ((x !== null) &&
-                (x !== undefined) &&
-                (typeof x !== 'function') &&
-                (x.hasOwnProperty('length')));
     };
 
     isClosed = function (x) {
@@ -855,29 +646,38 @@
      // my "generic.js" for a more careful treatment of "basic" iteration :-)
         return {
             by: function (f) {
-             // NOTE: I probably can't optimize this function for use only on
-             // arrays and objects because 'serialize' uses it on functions.
-                if (isFunction(f) === false) {
-                    throw new TypeError('"ply..by" expects a function');
-                }
-                var key, n;
-                if (isArrayLike(x)) {
+             // This function needs documentation.
+                var key, flag, i, n;
+             // We need to identify a generic iteration pattern for 'x', and
+             // we will start by testing it as an "Array-Like Object" (ALO).
+             // An ALO is an object whose 'length' property represents its
+             // maximum numerical property key. Such objects may use Array
+             // methods generically, and for iteration this can be especially
+             // useful. The two surprises here are functions and strings. A
+             // function has a 'length' property representing its arity, which
+             // is its number of input arguments -- it cannot be an ALO. A
+             // string is actually a primitive, not an object, but it _can_
+             // be used as an Array-Like Object. Go figure :-P
+                flag = ((x !== null)                        &&
+                        (x !== undefined)                   &&
+                        (x.hasOwnProperty('length'))        &&
+                        (typeof x !== 'function')           &&
+                        ((x instanceof Function) === false));
+                if (flag === true) {
                  // This arm takes advantage of the fact that indexed 'for'
                  // loops are substantially faster than 'for in' loops.
                     n = x.length;
-                    for (key = 0; key < n; key += 1) {
-                        f(key, x[key]);
+                    for (i = 0; i < n; i += 1) {
+                        f(i, x[i]);
                     }
-                } else if (x instanceof Object) {
+                    return;
+                }
+                if (x instanceof Object) {
                     for (key in x) {
                         if (x.hasOwnProperty(key)) {
                             f(key, x[key]);
                         }
                     }
-                } else {
-                 // I've never really liked this as a fallback definition, but
-                 // it still helps to have it here, just in case.
-                    f(undefined, x);
                 }
                 return;
             }
@@ -899,7 +699,7 @@
      // define some error handlers, and write the copies to the "filesystem".
         f = avar({val: obj.f});
         first = true;
-        x = avar({key: obj.x.key, val: obj.x.val});
+        x = avar(obj.x);
         f.onerror = x.onerror = function (message) {
          // This function tells the original 'x' that something has gone awry.
             if (first === true) {
@@ -915,13 +715,7 @@
          // This function creates a 'task' object to represent the computation
          // and monitors its status by "polling" the "filesystem" for changes.
             var task;
-            task = avar({
-                val: {
-                    f:      f.key,
-                    x:      x.key,
-                    status: 'waiting'
-                }
-            });
+            task = avar({status: 'waiting', val: {f: f.key, x: x.key}});
             task.onerror = function (message) {
              // This function alerts 'f' and 'x' that something has gone awry.
                 return evt.fail(message);
@@ -931,7 +725,7 @@
              // This function polls for changes in the 'status' property using
              // a variation on the 'update_local' function as a non-blocking
              // 'while' loop -- hooray for disposable avars!
-                var temp = sys.read(task.key);
+                var temp = sys.read(task);
                 temp.onerror = function (message) {
                  // This alerts 'task' that something has gone awry.
                     return evt.fail(message);
@@ -939,7 +733,7 @@
                 temp.onready = function (temp_evt) {
                  // This function analyzes the results of the 'read' operation
                  // to determine if the 'task' computation is ready to proceed.
-                    switch (temp.val.status) {
+                    switch (temp.status) {
                     case 'done':
                         task.val = temp.val;
                         evt.exit();
@@ -1095,7 +889,7 @@
      // This object contains stubs for methods and properties that can be
      // defined externally using the 'Q.init' method. For more information,
      // read the comments in the 'init' function's definition.
-        queue:  null,
+        jobs:   null,
         read:   null,
         write:  null
     };
@@ -1110,14 +904,18 @@
         }
         var local, temp;
         local = this;
-        temp = sys.read(local.key);
+        temp = sys.read(local);
         temp.onerror = function (message) {
          // This function tells 'local' that something has gone awry.
             return evt.fail(message);
         };
         temp.onready = function (temp_evt) {
          // Here, we copy the remote representation into the local one.
-            local.val = temp.val;
+            ply(temp).by(function (key, val) {
+             // This function needs documentation.
+                local[key] = val;
+                return;
+            });
             temp_evt.exit();
             return evt.exit();
         };
@@ -1132,13 +930,13 @@
         if (sys.write === null) {
             return evt.stay('Waiting for a "write" definition ...');
         }
-        var temp = sys.write(this.key, this.val);
+        var temp = sys.write(this);
         temp.onerror = function (message) {
          // This tells the local avar ('this') that something has gone awry.
             return evt.fail(message);
         };
         temp.onready = function (temp_evt) {
-         // This function just releases execution for the "outer" avar.
+         // This function just releases execution for the local avar ('this').
             temp_evt.exit();
             return evt.exit();
         };
@@ -1169,10 +967,10 @@
          // This function retrieves the key of a task from the queue so we
          // can retrieve that task's full description. If no tasks are found,
          // we will simply check back later :-)
-            if (sys.queue === null) {
-                return evt.fail('Waiting for a "queue" definition ...');
+            if (sys.jobs === null) {
+                return evt.fail('Waiting for a "jobs" definition ...');
             }
-            var temp = sys.queue();
+            var temp = sys.jobs();
             temp.onerror = function (message) {
              // This function notifies 'task' that something has gone wrong
              // during retrieval and interpretation of its description.
@@ -1186,7 +984,7 @@
                 if ((temp.val instanceof Array) === false) {
                  // This seems like a common problem that will occur whenever
                  // users begin implementing custom storage mechanisms.
-                    return temp_evt.fail('"queue" should return an array');
+                    return temp_evt.fail('"jobs" should return an array');
                 }
                 if (temp.val.length === 0) {
                  // Here, we choose to 'fail' not because this is a dreadful
@@ -1206,7 +1004,7 @@
         task.onready = update_local;
         task.onready = function (evt) {
          // This function needs documentation.
-            task.val.status = 'running';
+            task.status = 'running';
             return evt.exit();
         };
         task.onready = update_remote;
@@ -1222,9 +1020,9 @@
                 if (first) {
                     first = false;
                     task.val.epitaph = message;
-                    task.val.status = 'failed';
-                    temp_f = avar({key: f.key, val: f.val});
-                    temp_x = avar({key: x.key, val: x.val});
+                    task.status = 'failed';
+                    temp_f = avar(f);
+                    temp_x = avar(x);
                     temp_f = temp_x = update_remote;
                     when(temp_f, temp_x).areready = function (temp_evt) {
                      // This function needs documentation.
@@ -1258,7 +1056,7 @@
             f.onready = x.onready = update_remote;
             when(f, x).areready = function (temp_evt) {
              // This function needs documentation.
-                task.val.status = 'done';
+                task.status = 'done';
                 temp_evt.exit();
                 return evt.exit();
             };
@@ -1347,14 +1145,7 @@
              // This setter "absorbs" 'f', which is expected to be a function,
              // and it stores it in the queue for 'y' to execute later.
                 if (f instanceof AVar) {
-                    when(f, y).areready = function (evt) {
-                     // If 'f' was an avar, then we have to wait on it, too!
-                        var f, y;
-                        f = this.val[0];
-                        y = this.val[1];
-                        f.val.call(y, evt);
-                        return;
-                    };
+                    y.comm({set_onready: f, secret: secret});
                     return;
                 }
                 var count, egress, g, n, ready;
@@ -1523,7 +1314,14 @@
          // Thus, providing this function allows Quanah to use its own format
          // for serialization without making it impossibly hard for users to
          // implement the abstract filesystem routines.
-            return JSON.parse(serialize({key: this.key, val: this.val}));
+            var temp = {};
+            ply(this).by(function (key, val) {
+             // This function needs documentation.
+                temp[key] = val;
+                return;
+            });
+            return JSON.parse(serialize(temp));
+            //return JSON.parse(serialize({key: this.key, val: this.val}));
         }
     });
 
@@ -1570,32 +1368,7 @@
          // one argument which is either a function of a single variable or
          // else an avar whose value is such a function.
             var x = (this instanceof AVar) ? this : avar({val: this});
-            when(f, x).areready = function (evt) {
-             // This function closes over 'f' and 'x' to induce execution on
-             // the local (invoking) machine of the type-testing logic, but it
-             // doesn't actually force the computation 'x.Q(f)' itself to run
-             // locally. How? Well, by halting transformations of 'f' and 'x',
-             // we can guarantee that when the handler function executes, the
-             // value of 'f' will not change even if it's an avar. Thus, we can
-             // use a disposable avar ('temp') to stand for 'x' and assign the
-             // appropriate value of 'f' as an 'onready' handler which can run
-             // remotely if 'f' and 'x' were distributable to begin with :-)
-                var temp = avar({key: x.key, val: x.val});
-                temp.onerror = function (message) {
-                 // This function sends the 'message' along to 'f' and 'x'.
-                    return evt.fail(message);
-                };
-                temp.onready = (f instanceof AVar) ? f.val : f;
-                temp.onready = function (temp_evt) {
-                 // This function updates the original avar to match and then
-                 // exits the enclosing 'when' statement.
-                    x.key = temp.key;   //- NOTE: is this a good idea?
-                    x.val = temp.val;
-                    temp_evt.exit();
-                    return evt.exit();
-                };
-                return;
-            };
+            x.onready = f;
             return x;
         }
     });
@@ -1610,10 +1383,6 @@
         obj = {
             avar:       avar,
             init:       init,
-            map:        dmap,
-            ply:        dply,
-            reduce:     dreduce,
-            uuid:       uuid,
             volunteer:  volunteer,
             when:       when
         };

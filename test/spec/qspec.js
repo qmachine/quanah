@@ -109,9 +109,9 @@
       var api, thing;
       api = {
         avar : 'function',
-        ply : 'function',
-        map : 'function',
-        reduce : 'function',
+        //ply : 'function',
+        //map : 'function',
+        //reduce : 'function',
         when : 'function'
       };
       for ( thing in api ){
@@ -189,7 +189,7 @@
         expect(spy.callCount).toEqual(5);
       });
 
-      it("should allow the value to be retrieved as a string with toString()", function(){
+      xit("should allow the value to be retrieved as a string with toString()", function(){
         avars.onready = Q.ply(function(k,v){
           expect(v.toString()).toEqual(vals[k].toString());
           spy();
@@ -197,7 +197,7 @@
         expect(spy.callCount).toEqual(5);
       });
 
-      it("should allow the value to be retrieved with valueOf()", function(){
+      xit("should allow the value to be retrieved with valueOf()", function(){
         avars.onready = Q.ply(function(k,v){
           expect(v.valueOf()).toEqual(vals[k]);
           spy();
@@ -278,7 +278,7 @@
         expect(spy).toHaveBeenCalled();
       });
 
-      it("should allow iteration over iterable avars with Q.ply", function(){
+      xit("should allow iteration over iterable avars with Q.ply", function(){
         var vals, avars, afterVals, i, doubleIt, checkIt;
         vals = [[1,2,3,4], {a:1,b:2,c:3,d:4}];
         afterVals = [[2,4,6,8], {a:2,b:4,c:6,d:8}];

@@ -259,7 +259,7 @@
             when(x, y).areready = f;
             f.onready = function (evt) {
              // This function needs documentation.
-                puts('Demo 9 is finished.');
+                puts('Demo 7 is finished.');
                 return evt.exit();
             };
             return;
@@ -439,7 +439,7 @@
 
         var excludes, i, n;
 
-        excludes = [3, 6];
+        excludes = [3, 6, 8];
 
         n = demos.length;
 

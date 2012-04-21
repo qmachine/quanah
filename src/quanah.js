@@ -25,8 +25,16 @@
 //  Open questions:
 //
 //  -   Can users' own JSLINT pragmas circumvent the 'isClosed' function?
+//
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.
+//
+//  -   Should the 'serialize' function try to correct the following "mistake"
+//      in JSON itself?
+//
+//          x = [5, 6, 7, 8];
+//          x.hello = 'world';
+//          JSON.stringify(x); // --> "[5,6,7,8]"
 //
 //  Recently solved:
 //
@@ -53,7 +61,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 12 Apr 2012
+//                                                      ~~ (c) SRW, 21 Apr 2012
 
 (function (global) {
     'use strict';

@@ -61,7 +61,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 21 Apr 2012
+//                                                      ~~ (c) SRW, 22 May 2012
 
 (function (global) {
     'use strict';
@@ -1089,43 +1089,41 @@
      // the immediate usefulness of this ability may not be obvious, it will
      // turn out to be crucially important for expressing certain concurrency
      // patterns idiomatically :-)
-        var args, x, y;
+        var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
-        x = (function union(x) {
-         // This 'union' function calls itself recursively to create an array
-         // 'x' of unique dependencies from the input arguments 'args'. In
-         // particular, the prerequisites of compound avars will be added, but
-         // the compound avars themselves will not be added. Performing this
-         // operation is what allows Quanah to "un-nest" 'when' statements in
-         // a single pass without constructing DAGs or preprocessing sources.
-            var y = [];
-            ply(x).by(function (i, xi) {
-             // This function iterates over each element in 'x'.
-                var flag;
-                if ((xi instanceof AVar) &&
-                        (xi.hasOwnProperty('isready') ||
-                        (xi.hasOwnProperty('areready')))) {
-                 // This arms "flattens" dependencies using recursion.
-                    y = union(y.concat(xi.val));
-                } else {
-                 // This arm ensures elements are unique.
-                    flag = true;
-                    ply(y).by(function (j, yj) {
-                     // This function iterates over each element in 'y'.
-                        if (flag === true) {
-                            flag = (xi !== yj);
-                        }
-                        return;
-                    });
-                    if (flag === true) {
-                        y.push(xi);
-                    }
-                }
-                return;
-            });
-            return y;
-        }(args));
+        stack = args.slice();
+        x = [];
         y = avar({val: args});
+        while (stack.length > 0) {
+         // This `while` loop replaces the previous `union` function, which
+         // called itself recursively to create an array `x` of unique
+         // dependencies from the input arguments `args`. Instead, I am using
+         // an array-based stack here with a `while` loop as a means to avoid
+         // the treacherous function recursion stack and its unpredictably
+         // limited depth, since a user could potentially write fiendishly
+         // complicated code that would actually overflow that limit. Anyway,
+         // the prerequisites of compound avars will be added, but the compound
+         // avars themselves will not be added. Performing this operation is
+         // what allows Quanah to "un-nest" `when` statements in a single pass
+         // without constructing a directed acyclic graph or preprocessing the
+         // source code :-)
+            temp = stack.shift();
+            if ((temp instanceof AVar) &&
+                    (temp.hasOwnProperty('isready') ||
+                    (temp.hasOwnProperty('areready')))) {
+             // This arm "flattens" dependencies for array-based recursion.
+                Array.prototype.push.apply(stack, temp.val);
+            } else {
+             // This arm ensures that elements are unique.
+                flag = true;
+                for (i = 0; (flag === true) && (i < x.length); i += 1) {
+                    flag = (temp !== x[i]);
+                }
+                if (flag === true) {
+                    x.push(temp);
+                }
+            }
+        }
         y.onerror = function (message) {
          // This function runs when something "terrible" has occurred.
             ply(x).by(function (key, val) {

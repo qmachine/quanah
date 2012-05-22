@@ -1208,7 +1208,7 @@
                             return evt.stay(message);
                         }
                     });
-                    return;
+                    return revive();    //- NOTE: Is this change justified?
                 };
                 n = x.length;
                 ready = false;

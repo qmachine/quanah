@@ -61,7 +61,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 28 May 2012
+//                                                      ~~ (c) SRW, 30 May 2012
 
 (function (global) {
     'use strict';
@@ -1327,7 +1327,6 @@
                 return;
             });
             return JSON.parse(serialize(temp));
-            //return JSON.parse(serialize({key: this.key, val: this.val}));
         }
     });
 
@@ -1352,9 +1351,6 @@
          // This function "forwards" to the avar's `val` property if possible.
             if ((this.val === null) || (this.val === undefined)) {
                 return this.val;
-            }
-            if (this.hasOwnProperty('isready')) {
-                return this.val[0].valueOf();
             }
             return this.val.valueOf.apply(this.val, arguments);
         }

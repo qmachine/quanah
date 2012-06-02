@@ -922,7 +922,10 @@
             return x;
         }
         var key;
-        if (arguments.length === 1) {
+        if (y === undefined) {
+         // I used to use a test here that `arguments.length === 1`, but that
+         // offended JSLINT:
+         //     "Do not mutate parameter 'y' when using 'arguments'."
             y = {};
         }
         for (key in x) {

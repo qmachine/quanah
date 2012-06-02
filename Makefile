@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on Quanah.
 #
-#                                                       ~~ (c) SRW, 16 Apr 2012
+#                                                       ~~ (c) SRW, 02 Jun 2012
 
 include ./tools/macros.make
 
@@ -14,7 +14,7 @@ ALLJS   :=  $(call available, $(sort $(JS)))
 USEJS   :=  $(strip $(call contingent, $(JS)))
 JSLIBS  :=  libs.js
 QUANAH  :=  src/quanah.js
-SRCJS   :=  $(JSLIBS) $(QUANAH) $(wildcard tests/*.js)
+SRCJS   :=  $(JSLIBS) $(QUANAH) tools/chubby-checker.js $(wildcard tests/*.js)
 EXEJS   :=  main.js
 HTML    :=  index.html
 

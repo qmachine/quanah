@@ -5,9 +5,11 @@
 //  This test ensures that the 'key' property of an avar doesn't "change" (as
 //  presented to the user) when using either Method Q or 'onready' assignment.
 //
-//                                                      ~~ (c) SRW, 22 Feb 2012
+//                                                      ~~ (c) SRW, 02 Jun 2012
 
-(function () {
+/*global CHUBBY: false */
+
+CHUBBY(function (checker) {
     'use strict';
 
  // Pragmas
@@ -56,6 +58,6 @@
 
     return;
 
-}());
+});
 
 //- vim:set syntax=javascript:

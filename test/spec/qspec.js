@@ -12,7 +12,7 @@
 //  in the describe(...) blocks; everything prior is just helpers.
 //
 //                                                      ~~ (c) DER, 06 Apr 2012
-//                                                      update SRW, 20 Apr 2012
+//                                                      update SRW, 01 Jun 2012
 
 (function () {
     'use strict';
@@ -145,10 +145,10 @@
          // Needs a better "should" string...
             var api, thing;
             api = {
-                avar : 'function',
-                //ply : 'function',
-                //map : 'function',
-                //reduce : 'function',
+                avar: 'function',
+                init: 'function',
+                ply:  'function',
+                volunteer: 'function',
                 when : 'function'
             };
             for (thing in api) {
@@ -233,7 +233,7 @@
                 expect(spy.callCount).toEqual(5);
             });
 
-            xit('coerces val to string when toString is called', function () {
+            it('coerces val to string when toString is called', function () {
                 avars.onready = Q.ply(function (k, v) {
                     expect(v.toString()).toEqual(vals[k].toString());
                     spy();
@@ -241,7 +241,7 @@
                 expect(spy.callCount).toEqual(5);
             });
 
-            xit('returns raw val when valueOf is called', function () {
+            it('returns raw val when valueOf is called', function () {
                 avars.onready = Q.ply(function (k, v) {
                     expect(v.valueOf()).toEqual(vals[k]);
                     spy();

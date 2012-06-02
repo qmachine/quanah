@@ -362,6 +362,10 @@
         };
     };
 
+ // There is still a subtle difference between my new `ply` and the version of
+ // `ply` defined above, which I do have a fondness for ...
+    //ply = Q.ply;
+
     puts = function () {
      // This function is my own self-contained output logging utility.
         var hOP, isFunction, join;

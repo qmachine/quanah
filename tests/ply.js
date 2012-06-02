@@ -1,9 +1,9 @@
 //- JavaScript source code
 
 //- ply.js ~~
-//                                                      ~~ (c) SRW, 16 Apr 2012
+//                                                      ~~ (c) SRW, 01 Jun 2012
 
-(function (env) {
+(function (global) {
     'use strict';
 
  // Pragmas
@@ -61,94 +61,7 @@
         };
     };
 
-    dply = function (f) {
-     // This function needs documentation.
-        return function (evt) {
-         // This function needs documentation.
-            var elements, g, key, n, x;
-            g = function (f, key, val) {
-             // This function needs documentation.
-                var temp = avar({val: {f: f, key: key, val: val}});
-                temp.onerror = function (message) {
-                 // This function needs documentation.
-                    return evt.fail(message);
-                };
-                temp.onready = function (evt) {
-                 // This function needs documentation.
-                    this.val.f(this.val.key, this.val.val);
-                    return evt.exit();
-                };
-                temp.onready = function (evt) {
-                 // This function needs documentation.
-                    x.val[key] = this.val.val;
-                    return evt.exit();
-                };
-                return temp;
-            };
-            elements = [];
-            x = (this.hasOwnProperty('isready')) ? this.val[0] : this;
-            if (isArrayLike(x.val)) {
-                n = x.val.length;
-                for (key = 0; key < n; key += 1) {
-                    elements.push(g(f, key, x.val[key]));
-                }
-            } else if (x.val instanceof Object) {
-                for (key in x.val) {
-                    if (x.val.hasOwnProperty(key)) {
-                        elements.push(g(f, key, x.val[key]));
-                    }
-                }
-            } else {
-                return evt.fail('Cannot "ply" this value (' + x.val + ')');
-            }
-            when.apply(this, elements).onready = function (when_evt) {
-             // This function needs documentation.
-                when_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-    };
-
-    ply = function (x) {
-     // This function is a general-purpose iterator for key-value pairs, and
-     // it works exceptionally well in JavaScript because hash-like objects
-     // are so common in this language. This definition itself is an optimized
-     // version that depends on assumptions about how it is used within the
-     // giant anonymous closure to which it belongs. If performance becomes a
-     // strong enough motivation, I will probably end up inlining the loops
-     // anyway, but if you enjoy functional patterns as I do, take a look at
-     // my "generic.js" for a more careful treatment of "basic" iteration :-)
-        return {
-            by: function (f) {
-             // NOTE: I probably can't optimize this function for use only on
-             // arrays and objects because 'serialize' uses it on functions.
-                if (isFunction(f) === false) {
-                    throw new TypeError('"ply..by" expects a function');
-                }
-                var key, n;
-                if (isArrayLike(x)) {
-                 // This arm takes advantage of the fact that indexed 'for'
-                 // loops are substantially faster than 'for in' loops.
-                    n = x.length;
-                    for (key = 0; key < n; key += 1) {
-                        f(key, x[key]);
-                    }
-                } else if (x instanceof Object) {
-                    for (key in x) {
-                        if (x.hasOwnProperty(key)) {
-                            f(key, x[key]);
-                        }
-                    }
-                } else {
-                 // I've never really liked this as a fallback definition, but
-                 // it still helps to have it here, just in case.
-                    f(undefined, x);
-                }
-                return;
-            }
-        };
-    };
+    dply = ply = Q.ply;
 
     dreduce = function (f) {
      // This function needs documentation.
@@ -225,10 +138,81 @@
     };
 
     puts = function () {
-     // This function needs documentation.
-        // ...
+     // This function is my own self-contained output logging utility.
+        var hOP, isFunction, join;
+        hOP = function (obj, name) {
+         // See "hOP.js" for more information.
+            return ((obj !== null)      &&
+                    (obj !== undefined) &&
+                    (obj.hasOwnProperty(name)));
+        };
+        isFunction = function (f) {
+         // See "isFunction.js" for more information.
+            return ((typeof f === 'function') && (f instanceof Function));
+        };
+        join = Array.prototype.join;
+        if (hOP(global, 'system') && isFunction(global.system.print)) {
+            puts = function () {
+             // This function is typically used by Narwhal and RingoJS. Since
+             // Narwhal can be powered by any conforming engine, I should warn
+             // you that I've only tested it on JSC and Rhino engines.
+                global.system.print(join.call(arguments, ' '));
+                return;
+            };
+        } else if (hOP(global, 'console') && isFunction(global.console.log)) {
+            puts = function () {
+             // This function is typically used by Node.js and by modern web
+             // browsers that have a developer's console.
+                global.console.log(join.call(arguments, ' '));
+                return;
+            };
+        } else if (isFunction(global.alert)) {
+            puts = function () {
+             // This function is a fallback definition used by "crusty old web
+             // browsers" that lack a developer's console. Falling back to the
+             // 'alert' function is possibly the most obnoxious thing I could
+             // have done, but I'll try and find some other alternatives soon.
+                global.alert(join.call(arguments, ' '));
+                return;
+            };
+        } else if (hOP(global, 'print') && isFunction(global.print)) {
+         // JavaScriptCore, Rhino, Spidermonkey (==> 'couchjs' also), D8/V8
+            puts = function () {
+             // This function is typically used by server-side developers'
+             // shells like JavaScriptCore, Rhino, Spidermonkey, and V8. A
+             // few variations include 'couchjs', 'd8', and 'mongo'.
+                global.print(join.call(arguments, ' '));
+                return;
+            };
+        } else if (isFunction(global.postMessage)) {
+            puts = function () {
+             // This function is typically used by a Web Worker, but it isn't
+             // a standalone definition. It must be tied through in the main
+             // browser context to some 'bee.onmessage' handler ...
+                global.postMessage(join.call(arguments, ' '));
+                return;
+            };
+        } else {
+         // This is the place where only the naughtiest of implementations
+         // will land. Unfortunately, Adobe/Mozilla Tamarin is one of them.
+            puts = function () {
+             // This function definition is a last resort, trust me. Only the
+             // naughtiest of implementations will land here. Unfortunately,
+             // Adobe/Mozilla Tamarin is one of them. Although it's mainly an
+             // ActionScript engine at the moment, major ECMAScript upgrades
+             // are planned to roll out here later in the year ...
+                /*global print: false */
+                if (isFunction(print)) {
+                    print(join.call(arguments, ' '));
+                    return;
+                }
+                throw new Error('The "puts" definition fell through.');
+            };
+        }
+        puts.apply(this, arguments);
         return;
     };
+
 
     when = Q.when;
 
@@ -284,6 +268,15 @@
 
     return;
 
-}());
+}(function (outer_scope) {
+    'use strict';
+ // See "getGlobal.js" for more information.
+    /*global global: true */
+    if (this === null) {
+        return (typeof global === 'object') ? global : outer_scope;
+    } else {
+        return (typeof this.global === 'object') ? this.global : this;
+    }
+}.call(null, this)));
 
 //- vim:set syntax=javascript:

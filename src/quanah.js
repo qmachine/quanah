@@ -129,8 +129,8 @@
                         'abcdefghijklmnopqrstuvwxyz' +
                         '0123456789+/=';
                  // NOTE: This `for` loop may actually require sequentiality
-                 // as currently written. I converted it from a "do-while"
-                 // implementation, but I will write it as a "map" soon :-)
+                 // as currently written. I converted it from a `do..while`
+                 // implementation, but I will write it as a `map` soon :-)
                     for (i = 0; i < n; i += 4) {
                         en1 = a.indexOf(input[i]);
                         en2 = a.indexOf(input[i + 1]);
@@ -195,11 +195,7 @@
         } else {
             temp = spec;
         }
-        for (key in temp) {
-            if (temp.hasOwnProperty(key)) {
-                that[key] = temp[key];
-            }
-        }
+        shallow_copy(temp, that);
         that.key = (temp.hasOwnProperty('key')) ? temp.key : uuid();
         that.val = (temp.hasOwnProperty('val')) ? temp.val : null;
         return that;
@@ -231,8 +227,8 @@
                         'abcdefghijklmnopqrstuvwxyz' +
                         '0123456789+/=';
                  // NOTE: This `for` loop may actually require sequentiality
-                 // as currently written. I converted it from a "do-while"
-                 // implementation, but I will write it as a "map" soon :-)
+                 // as currently written. I converted it from a `do..while`
+                 // implementation, but I will write it as a `map` soon :-)
                     for (i = 0; i < input.length; i += 3) {
                         ch1 = input.charCodeAt(i);
                         ch2 = input.charCodeAt(i + 1);
@@ -372,7 +368,7 @@
              // In such a case, we may try to rely on user-submitted reports,
              // but right now we just hope we can capture the error ...
                 x.comm({
-                    fail: 'Invalid "comm" message "' + message + '"',
+                    fail: 'Invalid `comm` message "' + message + '"',
                     secret: secret
                 });
             }
@@ -953,7 +949,7 @@
      // the one from its remote representation. It is written as a function of
      // `evt` because it is intended to be assigned to `onready`.
         if (sys.read === null) {
-            return evt.stay('Waiting for a "read" definition ...');
+            return evt.stay('Waiting for a `read` definition ...');
         }
         var local, temp;
         local = this;
@@ -977,7 +973,7 @@
      // the one from its local representation. It is written as a function of
      // `evt` because it is intended to be assigned to `onready`.
         if (sys.write === null) {
-            return evt.stay('Waiting for a "write" definition ...');
+            return evt.stay('Waiting for a `write` definition ...');
         }
         var temp = sys.write(this);
         temp.onerror = function (message) {
@@ -1017,7 +1013,7 @@
          // can retrieve that task's full description. If no tasks are found,
          // we will simply check back later :-)
             if (sys.jobs === null) {
-                return evt.fail('Waiting for a "jobs" definition ...');
+                return evt.fail('Waiting for a `jobs` definition ...');
             }
             var temp = sys.jobs();
             temp.onerror = function (message) {
@@ -1033,7 +1029,7 @@
                 if ((temp.val instanceof Array) === false) {
                  // This seems like a common problem that will occur whenever
                  // users begin implementing custom storage mechanisms.
-                    return temp_evt.fail('"jobs" should return an array');
+                    return temp_evt.fail('`jobs` should return an array');
                 }
                 if (temp.val.length === 0) {
                  // Here, we choose to `fail` not because this is a dreadful
@@ -1401,7 +1397,7 @@
     defineProperty(Object.prototype, 'Q', {
      // Modifying the native prototype objects is extremely poor taste,
      // so we need to do this as invisibly as possible. To that end, I
-     // have added the new method using "defineProperty" instead of by
+     // have added the new method using `defineProperty` instead of by
      // assigning directly because then I can edit ES5 meta-properties.
         configurable: false,
         enumerable: false,
@@ -1460,7 +1456,7 @@
  // This strict anonymous closure encapsulates the logic for detecting which
  // object in the environment should be treated as _the_ global object. It's
  // not as easy as you may think -- strict mode disables the `call` method's
- // default behavior of replacing "null" with the global object. Luckily, we
+ // default behavior of replacing `null` with the global object. Luckily, we
  // can work around that by passing a reference to the enclosing scope as an
  // argument at the same time and testing to see if strict mode has done its
  // deed. This task is not hard in the usual browser context because we know

@@ -61,7 +61,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 01 Jun 2012
+//                                                      ~~ (c) SRW, 02 Jun 2012
 
 (function (global) {
     'use strict';
@@ -682,78 +682,35 @@
          // run often but rarely change, I have inlined loops as appropriate.
          // It is difficult to optimize code for use with modern JIT compilers,
          // and my own recommendation is to hand-optimize with loops only if
-         // you're truly obsessed with performance -- it's a lot of work. That
-         // said, if you are such a person, drop me a line if you know how to
-         // make `ply` faster!
+         // you're truly obsessed with performance -- it's a lot of work, and
+         // the auto-detecting and delegating dynamically in order to use the
+         // fastest possible loop pattern adds overhead that can be difficult
+         // to optimize for use in real-world applications. That said, if you
+         // have ideas for how to make `ply` run more efficiently, by all means
+         // drop me a line! :-)
             if (isFunction(f) === false) {
-                throw new TypeError('".by" expects a function.');
+                throw new TypeError('`ply..by` expects a function.');
             }
-            var first, flag, i, j, key, m, n, row, temp;
+            var i, key, obj, n, toc, x;
             n = args.length;
-            if ((n > 0) && (args[0] !== null) && (args[0] !== undefined)) {
-                first = args[0].valueOf();
-            }
-            temp = [];
-         // We need to identify a generic iteration pattern for `x`, and
-         // we will start by testing it as an "Array-Like Object" (ALO).
-         // An ALO is an object whose `length` property represents its
-         // maximum numerical property key. Such objects may use Array
-         // methods generically, and for iteration this can be especially
-         // useful. The two surprises here are functions and strings. A
-         // function has a `length` property representing its arity, which
-         // is its number of input arguments -- it cannot be an ALO. A
-         // string is actually a primitive, not an object, but it _can_
-         // be used as an Array-Like Object. Go figure :-P
-            flag = ((first !== null)                        &&
-                    (first !== undefined)                   &&
-                    (first.hasOwnProperty('length'))        &&
-                    (typeof first !== 'function')           &&
-                    ((first instanceof Function) === false));
-            if (flag === true) {
-             // This arm takes advantage of the fact that indexed `for`
-             // loops are substantially faster than `for..in` loops.
-                m = first.length;
-                for (j = 0; j < n; j += 1) {
-                    if ((args[j] === null) || (args[j] === undefined)) {
-                        temp[j] = {};
-                    } else {
-                        temp[j] = args[j].valueOf();
-                    }
-                }
-                for (i = 0; i < m; i += 1) {
-                    row = [i];
-                    for (j = 0; j < n; j += 1) {
-                        row[j + 1] = temp[j][i];
-                    }
-                    f.apply(null, row);
-                }
-            } else if (first instanceof Object) {
-             // This arm, which is still experimental, iterates over `first`'s
-             // named properties using the standard `for..in` loop.
-                for (j = 0; j < n; j += 1) {
-                    if ((args[j] === null) || (args[j] === undefined)) {
-                        temp[j] = {};
-                    } else {
-                        temp[j] = args[j].valueOf();
-                    }
-                }
-                for (key in first) {
-                    if (first.hasOwnProperty(key)) {
-                        row = [key];
-                        for (j = 0; j < n; j += 1) {
-                            if (temp[j].hasOwnProperty(key)) {
-                                row[j + 1] = temp[j][key];
+            toc = {};
+            x = [];
+            for (i = 0; i < n; i += 1) {
+                if ((args[i] !== null) && (args[i] !== undefined)) {
+                    obj = args[i].valueOf();
+                    for (key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            if (toc.hasOwnProperty(key) === false) {
+                                toc[key] = x.push([key]) - 1;
                             }
+                            x[toc[key]][i + 1] = obj[key];
                         }
-                        f.apply(null, row);
                     }
                 }
-            } else {
-             // This arm is used for all "strange" cases that fell through.
-             // If your code keeps hitting this arm, you're probably better
-             // off not using `ply` at all.
-                row = [undefined].concat(args);
-                f.apply(null, row);
+            }
+            n = x.length;
+            for (i = 0; i < n; i += 1) {
+                f.apply(this, x[i]);
             }
             return;
         };

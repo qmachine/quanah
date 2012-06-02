@@ -1,7 +1,7 @@
 //- JavaScript source code
 
 //- demo.js ~~
-//                                                      ~~ (c) SRW, 26 Mar 2012
+//                                                      ~~ (c) SRW, 02 Jun 2012
 
 (function (global) {
     'use strict';
@@ -18,7 +18,7 @@
 
  // Declarations
 
-    var Q, avar, demos, map, ply, reduce, puts, when;
+    var Q, avar, demos, ply, puts, when;
 
  // Definitions
 
@@ -320,51 +320,7 @@
 
     ];
 
-    map = Q.map;
-
-    ply = function () {
-     // This function is a generalized "zippered" iterator that also works
-     // extremely well for key-value pairs, and it serves as the "fallback"
-     // definition for the generic 'Q.ply' method. It is incredibly useful in
-     // JavaScript because hash-like objects are so common in that language.
-     // It provides access not only to the values of its input arguments, but
-     // also to the index at which each set of values was found.
-        var args, i, key, obj, n, toc, x;
-        args = Array.prototype.slice.call(arguments);
-        n = args.length;
-        toc = {};
-        x = [];
-        for (i = 0; i < n; i += 1) {
-            if ((args[i] !== null) && (args[i] !== undefined)) {
-                obj = args[i].valueOf();
-                for (key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        if (toc.hasOwnProperty(key) === false) {
-                            toc[key] = x.push([key]) - 1;
-                        }
-                        x[toc[key]][i + 1] = obj[key];
-                    }
-                }
-            }
-        }
-        return {
-            by: function (f) {
-             // This function forgoes "type checking" because 'ply' is only
-             // available in an anonymous closure for demonstration purposes.
-             // Thus, I already know it's only going to receive functions ;-)
-                var i, n;
-                n = x.length;
-                for (i = 0; i < n; i += 1) {
-                    f.apply(this, x[i]);
-                }
-                return;
-            }
-        };
-    };
-
- // There is still a subtle difference between my new `ply` and the version of
- // `ply` defined above, which I do have a fondness for ...
-    //ply = Q.ply;
+    ply = Q.ply;
 
     puts = function () {
      // This function is my own self-contained output logging utility.
@@ -429,8 +385,6 @@
         return;
     };
 
-    reduce = Q.reduce;
-
     when = Q.when;
 
  // Out-of-scope definitions ("exports")
@@ -443,7 +397,7 @@
 
         var excludes, i, n;
 
-        excludes = [3, 6, 8];
+        excludes = [3, 8];
 
         n = demos.length;
 

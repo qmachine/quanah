@@ -4,11 +4,11 @@
 #
 #   This contains live instructions for development on Quanah.
 #
-#                                                       ~~ (c) SRW, 02 Jun 2012
+#                                                       ~~ (c) SRW, 10 Jun 2012
 
 include ./tools/macros.make
 
-JS      :=  v8 js jsc d8 node nodejs narwhal-jsc rhino ringo narwhal    \
+JS      :=  jsc v8 js d8 node nodejs narwhal-jsc rhino ringo narwhal    \
                 couchjs phantomjs #js-1.8.0 avmshell
 ALLJS   :=  $(call available, $(sort $(JS)))
 USEJS   :=  $(strip $(call contingent, $(JS)))

@@ -4,9 +4,11 @@
 #
 #   This contains live instructions for development on Quanah.
 #
-#                                                       ~~ (c) SRW, 10 Jun 2012
+#                                                       ~~ (c) SRW, 06 Jul 2012
 
-include ./tools/macros.make
+PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
+
+include $(PROJECT_ROOT)/tools/macros.make
 
 JS      :=  jsc v8 js d8 node nodejs narwhal-jsc rhino ringo narwhal    \
                 couchjs phantomjs #js-1.8.0 avmshell
@@ -73,7 +75,7 @@ run: quick
 
 ###
 
-.PHONY: benchmark browse browser check check-jasmine check-old quick
+.PHONY: benchmark browse browser check check-jasmine check-old quick test
 
 benchmark: $(EXEJS)
 	@   $(RM) time-data.out                                         ;   \
@@ -161,6 +163,8 @@ quick:
                 $(call alert, 'Failure.')                               ;   \
             fi                                                          ;   \
             $(RM) $${QUICK_JS_FILE}
+
+test: check
 
 ###
 

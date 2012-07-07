@@ -10,24 +10,23 @@ PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(PROJECT_ROOT)/tools/macros.make
 
-JS      :=  jsc v8 js d8 node nodejs narwhal-jsc rhino ringo narwhal    \
-                couchjs phantomjs #js-1.8.0 avmshell
-ALLJS   :=  $(call available, $(sort $(JS)))
-USEJS   :=  $(strip $(call contingent, $(JS)))
+ENGINES :=  jsc v8 js d8 node nodejs narwhal-jsc rhino ringo narwhal    \
+                couchjs phantomjs # avmshell
+JS      :=  $(strip $(call contingent, $(ENGINES)))
 JSLIBS  :=  libs.js
 QUANAH  :=  src/quanah.js
 SRCJS   :=  $(JSLIBS) $(QUANAH) tools/chubby-checker.js $(wildcard tests/*.js)
 EXEJS   :=  main.js
 HTML    :=  index.html
 
-CAT     :=  $(call contingent, cat)
+CAT     :=  $(call contingent, gcat cat)
 CLOSURE :=  $(call contingent, closure)
-CP      :=  $(call contingent, rsync cp)
+CP      :=  $(call contingent, rsync gcp cp)
 CURL    :=  $(call contingent, curl) #-sS
 OPEN    :=  $(call contingent, gnome-open open)
-RM      :=  $(call contingent, rm) -rf
+RM      :=  $(call contingent, grm rm) -rf
 TIME    :=  $(call contingent, time)
-TOUCH   :=  $(call contingent, touch)
+TOUCH   :=  $(call contingent, gtouch touch)
 WEBPAGE :=  $(call contingent, ruby jruby) ./tools/webpage.rb
 YUICOMP :=  $(call contingent, yuicompressor)
 
@@ -79,7 +78,7 @@ run: quick
 
 benchmark: $(EXEJS)
 	@   $(RM) time-data.out                                         ;   \
-            for each in $(ALLJS); do                                        \
+            for each in $(call available, $(ENGINES)); do                   \
                 $(call aside, $${each})                                 ;   \
                 for i in 1 2 3; do                                          \
                     echo $${each} >>time-data.out 2>&1                  ;   \
@@ -101,7 +100,7 @@ check-jasmine: $(QUANAH)
 
 check-old: $(EXEJS)
 	@   $(RM) results1.out results2.out                             ;   \
-            for each in $(ALLJS); do                                        \
+            for each in $(call available, $(ENGINES)); do                   \
                 $(call aside, $${each})                                 ;   \
                 if [ ! -f results1.out ]; then                              \
                     $${each} $(EXEJS) 2>&1 >results1.out                ;   \
@@ -130,8 +129,8 @@ check-old: $(EXEJS)
 fast: $(EXEJS)
 	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
             $(call compile-js, $(EXEJS), $${QUICK_JS_FILE})             ;   \
-            $(call aside, "$(USEJS) $${QUICK_JS_FILE}")                 ;   \
-            $(TIME) $(USEJS) $${QUICK_JS_FILE}                          ;   \
+            $(call aside, "$(JS) $${QUICK_JS_FILE}")                    ;   \
+            $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \
             if [ $$? -eq 0 ]; then                                          \
                 $(call hilite, 'Success.')                              ;   \
             else                                                            \
@@ -143,8 +142,8 @@ faster:
 	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
             $(call compile-js,                                              \
                 $(filter-out $(JSLIBS), $(SRCJS)), $${QUICK_JS_FILE})   ;   \
-            $(call aside, "$(USEJS) $${QUICK_JS_FILE}")                 ;   \
-            $(TIME) $(USEJS) $${QUICK_JS_FILE}                          ;   \
+            $(call aside, "$(JS) $${QUICK_JS_FILE}")                    ;   \
+            $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \
             if [ $$? -eq 0 ]; then                                          \
                 $(call hilite, 'Success.')                              ;   \
             else                                                            \
@@ -155,8 +154,8 @@ faster:
 quick:
 	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
             $(CAT) $(filter-out $(JSLIBS), $(SRCJS)) > $${QUICK_JS_FILE};   \
-            $(call aside, $(USEJS))                                     ;   \
-            $(TIME) $(USEJS) $${QUICK_JS_FILE}                          ;   \
+            $(call aside, $(JS))                                        ;   \
+            $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \
             if [ $$? -eq 0 ]; then                                          \
                 $(call hilite, 'Success.')                              ;   \
             else                                                            \

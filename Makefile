@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on Quanah.
 #
-#                                                       ~~ (c) SRW, 06 Jul 2012
+#                                                       ~~ (c) SRW, 11 Jul 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -20,7 +20,7 @@ EXEJS   :=  main.js
 HTML    :=  index.html
 
 CAT     :=  $(call contingent, gcat cat)
-CLOSURE :=  $(call contingent, closure)
+CLOSURE :=  $(call contingent, closure-compiler closure)
 CP      :=  $(call contingent, rsync gcp cp)
 CURL    :=  $(call contingent, curl) #-sS
 OPEN    :=  $(call contingent, gnome-open open)

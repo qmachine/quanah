@@ -21,6 +21,7 @@
 //  -   replace `throw` statements with `evt.fail` statements for robustness
 //  -   rewrite `onready` assignments as `comm` invocations (optional)
 //  -   rewrite `remote_call` in terms of a single avar to be like `volunteer`
+//  -   verify correct getter/setter handling in `shallow_copy`
 //
 //  Open questions:
 //
@@ -61,7 +62,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 02 Jun 2012
+//                                                      ~~ (c) SRW, 11 Jul 2012
 
 (function (global) {
     'use strict';
@@ -196,8 +197,12 @@
             temp = spec;
         }
         shallow_copy(temp, that);
-        that.key = (temp.hasOwnProperty('key')) ? temp.key : uuid();
-        that.val = (temp.hasOwnProperty('val')) ? temp.val : null;
+        if (that.hasOwnProperty('key') === false) {
+            that.key = uuid();
+        }
+        if (that.hasOwnProperty('val') === false) {
+            that.val = null;
+        }
         return that;
     };
 
@@ -914,16 +919,13 @@
 
     shallow_copy = function (x, y) {
      // This function needs documentation.
-        if ((x instanceof Object) === false) {
-            return x;
-        }
-        var key;
         if (y === undefined) {
-         // I used to use a test here that `arguments.length === 1`, but that
-         // offended JSLINT:
+         // At one point, I used a test here that `arguments.length === 1`, but
+         // it offended JSLint:
          //     "Do not mutate parameter 'y' when using 'arguments'."
             y = {};
         }
+        var key;
         for (key in x) {
             if (x.hasOwnProperty(key)) {
                 y[key] = x[key];

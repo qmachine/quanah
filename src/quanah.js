@@ -165,7 +165,7 @@
      // order to data. For each avar, such a sequence is stored as a first-in,
      // first-out (FIFO) queue and executed according to messages the avar
      // receives through its `comm` method.
-        var key, state, temp, that;
+        var state, temp, that;
         state = {
             epitaph:    null,
             onerror:    null,

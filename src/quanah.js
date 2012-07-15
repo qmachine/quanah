@@ -62,7 +62,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 11 Jul 2012
+//                                                      ~~ (c) SRW, 15 Jul 2012
 
 (function (global) {
     'use strict';
@@ -506,7 +506,7 @@
              // answer to our question would be `true`, which is why we have
              // to negate JSLINT's output.
                 flag = (false === JSLINT($f, {
-                 // JSLINT configuration options, as of version 2012-03-29:
+                 // JSLINT configuration options, as of version 2012-07-13:
                     anon:       true,   //- allow `function()`?
                     bitwise:    true,   //- allow use of bitwise operators?
                     browser:    false,  //- assume browser as JS environment?
@@ -540,7 +540,7 @@
                     sub:        true,   //- allow all forms of subset notation?
                     vars:       true,   //- allow multiple `var` statements?
                     white:      true,   //- allow sloppy whitespace?
-                    widget:     false,  //- assume Yahoo widget JS environment?
+                    //widget:     false,//- assume Yahoo widget JS environment?
                     windows:    false   //- assume Windows OS?
                 }));
             }

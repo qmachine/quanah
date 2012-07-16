@@ -69,8 +69,23 @@
 
  // Pragmas
 
-    /*jslint indent: 4, maxlen: 80, unparam: true */
+    /*jslint indent: 4, maxlen: 80 */
+
     /*global JSLINT: false */
+
+    /*properties
+        Q, adsafe, anon, apply, areready, atob, avar, bitwise, browser, btoa,
+        by, call, cap, charCodeAt, comm, concat, configurable, continue, css,
+        debug, defineProperty, devel, done, enumerable, epitaph, eqeq, es5,
+        evil, exit, f, fail, forin, fragment, fromCharCode, get, get_onerror,
+        get_onready, global, hasOwnProperty, indexOf, init, jobs, key, length,
+        newcap, node, nomen, on, onerror, onready, parse, passfail, plusplus,
+        ply, predef, properties, prototype, push, queue, random, read, ready,
+        regexp, replace, rhino, safe, secret, set, set_onerror, set_onready,
+        shift, slice, sloppy, status, stay, stringify, stupid, sub, test, todo,
+        toJSON, toSource, toString, undef, unparam, unshift, val, value,
+        valueOf, vars, volunteer, when, white, windows, writable, write, x
+    */
 
  // Prerequisites
 
@@ -126,9 +141,8 @@
                 n = input.length;
                 output = '';
                 if (n > 0) {
-                    a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-                        'abcdefghijklmnopqrstuvwxyz' +
-                        '0123456789+/=';
+                    a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg' +
+                        'hijklmnopqrstuvwxyz0123456789+/=';
                  // NOTE: This `for` loop may actually require sequentiality
                  // as currently written. I converted it from a `do..while`
                  // implementation, but I will write it as a `map` soon :-)
@@ -228,9 +242,8 @@
                 n = input.length;
                 output = '';
                 if (n > 0) {
-                    a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-                        'abcdefghijklmnopqrstuvwxyz' +
-                        '0123456789+/=';
+                    a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg' +
+                        'hijklmnopqrstuvwxyz0123456789+/=';
                  // NOTE: This `for` loop may actually require sequentiality
                  // as currently written. I converted it from a `do..while`
                  // implementation, but I will write it as a `map` soon :-)
@@ -345,7 +358,8 @@
                     }
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
-                     // This function needs documentation.
+                     // This function allows Quanah to postpone execution of
+                     // the given task until both `f` and `x` are ready.
                         var f, x;
                         f = this.val[0].val;
                         x = this.val[1];
@@ -395,6 +409,7 @@
      // prototype method, and it would have to be extensible for all types.
      // NOTE: This definition could stand to be optimized, but I recommend
      // leaving it as-is until improving performance is absolutely critical.
+        /*jslint unparam: true */
         return JSON.parse($x, function (key, val) {
          // This function is provided to `JSON.parse` as the optional second
          // parameter that its documentation refers to as a `revive` function.
@@ -472,6 +487,7 @@
      // occur on the same machines that invoked them! Anyway, this function is
      // only one solution to the serialization problem, and I welcome feedback
      // from others who may have battled the same problems :-)
+        /*jslint unparam: true */
         var $f, flag, left, right;
         flag = false;
         left = '(function () {\nreturn ';
@@ -507,11 +523,12 @@
              // to negate JSLINT's output.
                 flag = (false === JSLINT($f, {
                  // JSLINT configuration options, as of version 2012-07-13:
+                    adsafe:     false,  //- enforce ADsafe rules?
                     anon:       true,   //- allow `function()`?
                     bitwise:    true,   //- allow use of bitwise operators?
                     browser:    false,  //- assume browser as JS environment?
                     cap:        true,   //- allow uppercase HTML?
-                    //confusion:  true, //- allow inconsistent type usage?
+                    //confusion:true,   //- allow inconsistent type usage?
                     'continue': true,   //- allow continuation statement?
                     css:        true,   //- allow CSS workarounds?
                     debug:      false,  //- allow debugger statements?
@@ -521,26 +538,29 @@
                     evil:       false,  //- allow the `eval` statement?
                     forin:      true,   //- allow unfiltered `for..in`?
                     fragment:   true,   //- allow HTML fragments?
-                    //indent:     4,
-                    //maxerr:     1,
-                    //maxlen:     80,
+                    //indent:   4,
+                    //maxerr:   1,
+                    //maxlen:   80,
                     newcap:     true,   //- constructors must be capitalized?
                     node:       false,  //- assume Node.js as JS environment?
                     nomen:      true,   //- allow names' dangling underscores?
                     on:         false,  //- allow HTML event handlers
                     passfail:   true,   //- halt the scan on the first error?
                     plusplus:   true,   //- allow `++` and `--` usage?
+                    predef:     {},     //- predefined global variables
                     properties: false,  //- require JSLINT /*properties */?
                     regexp:     true,   //- allow `.` in regexp literals?
                     rhino:      false,  //- assume Rhino as JS environment?
-                    undef:      false,  //- allow out-of-order definitions?
-                    unparam:    true,   //- allow unused parameters?
+                    safe:       false,  //- enforce safe subset of ADsafe?
                     sloppy:     true,   //- ES5 strict mode pragma is optional?
                     stupid:     true,   //- allow `*Sync` calls in Node.js?
                     sub:        true,   //- allow all forms of subset notation?
+                    todo:       true,   //- allow comments that start with TODO
+                    undef:      false,  //- allow out-of-order definitions?
+                    unparam:    true,   //- allow unused parameters?
                     vars:       true,   //- allow multiple `var` statements?
                     white:      true,   //- allow sloppy whitespace?
-                    //widget:     false,//- assume Yahoo widget JS environment?
+                    //widget:   false,//- assume Yahoo widget JS environment?
                     windows:    false   //- assume Windows OS?
                 }));
             }
@@ -872,6 +892,7 @@
      // depends on `btoa`, which unfortunately has issues with UTF-8 strings.
      // I haven't found a test case yet that proves I need to work around the
      // problem, but if I do, I will follow the post at http://goo.gl/cciXV.
+        /*jslint unparam: true */
         return JSON.stringify(x, function replacer(key, val) {
             var obj, $val;
             if (isFunction(val)) {
@@ -918,10 +939,14 @@
     };
 
     shallow_copy = function (x, y) {
-     // This function needs documentation.
+     // This function copies the properties of `x` to `y`, specifying `y` as
+     // object literal if it was not provided as an input argument. It does
+     // not perform a "deep copy", which means that properties whose values
+     // are objects will be "copied by reference" rather than by value. Right
+     // now, I see no reason to worry about deep copies or getters / setters.
         if (y === undefined) {
-         // At one point, I used a test here that `arguments.length === 1`, but
-         // it offended JSLint:
+         // At one point, I used a test here that `arguments.length === 1`,
+         // but it offended JSLint:
          //     "Do not mutate parameter 'y' when using 'arguments'."
             y = {};
         }
@@ -1050,19 +1075,33 @@
         };
         task.onready = update_local;
         task.onready = function (evt) {
-         // This function needs documentation.
+         // This function changes the `status` property of the local `task`
+         // object we just synced from remote; the next step, obviously, is
+         // to sync back to remote so that the abstract task will disappear
+         // from the "waiting" queue.
             task.status = 'running';
             return evt.exit();
         };
         task.onready = update_remote;
         task.onready = function (evt) {
-         // This function needs documentation.
+         // This function executes the abstract task by recreating `f` and `x`
+         // and running them in the local environment. Since we know `task` is
+         // serializable, we cannot simply add its deserialized form to the
+         // local machine's queue (`stack`), because `revive` would just send
+         // it back out for remote execution again. Thus, we deliberately close
+         // over local variables like `avar` in order to restrict execution to
+         // the current environment. The transform defined in `task.val.f` is
+         // still able to distribute its own sub-tasks for remote execution.
             var f, first, x;
             f = avar({key: task.val.f});
             first = true;
             x = avar({key: task.val.x});
             f.onerror = x.onerror = function (message) {
-             // This function needs documentation.
+             // This function runs if execution of the abstract task fails.
+             // The use of a `first` value prevents this function from running
+             // more than once, because aside from annoying the programmer by
+             // returning lots of error messages on his or her screen, such a
+             // situation can also wreak all kinds of havoc for reentrancy.
                 var temp_f, temp_x;
                 if (first) {
                     first = false;
@@ -1072,7 +1111,8 @@
                     temp_x = avar(x);
                     temp_f = temp_x = update_remote;
                     when(temp_f, temp_x).areready = function (temp_evt) {
-                     // This function needs documentation.
+                     // This function runs only when the error messages have
+                     // finished syncing to remote storage successfully.
                         temp_evt.exit();
                         return evt.exit();
                     };
@@ -1081,7 +1121,7 @@
             };
             f.onready = x.onready = update_local;
             when(f, x).areready = function (evt) {
-             // This function needs documentation.
+             // This function contains the _actual_ execution. (Boring, huh?)
                 f.val.call(x, evt);
                 return;
             };
@@ -1107,7 +1147,11 @@
          //
             f.onready = x.onready = update_remote;
             when(f, x).areready = function (temp_evt) {
-             // This function needs documentation.
+             // This function only executes when the task has successfully
+             // executed and the transformed values of `f` and `x` are synced
+             // back to remote storage. Thus, we are now free to send the
+             // signal for successful completion to the invoking machine by
+             // updating the `status` property locally and syncing to remote.
                 task.status = 'done';
                 temp_evt.exit();
                 return evt.exit();
@@ -1170,6 +1214,7 @@
         }
         y.onerror = function (message) {
          // This function runs when something "terrible" has occurred.
+            /*jslint unparam: true */
             ply(x).by(function (key, val) {
              // This function passes `message` to each avar in `x`. For the
              // other elements, there isn't much we can do, so we ignore them.
@@ -1194,6 +1239,7 @@
             set: function (f) {
              // This setter "absorbs" `f`, which is expected to be a function,
              // and it stores it in the queue for `y` to execute later.
+                /*jslint unparam: true */
                 if (f instanceof AVar) {
                     y.comm({set_onready: f, secret: secret});
                     return;

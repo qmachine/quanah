@@ -17,6 +17,8 @@
 //
 //  To-do list:
 //
+//  -   annotate for the Closure Compiler as documented here:
+//        https://developers.google.com/closure/compiler/docs/js-for-compiler
 //  -   remove type-checks in user-unreachable functions where appropriate
 //  -   replace `throw` statements with `evt.fail` statements for robustness
 //  -   rewrite `onready` assignments as `comm` invocations (optional)
@@ -26,6 +28,8 @@
 //  Open questions:
 //
 //  -   Can users' own JSLINT pragmas circumvent the `isClosed` function?
+//      -   I know that enabling ADsafe in JSLINT can prevent this, but it
+//          also seems to restrict too many other [useful] things ...
 //
 //  -   Is Quanah a kernel?
 //      -   If so, is it "re-entrant"? See http://goo.gl/985r.

@@ -78,9 +78,9 @@
         by, call, cap, charCodeAt, comm, concat, configurable, continue, css,
         debug, defineProperty, devel, done, enumerable, epitaph, eqeq, es5,
         evil, exit, f, fail, forin, fragment, fromCharCode, get, get_onerror,
-        get_onready, global, hasOwnProperty, indexOf, init, jobs, key, length,
-        newcap, node, nomen, on, onerror, onready, parse, passfail, plusplus,
-        ply, predef, properties, prototype, push, queue, random, read, ready,
+        get_onready, hasOwnProperty, indexOf, init, jobs, key, length, newcap,
+        node, nomen, on, onerror, onready, parse, passfail, plusplus, ply,
+        predef, properties, prototype, push, queue, random, read, ready,
         regexp, replace, rhino, safe, secret, set, set_onerror, set_onready,
         shift, slice, sloppy, status, stay, stringify, stupid, sub, test, todo,
         toJSON, toSource, toString, undef, unparam, unshift, val, value,
@@ -1524,6 +1524,7 @@
 
     /*jslint indent: 4, maxlen: 80 */
     /*global global: true */
+    /*properties global */
 
     if (this === null) {
 

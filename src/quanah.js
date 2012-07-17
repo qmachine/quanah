@@ -66,7 +66,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 15 Jul 2012
+//                                                      ~~ (c) SRW, 17 Jul 2012
 
 (function (global) {
     'use strict';
@@ -1181,6 +1181,16 @@
      // the immediate usefulness of this ability may not be obvious, it will
      // turn out to be crucially important for expressing certain concurrency
      // patterns idiomatically :-)
+     //
+     // NOTE: The existence of the `when` function almost certainly causes a
+     // conflict with CoffeeScript's `switch/when/else` construct. As always,
+     // I strongly recommend development directly in JavaScript, but if you
+     // prefer to write applications in another language, you will need to
+     // "compile" it to JS before using it with Quanah. If you encounter any
+     // problems in the opposite direction, such as compiling Quanah into a
+     // different language, please let me know so I can determine if the error
+     // is due to Quanah or due to the target language's compiler.
+     //
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();

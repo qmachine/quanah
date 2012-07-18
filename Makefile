@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on Quanah.
 #
-#                                                       ~~ (c) SRW, 11 Jul 2012
+#                                                       ~~ (c) SRW, 17 Jul 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -198,6 +198,16 @@ json2.js:
             else                                                            \
                 $(CURL) -o $@ $${CROCKHUB}/JSON-js/master/json2.js      ;   \
             fi 
+
+###
+
+#-  NOTE: The following rule is still experimental and should not be used in
+#   production, especially if you are planning to convert the resulting output
+#   back into JavaScript again for deployment. Such files might pass the unit
+#   tests but still contain bugs and/or security vulnerabilities.
+
+%.coffee: %.js
+	@   $(call contingent, js2coffee) $< > $@
 
 ###
 

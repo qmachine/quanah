@@ -66,7 +66,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 17 Jul 2012
+//                                                      ~~ (c) SRW, 27 Jul 2012
 
 (function (global) {
     'use strict';
@@ -78,17 +78,17 @@
     /*global JSLINT: false */
 
     /*properties
-        Q, adsafe, anon, apply, areready, atob, avar, bitwise, browser, btoa,
-        by, call, cap, charCodeAt, comm, concat, configurable, continue, css,
+        JSLINT, Q, adsafe, anon, apply, areready, atob, avar, bitwise,
+        browser, btoa, by, call, cap, charCodeAt, comm, concat, continue, css,
         debug, defineProperty, devel, done, enumerable, epitaph, eqeq, es5,
         evil, exit, f, fail, forin, fragment, fromCharCode, get, get_onerror,
-        get_onready, hasOwnProperty, indexOf, init, jobs, key, length, newcap,
-        node, nomen, on, onerror, onready, parse, passfail, plusplus, ply,
-        predef, properties, prototype, push, queue, random, read, ready,
+        get_onready, global, hasOwnProperty, indexOf, init, jobs, key, length,
+        newcap, node, nomen, on, onerror, onready, parse, passfail, plusplus,
+        ply, predef, properties, prototype, push, queue, random, read, ready,
         regexp, replace, rhino, safe, secret, set, set_onerror, set_onready,
-        shift, slice, sloppy, status, stay, stringify, stupid, sub, test, todo,
-        toJSON, toSource, toString, undef, unparam, unshift, val, value,
-        valueOf, vars, volunteer, when, white, windows, writable, write, x
+        shift, slice, sloppy, status, stay, stringify, stupid, sub, test,
+        toJSON, toSource, toString, todo, undef, unparam, unshift, val, value,
+        valueOf, vars, volunteer, when, white, windows, write, x
     */
 
  // Prerequisites
@@ -192,9 +192,11 @@
         };
         that = this;
         defineProperty(that, 'comm', {
-            configurable: false,
-            enumerable: false,
-            writable: false,
+         // NOTE: I commented the next three lines out because their values
+         // are the default ones specified by the ES5.1 standard.
+            //configurable: false,
+            //enumerable: false,
+            //writable: false,
             value: function (message) {
              // This function is a "hidden" instance method that forwards the
              // messages it receives to `comm` along with the internal `state`
@@ -525,7 +527,7 @@
              // returns `false` because the scan fails for some reason, the
              // answer to our question would be `true`, which is why we have
              // to negate JSLINT's output.
-                flag = (false === JSLINT($f, {
+                flag = (false === global.JSLINT($f, {
                  // JSLINT configuration options, as of version 2012-07-13:
                     adsafe:     false,  //- enforce ADsafe rules?
                     anon:       true,   //- allow `function()`?
@@ -849,10 +851,10 @@
      // it can always fall back to executing on the invoking machine :-)
         var task = stack.shift();
         if (task !== undefined) {
-            if (typeof JSON === 'undefined') {
+            if (global.hasOwnProperty('JSON') === false) {
              // We can't serialize the computation anyway.
                 local_call(task);
-            } else if (typeof JSLINT === 'undefined') {
+            } else if (global.hasOwnProperty('JSLINT') === false) {
              // We can't decide if the computation can be serialized.
                 local_call(task);
             } else if ((sys.read === null) || (sys.write === null)) {
@@ -1236,8 +1238,10 @@
             return;
         };
         defineProperty(y, 'onready', {
-            configurable: false,
-            enumerable: false,
+         // NOTE: I commented the next two lines out because their values
+         // are the default ones specified by the ES5.1 standard.
+            //configurable: false,
+            //enumerable: false,
             get: function () {
              // This getter passes a temporary object to `comm` in order to
              // return a reference to the next function in the avar's queue,
@@ -1335,8 +1339,10 @@
             }
         });
         defineProperty(y, ((args.length < 2) ? 'is' : 'are') + 'ready', {
-            configurable: false,
-            enumerable: false,
+         // NOTE: I commented the next two lines out because their values
+         // are the default ones specified by the ES5.1 standard.
+            //configurable: false,
+            //enumerable: false,
             get: function () {
              // This getter "forwards" to the avar's `onready` handler as a
              // means to let the code read more idiomatically in English.
@@ -1355,8 +1361,10 @@
  // Prototype definitions
 
     defineProperty(AVar.prototype, 'onerror', {
-        configurable: false,
-        enumerable: false,
+     // NOTE: I commented the next two lines out because their values are the
+     // default ones specified by the ES5.1 standard.
+        //configurable: false,
+        //enumerable: false,
         get: function () {
          // This getter passes a temporary object to `comm` in order to return
          // a reference to the private `onerror` value, since `comm` itself
@@ -1375,8 +1383,10 @@
     });
 
     defineProperty(AVar.prototype, 'onready', {
-        configurable: false,
-        enumerable: false,
+     // NOTE: I commented the next two lines out because their values are the
+     // default ones specified by the ES5.1 standard.
+        //configurable: false,
+        //enumerable: false,
         get: function () {
          // This getter passes a temporary object to `comm` in order to return
          // a reference to the private `onready` value, since `comm` itself
@@ -1397,9 +1407,11 @@
     });
 
     defineProperty(AVar.prototype, 'revive', {
-        configurable: false,
+     // NOTE: I commented two of the next three lines out because their values
+     // are the default ones specified by the ES5.1 standard.
+        //configurable: false,
         enumerable: true,
-        writable: false,
+        //writable: false,
         value: function () {
          // This function is syntactic sugar for triggering a `revive` from
          // code external to this giant anonymous closure. Currently, the same
@@ -1410,9 +1422,11 @@
     });
 
     defineProperty(AVar.prototype, 'toJSON', {
-        configurable: false,
+     // NOTE: I commented two of the next three lines out because their values
+     // are the default ones specified by the ES5.1 standard.
+        //configurable: false,
         enumerable: true,
-        writable: false,
+        //writable: false,
         value: function () {
          // This function exists as a way to ensure that `JSON.stringify` can
          // serialize avars correctly, because that function will delegate to
@@ -1425,9 +1439,11 @@
     });
 
     defineProperty(AVar.prototype, 'toString', {
-        configurable: false,
+     // NOTE: I commented two of the next three lines out because their values
+     // are the default ones specified by the ES5.1 standard.
+        //configurable: false,
         enumerable: true,
-        writable: false,
+        //writable: false,
         value: function () {
          // This function "forwards" to the avar's `val` property if possible.
             if ((this.val === null) || (this.val === undefined)) {
@@ -1438,9 +1454,11 @@
     });
 
     defineProperty(AVar.prototype, 'valueOf', {
-        configurable: false,
+     // NOTE: I commented two of the next three lines out because their values
+     // are the default ones specified by the ES5.1 standard.
+        //configurable: false,
         enumerable: true,
-        writable: false,
+        //writable: false,
         value: function () {
          // This function "forwards" to the avar's `val` property if possible.
             if ((this.val === null) || (this.val === undefined)) {
@@ -1457,9 +1475,12 @@
      // so we need to do this as invisibly as possible. To that end, I
      // have added the new method using `defineProperty` instead of by
      // assigning directly because then I can edit ES5 meta-properties.
-        configurable: false,
-        enumerable: false,
-        writable: false,
+     //
+     // NOTE: I commented the next three lines out because their values are
+     // the default ones specified by the ES5.1 standard.
+        //configurable: false,
+        //enumerable: false,
+        //writable: false,
         value: function (f) {
          // This function is globally available as `Object.prototype.Q`, and
          // it also acts as the "namespace" for Quanah. It can be used with
@@ -1492,9 +1513,12 @@
          // Method Q as a simple means for "export". Because order is not
          // important, the use of `ply` here is justified.
             defineProperty(Object.prototype.Q, key, {
-                configurable: false,
+             // NOTE: I commented two of the next three lines out because
+             // their values are the default ones specified by the ES5.1
+             // standard.
+                //configurable: false,
                 enumerable: true,
-                writable: false,
+                //writable: false,
                 value: val
             });
             return;

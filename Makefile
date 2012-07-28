@@ -2,9 +2,9 @@
 
 #-  Makefile ~~
 #
-#   This contains live instructions for development on Quanah.
+#   This contains live instructions for development on the Quanah library.
 #
-#                                                       ~~ (c) SRW, 17 Jul 2012
+#                                                       ~~ (c) SRW, 28 Jul 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -23,12 +23,12 @@ CAT     :=  $(call contingent, gcat cat)
 CLOSURE :=  $(call contingent, closure-compiler closure)
 CP      :=  $(call contingent, rsync gcp cp)
 CURL    :=  $(call contingent, curl) #-sS
-OPEN    :=  $(call contingent, gnome-open open)
+OPEN    :=  $(call contingent, x-www-browser gnome-open open)
 RM      :=  $(call contingent, grm rm) -rf
 TIME    :=  $(call contingent, time)
 TOUCH   :=  $(call contingent, gtouch touch)
 WEBPAGE :=  $(call contingent, ruby jruby) ./tools/webpage.rb
-YUICOMP :=  $(call contingent, yuicompressor)
+YUICOMP :=  $(call contingent, yui-compressor yuicompressor)
 
 define compile-with-google-closure
     $(CLOSURE) --compilation_level SIMPLE_OPTIMIZATIONS \
@@ -36,7 +36,7 @@ define compile-with-google-closure
 endef
 
 define compile-with-yuicompressor
-    JS_TEMP_FILE="$${RANDOM}-$(strip $(2))"                             ;   \
+    JS_TEMP_FILE="$(strip $(call random-prefix, $(2)))"                 ;   \
     $(CAT) $(1) > $${JS_TEMP_FILE}                                      ;   \
     $(YUICOMP) --type js $${JS_TEMP_FILE} -o $(2)                       ;   \
     $(RM) $${JS_TEMP_FILE}
@@ -52,6 +52,10 @@ define fetch-url
     $(CURL) -o $(2) $(1)
 endef
 
+define random-prefix
+    $${RANDOM:=`hexdump -n 2 -e '/2 "%u"' /dev/urandom`}-$(strip $(1))
+endef
+
 .PHONY: all clean clobber distclean reset run
 .INTERMEDIATE: jslint.js json2.js
 .SILENT: ;
@@ -62,7 +66,7 @@ clean: reset
 	@   $(RM) $(EXEJS) results1.out results2.out time-data.out
 
 clobber: clean
-	@   $(RM) $(filter-out $(SRCJS), $(wildcard *.js))
+	@   $(RM) $(abspath $(filter-out $(SRCJS), $(wildcard *.js)))
 
 distclean: clobber
 	@   $(RM) .d8_history .v8_history libs.js $(HTML)
@@ -127,7 +131,7 @@ check-old: $(EXEJS)
             done
 
 fast: $(EXEJS)
-	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
+	@   QUICK_JS_FILE="$(strip $(call random-prefix, $(EXEJS)))"    ;   \
             $(call compile-js, $(EXEJS), $${QUICK_JS_FILE})             ;   \
             $(call aside, "$(JS) $${QUICK_JS_FILE}")                    ;   \
             $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \
@@ -139,7 +143,7 @@ fast: $(EXEJS)
             $(RM) $${QUICK_JS_FILE}
 
 faster:
-	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
+	@   QUICK_JS_FILE="$(strip $(call random-prefix, $(EXEJS)))"    ;   \
             $(call compile-js,                                              \
                 $(filter-out $(JSLIBS), $(SRCJS)), $${QUICK_JS_FILE})   ;   \
             $(call aside, "$(JS) $${QUICK_JS_FILE}")                    ;   \
@@ -152,7 +156,7 @@ faster:
             $(RM) $${QUICK_JS_FILE}
 
 quick:
-	@   QUICK_JS_FILE="$${RANDOM}-$(strip $(EXEJS))"                ;   \
+	@   QUICK_JS_FILE="$(strip $(call random-prefix, $(EXEJS)))"    ;   \
             $(CAT) $(filter-out $(JSLIBS), $(SRCJS)) > $${QUICK_JS_FILE};   \
             $(call aside, $(JS))                                        ;   \
             $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \

@@ -1026,7 +1026,17 @@
     uuid = function () {
      // This function generates random hexadecimal UUIDs of length 32. It will
      // not work correctly in ActionScript, but I have written such a function
-     // before and will include it again here if ever it is needed.
+     // before and will include it again here if ever it is needed. Note also
+     // that the UUIDs generated here do not conform to RFC 4122 et al. because
+     // it hurts performance without offering any obvious advantages. The way
+     // I currently generate UUIDs usually only requires three or four random
+     // numbers, and string concatenation is very cheap when you can assume the
+     // strings are short; inserting the hyphens requires extra logic that, at
+     // least in my testing, slows down one of Quanah's most commonly invoked
+     // functions. For the most part, I completely support writing meaningful,
+     // correct code rather than fast, "clever" code, but until I find the time
+     // to annotate Quanah correctly for optimizers like the Google Closure
+     // compiler, I have to consider these sorts of things ... argh :-P
         var y = '';
         while (y.length < 32) {
             y += Math.random().toString(16).slice(2, 34 - y.length);

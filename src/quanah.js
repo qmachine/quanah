@@ -66,7 +66,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 27 Jul 2012
+//                                                      ~~ (c) SRW, 28 Jul 2012
 
 (function (global) {
     'use strict';
@@ -218,9 +218,11 @@
         }
         shallow_copy(temp, that);
         if (that.hasOwnProperty('key') === false) {
+         // NOTE: The `key` property lacks "secure" attributes in this case.
             that.key = uuid();
         }
         if (that.hasOwnProperty('val') === false) {
+         // NOTE: The `val` property lacks "secure" attributes in this case.
             that.val = null;
         }
         return that;
@@ -253,7 +255,7 @@
                  // NOTE: This `for` loop may actually require sequentiality
                  // as currently written. I converted it from a `do..while`
                  // implementation, but I will write it as a `map` soon :-)
-                    for (i = 0; i < input.length; i += 3) {
+                    for (i = 0; i < n; i += 3) {
                         ch1 = input.charCodeAt(i);
                         ch2 = input.charCodeAt(i + 1);
                         ch3 = input.charCodeAt(i + 2);

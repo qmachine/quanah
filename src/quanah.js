@@ -79,16 +79,17 @@
 
     /*properties
         JSLINT, Q, adsafe, anon, apply, areready, atob, avar, bitwise,
-        browser, btoa, by, call, cap, charCodeAt, comm, concat, continue, css,
-        debug, defineProperty, devel, done, enumerable, epitaph, eqeq, es5,
-        evil, exit, f, fail, forin, fragment, fromCharCode, get, get_onerror,
-        get_onready, global, hasOwnProperty, indexOf, init, jobs, key, length,
-        newcap, node, nomen, on, onerror, onready, parse, passfail, plusplus,
-        ply, predef, properties, prototype, push, queue, random, read, ready,
-        regexp, replace, rhino, safe, secret, set, set_onerror, set_onready,
-        shift, slice, sloppy, status, stay, stringify, stupid, sub, test,
-        toJSON, toSource, toString, todo, undef, unparam, unshift, val, value,
-        valueOf, vars, volunteer, when, white, windows, write, x
+        browser, btoa, by, call, cap, charCodeAt, comm, concat, continue,
+        css, debug, defineProperty, devel, done, enumerable, epitaph, eqeq,
+        es5, evil, exit, f, fail, floor, forin, fragment, fromCharCode, get,
+        get_onerror, get_onready, global, hasOwnProperty, indexOf, init,
+        jobs, key, length, newcap, node, nomen, on, onerror, onready, parse,
+        passfail, plusplus, ply, predef, properties, prototype, push, queue,
+        random, read, ready, regexp, replace, rhino, safe, secret, set,
+        set_onerror, set_onready, shift, slice, sloppy, status, stay,
+        stringify, stupid, sub, test, toJSON, toSource, toString, todo, undef,
+        unparam, unshift, val, value, valueOf, vars, volunteer, when, white,
+        windows, write, x
     */
 
  // Prerequisites

@@ -1069,12 +1069,13 @@
             };
             temp.onready = function (temp_evt) {
              // This function chooses a task from the queue and runs it.
-                if ((temp.val instanceof Array) === false) {
+                var queue = temp.val;
+                if ((queue instanceof Array) === false) {
                  // This seems like a common problem that will occur whenever
                  // users begin implementing custom storage mechanisms.
                     return temp_evt.fail('`jobs` should return an array');
                 }
-                if (temp.val.length === 0) {
+                if (queue.length === 0) {
                  // Here, we choose to `fail` not because this is a dreadful
                  // occurrence or something, but because this decision allows
                  // us to avoid running subsequent functions whose assumptions
@@ -1096,7 +1097,7 @@
              // will get an answer faster. In some cases, though, such as for
              // batch jobs that take roughly the same amount of time to run, we
              // need to "jitter" the queue a little to avoid deadlock.
-                task.key = temp.val[Math.floor(Math.random() * temp.length)];
+                task.key = queue[Math.floor(Math.random() * queue.length)];
                 temp_evt.exit();
                 return evt.exit();
             };

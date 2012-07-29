@@ -66,7 +66,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 28 Jul 2012
+//                                                      ~~ (c) SRW, 29 Jul 2012
 
 (function (global) {
     'use strict';
@@ -530,7 +530,7 @@
              // answer to our question would be `true`, which is why we have
              // to negate JSLINT's output.
                 flag = (false === global.JSLINT($f, {
-                 // JSLINT configuration options, as of version 2012-07-13:
+                 // JSLINT configuration options, as of version 2012-07-27:
                     adsafe:     false,  //- enforce ADsafe rules?
                     anon:       true,   //- allow `function()`?
                     bitwise:    true,   //- allow use of bitwise operators?
@@ -538,16 +538,16 @@
                     cap:        true,   //- allow uppercase HTML?
                     //confusion:true,   //- allow inconsistent type usage?
                     'continue': true,   //- allow continuation statement?
-                    css:        true,   //- allow CSS workarounds?
+                    css:        false,  //- allow CSS workarounds?
                     debug:      false,  //- allow debugger statements?
                     devel:      false,  //- allow output logging?
                     eqeq:       true,   //- allow `==` instead of `===`?
                     es5:        true,   //- allow ECMAScript 5 syntax?
                     evil:       false,  //- allow the `eval` statement?
                     forin:      true,   //- allow unfiltered `for..in`?
-                    fragment:   true,   //- allow HTML fragments?
+                    fragment:   false,  //- allow HTML fragments?
                     //indent:   4,
-                    //maxerr:   1,
+                    //maxerr:   50,
                     //maxlen:   80,
                     newcap:     true,   //- constructors must be capitalized?
                     node:       false,  //- assume Node.js as JS environment?
@@ -568,7 +568,7 @@
                     unparam:    true,   //- allow unused parameters?
                     vars:       true,   //- allow multiple `var` statements?
                     white:      true,   //- allow sloppy whitespace?
-                    //widget:   false,//- assume Yahoo widget JS environment?
+                    //widget:   false,  //- assume Yahoo widget JS environment?
                     windows:    false   //- assume Windows OS?
                 }));
             }
@@ -1067,10 +1067,7 @@
                 return evt.fail(message);
             };
             temp.onready = function (temp_evt) {
-             // This function chooses a task from the queue and runs it. The
-             // current form simply chooses the first available, but I could
-             // just as easily choose randomly by assigning weights to the
-             // elements of the queue.
+             // This function chooses a task from the queue and runs it.
                 if ((temp.val instanceof Array) === false) {
                  // This seems like a common problem that will occur whenever
                  // users begin implementing custom storage mechanisms.
@@ -1085,7 +1082,20 @@
                  // be much harder to tune Quanah externally.
                     return temp_evt.fail('Nothing to do ...');
                 }
-                task.key = temp.val[0];
+             // Here, we grab a random entry from the queue, rather than the
+             // first element in the queue. Why? Well, recall that tasks cannot
+             // enter the "global" queue until the avars they will transform
+             // are ready; this immediately implies that no task in the remote
+             // queue can ever run out of order anyway. Unfortunately, without
+             // fancy server-side transactional logic, workers can potentially
+             // execute the same job redundantly, especially when there are a
+             // large number of workers and a small number of jobs. This isn't
+             // a big deal for an opportunistic system, and it may even be a
+             // desirable "inefficiency" because it means the invoking machine
+             // will get an answer faster. In some cases, though, such as for
+             // batch jobs that take roughly the same amount of time to run, we
+             // need to "jitter" the queue a little to avoid deadlock.
+                task.key = temp.val[Math.floor(Math.random() * temp.length)];
                 temp_evt.exit();
                 return evt.exit();
             };

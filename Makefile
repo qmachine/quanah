@@ -4,13 +4,13 @@
 #
 #   This contains live instructions for development on the Quanah library.
 #
-#                                                       ~~ (c) SRW, 28 Jul 2012
+#                                                       ~~ (c) SRW, 30 Jul 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(PROJECT_ROOT)/tools/macros.make
 
-ENGINES :=  jsc v8 js d8 node nodejs narwhal-jsc rhino ringo narwhal    \
+ENGINES :=  jsc v8 js d8 v8cgi node nodejs narwhal-jsc rhino ringo narwhal  \
                 couchjs phantomjs # avmshell
 JS      :=  $(strip $(call contingent, $(ENGINES)))
 JSLIBS  :=  libs.js

@@ -7,6 +7,7 @@
 //  et al. cannot be run conveniently as part of the current workflow.
 //
 //                                                      ~~ (c) SRW, 02 Jun 2012
+//                                                  ~~ last updated 30 Jul 2012
 
 (function (global) {
     'use strict';
@@ -50,6 +51,13 @@
                 global.system.print(join.call(arguments, ' '));
                 return;
             };
+        } else if (hOP(global, 'system') && isFunction(global.system.stdout)) {
+            puts = function () {
+             // This function is typically used by v8cgi. Its support here is
+             // experimental; see http://code.google.com/p/v8cgi/ for info.
+                global.system.stdout(join.call(arguments, ' ') + '\n');
+                return;
+            };
         } else if (hOP(global, 'console') && isFunction(global.console.log)) {
             puts = function () {
              // This function is typically used by Node.js and by modern web
@@ -66,8 +74,14 @@
                 global.alert(join.call(arguments, ' '));
                 return;
             };
+        } else if (hOP(global, 'println') && isFunction(global.println)) {
+            puts = function () {
+             // This function is typically used by 'jrunscript', which is a
+             // JS environment that comes bundled with Java itself.
+                global.println(join.call(arguments, ' '));
+                return;
+            };
         } else if (hOP(global, 'print') && isFunction(global.print)) {
-         // JavaScriptCore, Rhino, Spidermonkey (==> 'couchjs' also), D8/V8
             puts = function () {
              // This function is typically used by server-side developers'
              // shells like JavaScriptCore, Rhino, Spidermonkey, and V8. A

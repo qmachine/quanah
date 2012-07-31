@@ -12,7 +12,7 @@
 //  in the describe(...) blocks; everything prior is just helpers.
 //
 //                                                      ~~ (c) DER, 06 Apr 2012
-//                                                      update SRW, 01 Jun 2012
+//                                                      update SRW, 31 Jul 2012
 
 (function () {
     'use strict';
@@ -26,7 +26,6 @@
         expect: false,
         it: false,
         jasmine: false,
-        Q: false,
         runs: false,
         waitsFor: false,
         xit: false
@@ -44,9 +43,11 @@
 
  // Declarations
 
-    var getAvars, toType, onerror;
+    var Q, getAvars, toType, onerror;
 
  // Definitions
+
+    Q = Object.prototype.Q;
 
     getAvars = function (x) {
      // Returns an avar whose val is an array of avars, with one for each

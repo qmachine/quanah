@@ -17,6 +17,9 @@
 //
 //  To-do list:
 //
+//  -   fix non-invertible serialization format by always specifying types, so
+//      that cases such as the following would not return `true`:
+//          `serialize([REGEXP L2FzZGYv e30=]) === serialize(/asdf/)`
 //  -   annotate for the Closure Compiler as documented here:
 //        https://developers.google.com/closure/compiler/docs/js-for-compiler
 //  -   remove type-checks in user-unreachable functions where appropriate

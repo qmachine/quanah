@@ -66,7 +66,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 29 Jul 2012
+//                                                      ~~ (c) SRW, 12 Aug 2012
 
 (function (global) {
     'use strict';
@@ -82,14 +82,14 @@
         browser, btoa, by, call, cap, charCodeAt, comm, concat, continue,
         css, debug, defineProperty, devel, done, enumerable, epitaph, eqeq,
         es5, evil, exit, f, fail, floor, forin, fragment, fromCharCode, get,
-        get_onerror, get_onready, global, hasOwnProperty, indexOf, init,
-        jobs, key, length, newcap, node, nomen, on, onerror, onready, parse,
-        passfail, plusplus, ply, predef, properties, prototype, push, queue,
-        random, read, ready, regexp, replace, rhino, safe, secret, set,
-        set_onerror, set_onready, shift, slice, sloppy, status, stay,
-        stringify, stupid, sub, test, toJSON, toSource, toString, todo, undef,
-        unparam, unshift, val, value, valueOf, vars, volunteer, when, white,
-        windows, write, x
+        get_onerror, get_onready, global, hasOwnProperty, ignoreCase, indexOf,
+        init, jobs, join, key, length, multiline, newcap, node, nomen, on,
+        onerror, onready, parse, passfail, plusplus, ply, predef, properties,
+        prototype, push, queue, random, read, ready, regexp, replace, rhino,
+        safe, secret, set, set_onerror, set_onready, shift, slice, sloppy,
+        source, status, stay, stringify, stupid, sub, test, toJSON, toSource,
+        toString, todo, undef, unparam, unshift, val, value, valueOf, vars,
+        volunteer, when, white, windows, write, x
     */
 
  // Prerequisites
@@ -122,9 +122,9 @@
  // Declarations
 
     var atob, AVar, avar, btoa, comm, deserialize, defineProperty, init,
-        isClosed, isFunction, local_call, ply, remote_call, revive, secret,
-        serialize, shallow_copy, stack, sys, update_local, update_remote,
-        uuid, volunteer, when;
+        isClosed, isFunction, isRegExp, local_call, ply, remote_call,
+        revive, secret, serialize, shallow_copy, stack, sys, update_local,
+        update_remote, uuid, volunteer, when;
 
  // Definitions
 
@@ -423,11 +423,12 @@
          // This function is provided to `JSON.parse` as the optional second
          // parameter that its documentation refers to as a `revive` function.
          // NOTE: This is not the same kind of function as Quanah's `revive`!
-            var f, pattern;
-            pattern = /^\[FUNCTION ([A-z0-9\+\/\=]+) ([A-z0-9\+\/\=]+)\]$/;
+            var f, re;
+            re = /^\[(FUNCTION|REGEXP) ([A-z0-9\+\/\=]+) ([A-z0-9\+\/\=]+)\]$/;
+         // Is the second condition even reachable in the line below?
             if ((typeof val === 'string') || (val instanceof String)) {
-                if (pattern.test(val)) {
-                    val.replace(pattern, function ($0, code, props) {
+                if (re.test(val)) {
+                    val.replace(re, function ($0, type, code, props) {
                      // This function is provided to the String prototype's
                      // `replace` method and uses references to the enclosing
                      // scope to return results. I wrote things this way in
@@ -587,11 +588,20 @@
     };
 
     isFunction = function (f) {
-     // This function returns `true` only if and only if the input argument
-     // `f` is a function. The second condition is necessary to avoid a false
-     // positive when `f` is a regular expression. Please note that an avar
-     // whose `val` property is a function will still return `false`.
+     // This function returns `true` if and only if input argument `f` is a
+     // function. The second condition is necessary to avoid a false positive
+     // in a pre-ES5 environment when `f` is a regular expression.
+     //
+     // NOTE: An avar whose `val` property is a function still returns `false`.
+     //
         return ((typeof f === 'function') && (f instanceof Function));
+    };
+
+    isRegExp = function (x) {
+     // This function returns `true` if and only if input argument `x` is a
+     // regular expression. I haven't been able to break it yet, but perhaps
+     // someone out there will let me know of a counterexample?
+        return (Object.prototype.toString.call(x) === '[object RegExp]');
     };
 
     local_call = function (obj) {
@@ -936,6 +946,45 @@
                  // using this function (`f`) itself as a reference. Because
                  // order isn't important, the use of `ply` is justified here.
                     if (f.hasOwnProperty(key) === false) {
+                        obj[key] = val;
+                    }
+                    return;
+                });
+             // Now, we use recursion to serialize the methods and properties.
+                $val += (' ' + btoa(serialize(obj)) + ']');
+            } else if (isRegExp(val)) {
+             // Using a similar approach as for functions for almost exactly
+             // the same reasons as for functions, we will now try to serialize
+             // regular expressions.
+                obj = {};
+                $val = '[REGEXP ';
+                if (val.hasOwnProperty('source')) {
+                    $val += btoa([
+                        '/', val.source, '/',
+                        ((val.global === true) ? 'g' : ''),
+                        ((val.ignoreCase === true) ? 'i' : ''),
+                        ((val.multiline === true) ? 'm' : '')
+                    ].join(''));
+                } else if (isFunction(val.toJSON)) {
+                    $val += btoa(val.toJSON());
+                } else if (isFunction(val.toSource)) {
+                    $val += btoa(val.toSource());
+                } else if (isFunction(val.toString)) {
+                    $val += btoa(val.toString());
+                } else {
+                 // Here, we just hope for the best. This arm shouldn't ever
+                 // run, actually, since we've likely already caught problems
+                 // that would land here in the `isClosed` function.
+                    $val += btoa(val);
+                }
+                ply(val, /^$/).by(function f(key, val, standard) {
+                 // This function copies methods and properties from the
+                 // regular expression stored in the outer `val` onto an object
+                 // `obj` so they can be serialized separately from the regular
+                 // expression itself, but it only transfers the ones a regular
+                 // expression wouldn't normally have. Because order isn't
+                 // important, the use of `ply` is justified here.
+                    if ((standard === undefined) && (val !== undefined)) {
                         obj[key] = val;
                     }
                     return;

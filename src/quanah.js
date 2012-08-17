@@ -69,7 +69,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 12 Aug 2012
+//                                                      ~~ (c) SRW, 17 Aug 2012
 
 (function (global) {
     'use strict';
@@ -422,10 +422,10 @@
      // NOTE: This definition could stand to be optimized, but I recommend
      // leaving it as-is until improving performance is absolutely critical.
         /*jslint unparam: true */
-        return JSON.parse($x, function (key, val) {
+        return JSON.parse($x, function reviver(key, val) {
          // This function is provided to `JSON.parse` as the optional second
-         // parameter that its documentation refers to as a `revive` function.
-         // NOTE: This is not the same kind of function as Quanah's `revive`!
+         // parameter that its documentation refers to as a `reviver` function.
+         // NOTE: This is _not_ the same as Quanah's `revive`!
             var f, re;
             re = /^\[(FUNCTION|REGEXP) ([A-z0-9\+\/\=]+) ([A-z0-9\+\/\=]+)\]$/;
          // Is the second condition even reachable in the line below?
@@ -916,6 +916,10 @@
      // problem, but if I do, I will follow the post at http://goo.gl/cciXV.
         /*jslint unparam: true */
         return JSON.stringify(x, function replacer(key, val) {
+         // For more information on the use of `replacer` functions with the
+         // `JSON.stringify` method, read the [inline] documentation for the
+         // reference implementation, "json2.js", available online at
+         // https://raw.github.com/douglascrockford/JSON-js/master/json2.js.
             var obj, $val;
             if (isFunction(val)) {
              // If the input argument `x` was actually a function, we have to

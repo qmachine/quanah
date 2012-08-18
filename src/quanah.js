@@ -2,18 +2,7 @@
 
 //- quanah.js ~~
 //
-//  Quanah does not support module systems and instead creates a single Object
-//  prototype method, `Q`, that it uses as a namespace. The general consensus
-//  in the community is that modifying the native prototypes is a Bad Thing,
-//  but I have found that Quanah's "Method Q" is actually a beautiful solution
-//  for a number of JavaScript's problems with code reuse. It packages methods
-//  and properties into a single, globally available object that runs correctly
-//  in "modern" JavaScript, and users can test for its existence without any
-//  special knowledge about a particular module system's quirks. In the end,
-//  the decision to use "Method Q" as a native prototype method is definitely
-//  motivated by the syntactic sugar it enables, but the only alternative would
-//  be to create a single global variable anyway, and I'd get just as many
-//  flames over that strategy ;-)
+//  A license and summary will be included here soon :-)
 //
 //  To-do list:
 //
@@ -124,30 +113,30 @@
 
  // Declarations
 
-    var atob, AVar, avar, btoa, comm, deserialize, defineProperty, init,
-        isClosed, isFunction, isRegExp, local_call, ply, remote_call,
-        revive, secret, serialize, shallow_copy, stack, sys, update_local,
-        update_remote, uuid, volunteer, when;
+    var atob, AVar, avar, btoa, comm, deserialize, init, isClosed, isFunction,
+        isRegExp, local_call, ply, remote_call, revive, secret, serialize,
+        shallow_copy, stack, sys, update_local, update_remote, uuid, volunteer,
+        when;
 
  // Definitions
 
-    atob = function (input) {
+    atob = function (x) {
      // This function redefines itself during its first invocation.
         if (isFunction(global.atob)) {
             atob = global.atob;
         } else {
-            atob = function (input) {
+            atob = function (x) {
              // This function decodes a string which has been encoded using
              // base64 encoding. It isn't part of JavaScript or any standard,
              // but it is a DOM Level 0 method, and it is extremely useful to
              // have around ;-)
                 /*jslint bitwise: true */
-                if ((/^[A-z0-9\+\/\=]*$/).test(input) === false) {
-                    throw new Error('Invalid base64 characters: ' + input);
+                if ((/^[A-z0-9\+\/\=]*$/).test(x) === false) {
+                    throw new Error('Invalid base64 characters: ' + x);
                 }
-                var a, output, ch1, ch2, ch3, en1, en2, en3, en4, i, n;
-                n = input.length;
-                output = '';
+                var a, ch1, ch2, ch3, en1, en2, en3, en4, i, n, y;
+                n = x.length;
+                y = '';
                 if (n > 0) {
                     a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg' +
                         'hijklmnopqrstuvwxyz0123456789+/=';
@@ -155,26 +144,26 @@
                  // as currently written. I converted it from a `do..while`
                  // implementation, but I will write it as a `map` soon :-)
                     for (i = 0; i < n; i += 4) {
-                        en1 = a.indexOf(input[i]);
-                        en2 = a.indexOf(input[i + 1]);
-                        en3 = a.indexOf(input[i + 2]);
-                        en4 = a.indexOf(input[i + 3]);
+                        en1 = a.indexOf(x[i]);
+                        en2 = a.indexOf(x[i + 1]);
+                        en3 = a.indexOf(x[i + 2]);
+                        en4 = a.indexOf(x[i + 3]);
                         ch1 = ((en1 << 2) | (en2 >> 4));
                         ch2 = (((en2 & 15) << 4) | (en3 >> 2));
                         ch3 = (((en3 & 3) << 6) | en4);
-                        output += String.fromCharCode(ch1);
+                        y += String.fromCharCode(ch1);
                         if (en3 !== 64) {
-                            output += String.fromCharCode(ch2);
+                            y += String.fromCharCode(ch2);
                         }
                         if (en4 !== 64) {
-                            output += String.fromCharCode(ch3);
+                            y += String.fromCharCode(ch3);
                         }
                     }
                 }
-                return output;
+                return y;
             };
         }
-        return atob(input);
+        return atob(x);
     };
 
     AVar = function AVar(spec) {
@@ -195,7 +184,7 @@
             ready:      true
         };
         that = this;
-        defineProperty(that, 'comm', {
+        Object.defineProperty(that, 'comm', {
          // NOTE: I commented the next three lines out because their values
          // are the default ones specified by the ES5.1 standard.
             //configurable: false,
@@ -238,21 +227,21 @@
         return new AVar(spec);
     };
 
-    btoa = function () {
+    btoa = function (x) {
      // This function redefines itself during its first invocation.
         if (isFunction(global.btoa)) {
             btoa = global.btoa;
         } else {
-            btoa = function (input) {
+            btoa = function (x) {
              // This function encodes binary data into a base64 string. It
              // isn't part of JavaScript or any standard, but it _is_ a DOM
              // Level 0 method, and it is extremely useful to have around.
              // Unfortunately, it throws an error in most browsers if you feed
              // it Unicode --> http://goo.gl/3fLFs.
                 /*jslint bitwise: true */
-                var a, output, ch1, ch2, ch3, en1, en2, en3, en4, i, n;
-                n = input.length;
-                output = '';
+                var a, ch1, ch2, ch3, en1, en2, en3, en4, i, n, y;
+                n = x.length;
+                y = '';
                 if (n > 0) {
                     a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg' +
                         'hijklmnopqrstuvwxyz0123456789+/=';
@@ -260,9 +249,9 @@
                  // as currently written. I converted it from a `do..while`
                  // implementation, but I will write it as a `map` soon :-)
                     for (i = 0; i < n; i += 3) {
-                        ch1 = input.charCodeAt(i);
-                        ch2 = input.charCodeAt(i + 1);
-                        ch3 = input.charCodeAt(i + 2);
+                        ch1 = x.charCodeAt(i);
+                        ch2 = x.charCodeAt(i + 1);
+                        ch3 = x.charCodeAt(i + 2);
                         en1 = (ch1 >> 2);
                         en2 = (((ch1 & 3) << 4) | (ch2 >> 4));
                         en3 = (((ch2 & 15) << 2) | (ch3 >> 6));
@@ -272,13 +261,13 @@
                         } else if (isNaN(ch3)) {
                             en4 = 64;
                         }
-                        output += (a[en1] + a[en2] + a[en3] + a[en4]);
+                        y += (a[en1] + a[en2] + a[en3] + a[en4]);
                     }
                 }
-                return output;
+                return y;
             };
         }
-        return btoa.apply(this, arguments);
+        return btoa(x);
     };
 
     comm = function (inside, outside) {
@@ -411,8 +400,6 @@
      // is that I can externally trigger a `revive` by invoking `x.comm()`.
         return revive();
     };
-
-    defineProperty = Object.defineProperty;
 
     deserialize = function ($x) {
      // This function is a JSON-based deserialization utility that can invert
@@ -1317,7 +1304,7 @@
             });
             return;
         };
-        defineProperty(y, 'onready', {
+        Object.defineProperty(y, 'onready', {
          // NOTE: I commented the next two lines out because their values
          // are the default ones specified by the ES5.1 standard.
             //configurable: false,
@@ -1418,7 +1405,7 @@
                 return y.comm({set_onready: g, secret: secret});
             }
         });
-        defineProperty(y, ((args.length < 2) ? 'is' : 'are') + 'ready', {
+        Object.defineProperty(y, ((args.length < 2) ? 'is' : 'are') + 'ready', {
          // NOTE: I commented the next two lines out because their values
          // are the default ones specified by the ES5.1 standard.
             //configurable: false,
@@ -1440,7 +1427,7 @@
 
  // Prototype definitions
 
-    defineProperty(AVar.prototype, 'onerror', {
+    Object.defineProperty(AVar.prototype, 'onerror', {
      // NOTE: I commented the next two lines out because their values are the
      // default ones specified by the ES5.1 standard.
         //configurable: false,
@@ -1462,7 +1449,7 @@
         }
     });
 
-    defineProperty(AVar.prototype, 'onready', {
+    Object.defineProperty(AVar.prototype, 'onready', {
      // NOTE: I commented the next two lines out because their values are the
      // default ones specified by the ES5.1 standard.
         //configurable: false,
@@ -1486,7 +1473,7 @@
         }
     });
 
-    defineProperty(AVar.prototype, 'revive', {
+    Object.defineProperty(AVar.prototype, 'revive', {
      // NOTE: I commented two of the next three lines out because their values
      // are the default ones specified by the ES5.1 standard.
         //configurable: false,
@@ -1501,7 +1488,7 @@
         }
     });
 
-    defineProperty(AVar.prototype, 'toJSON', {
+    Object.defineProperty(AVar.prototype, 'toJSON', {
      // NOTE: I commented two of the next three lines out because their values
      // are the default ones specified by the ES5.1 standard.
         //configurable: false,
@@ -1518,7 +1505,7 @@
         }
     });
 
-    defineProperty(AVar.prototype, 'toString', {
+    Object.defineProperty(AVar.prototype, 'toString', {
      // NOTE: I commented two of the next three lines out because their values
      // are the default ones specified by the ES5.1 standard.
         //configurable: false,
@@ -1533,7 +1520,7 @@
         }
     });
 
-    defineProperty(AVar.prototype, 'valueOf', {
+    Object.defineProperty(AVar.prototype, 'valueOf', {
      // NOTE: I commented two of the next three lines out because their values
      // are the default ones specified by the ES5.1 standard.
         //configurable: false,
@@ -1551,17 +1538,39 @@
  // Out-of-scope definitions
 
     (function () {
-
      // This function constructs a `target` function to act as a "namespace"
      // and then exports it as befits the customs of the current environment.
-
+     // My own personal preference has always been to create a single Object
+     // prototype method, `Q`, for use as a namespace. Although the general
+     // consensus in the community is that modifying the native prototypes is
+     // a Bad Thing, I find Quanah's "Method Q" to be a beautiful solution to
+     // a number of JavaScript's problems with code reuse. It packages methods
+     // and propertie into a single, globally available object that runs
+     // correctly in "modern" JavaScript, and users can test for its existence
+     // without any special knowledge about a particular environment's module
+     // system _or_ its quirks. Additionally, the Method Q solution provides a
+     // bonus by enabling asynchronous application of transformations to native
+     // types via the monadic syntactic sugar employed by jQuery. It seems to
+     // be a sticking point with some of my collaborators, however, that Quanah
+     // uses such a reckless export strategy, and thus I have now adopted more
+     // of a "pro-choice" strategy. The only JavaScript environment for which
+     // Quanah will _not_ be exported as Method Q is Node.js, but in that case
+     // the module exports an extra method which allows users to enable Method
+     // Q via the following idiom:
+     //
+     //     var Q = require('quanah').add_method_q();
+     //
+     // Until ECMAScript specifies a module system formally, however, I do not
+     // expect to support other module loaders unless issued a pull request ;-)
+     //
         /*jslint node: true */
 
         var add_method_q, obj, target;
 
         add_method_q = function () {
-         // This function needs documentation.
-            defineProperty(Object.prototype, 'Q', {
+         // This function is a convenience method which enables "Method Q" as
+         // an Object prototype method.
+            Object.defineProperty(Object.prototype, 'Q', {
              // Modifying the native prototype objects is generally held to
              // be in extremely poor taste, so we need to do this as invisibly
              // as possible. To that end, I have added the new method using
@@ -1587,11 +1596,11 @@
         };
 
         target = function (f) {
-         // This function is globally available as `Object.prototype.Q`, and
-         // it also acts as the "namespace" for Quanah. It can be used with
-         // any JavaScript value except `null` and `undefined`, and it expects
-         // one argument which is either a function of a single variable or
-         // else an avar whose value is such a function.
+         // This function acts as the "namespace" for Quanah, but it is far
+         // more useful when assigned to `Object.prototype.Q`, because then
+         // it can be used as a method of any native value except `null` and
+         // `undefined`. It expects its argument to be a function of a single
+         // variable or else an avar whose `val` property is such a function.
             var x = (this instanceof AVar) ? this : avar({val: this});
             x.onready = f;
             return x;
@@ -1601,7 +1610,7 @@
          // This function copies the methods and properties of `obj` onto
          // Method Q as a simple means for "export". Because order is not
          // important, the use of `ply` here is justified.
-            defineProperty(target, key, {
+            Object.defineProperty(target, key, {
              // NOTE: I commented two of the next three lines out because
              // their values are the default ones specified by the ES5.1
              // standard.
@@ -1618,7 +1627,7 @@
          // I have always preferred exporting as an Object prototype method,
          // but this strategy allows for a little more flexibility because I
          // am still allowing the end-user to choose on a case-by-case basis.
-            defineProperty(target, 'add_method_q', {
+            Object.defineProperty(target, 'add_method_q', {
              // NOTE: I commented two of the next three lines out because
              // their values are the default ones specified by the ES5.1
              // standard.

@@ -1,10 +1,7 @@
-/*  CSS style sheet  */
+/*- CSS style sheet */
 
-/*  screen.css ~~
- *
- *  NOTE: I need to figure out some fallbacks for IE ...
- *
- *                                                      ~~ (c) SRW, 07 Feb 2012
+/*- screen.css ~~
+ *                                                      ~~ (c) SRW, 18 Aug 2012
  */
 
 body {
@@ -14,7 +11,6 @@ body {
     font-family: Georgia, serif;
     font-size: 12pt;
     margin: 1in;
-    text-align: center;
 
 }
 
@@ -35,14 +31,6 @@ a:hover {
 canvas {
 
     border: 1px solid black;
-
-}
-
-div {
-
-    margin-bottom: 1em;
-    margin-top: 1em;
-    text-align: justify;
 
 }
 
@@ -72,6 +60,10 @@ figure img[src$=".svg"] {
 
 footer {}
 
+h1 {
+    text-align: center;
+}
+
 header {}
 
 iframe {
@@ -89,6 +81,14 @@ noscript {
 
 }
 
+p {
+
+    margin-bottom: 1em;
+    margin-top: 1em;
+    text-align: justify;
+
+}
+
 pre {
 
     text-align: left;
@@ -100,14 +100,6 @@ textarea {
     font-family: Courier, monospace;
     font-size: 12pt;
     text-align: left;
-
-}
-
-ul {
-
-    list-style-type: none;
-    padding: 0px;
-    margin: 0px;
 
 }
 
@@ -161,4 +153,4 @@ ul {
 
 }
 
-/*  vim:set syntax=css:  */
+/*- vim:set syntax=css: */

@@ -38,7 +38,7 @@ File::open(filename, "w") do |f|
     <a id="github_ribbon" href="https://github.com/wilkinson/quanah">
       <span>Fork me on GitHub!</span>
     </a>
-    #{markdown.render(IO.read("README.md")).chomp} 
+    #{markdown.render(IO.read("README.md")).chomp}
   </body>
 </html>
 EOF

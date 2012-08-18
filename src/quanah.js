@@ -1575,7 +1575,7 @@
                 //writable: false,
                 value: target
             });
-            return;
+            return target;
         };
 
         obj = {

@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on the Quanah library.
 #
-#                                                       ~~ (c) SRW, 30 Jul 2012
+#                                                       ~~ (c) SRW, 18 Aug 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -69,7 +69,7 @@ clobber: clean
 	@   $(RM) $(abspath $(filter-out $(SRCJS), $(wildcard *.js)))
 
 distclean: clobber
-	@   $(RM) .d8_history .v8_history libs.js $(HTML)
+	@   $(RM) .d8_history .v8_history $(HTML) libs.js quanah-*.tgz
 
 reset:
 	@   $(call contingent, clear)

@@ -69,7 +69,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 17 Aug 2012
+//                                                      ~~ (c) SRW, 18 Aug 2012
 
 (function (global) {
     'use strict';
@@ -81,10 +81,10 @@
     /*global JSLINT: false */
 
     /*properties
-        JSLINT, Q, adsafe, anon, apply, areready, atob, avar, bitwise,
-        browser, btoa, by, call, cap, charCodeAt, comm, concat, continue,
-        css, debug, defineProperty, devel, done, enumerable, epitaph, eqeq,
-        es5, evil, exit, f, fail, floor, forin, fragment, fromCharCode, get,
+        JSLINT, adsafe, anon, apply, areready, atob, avar, bitwise, browser,
+        btoa, by, call, cap, charCodeAt, comm, concat, continue, css, debug,
+        defineProperty, devel, done, enumerable, epitaph, eqeq, es5, evil,
+        exit, exports, f, fail, floor, forin, fragment, fromCharCode, get,
         get_onerror, get_onready, global, hasOwnProperty, ignoreCase, indexOf,
         init, jobs, join, key, length, multiline, newcap, node, nomen, on,
         onerror, onready, parse, passfail, plusplus, ply, predef, properties,
@@ -1550,35 +1550,33 @@
 
  // Out-of-scope definitions
 
-    defineProperty(Object.prototype, 'Q', {
-     // Modifying the native prototype objects is extremely poor taste,
-     // so we need to do this as invisibly as possible. To that end, I
-     // have added the new method using `defineProperty` instead of by
-     // assigning directly because then I can edit ES5 meta-properties.
-     //
-     // NOTE: I commented the next three lines out because their values are
-     // the default ones specified by the ES5.1 standard.
-        //configurable: false,
-        //enumerable: false,
-        //writable: false,
-        value: function (f) {
-         // This function is globally available as `Object.prototype.Q`, and
-         // it also acts as the "namespace" for Quanah. It can be used with
-         // any JavaScript value except `null` and `undefined`, and it expects
-         // one argument which is either a function of a single variable or
-         // else an avar whose value is such a function.
-            var x = (this instanceof AVar) ? this : avar({val: this});
-            x.onready = f;
-            return x;
-        }
-    });
-
     (function () {
 
-     // This function constructs a temporary "namespace" object `obj` and
-     // then copies its methods and properties onto Method Q for "export".
+     // This function constructs a `target` function to act as a "namespace"
+     // and then exports it as befits the customs of the current environment.
 
-        var obj;
+        /*jslint node: true */
+
+        var add_method_q, obj, target;
+
+        add_method_q = function () {
+         // This function needs documentation.
+            defineProperty(Object.prototype, 'Q', {
+             // Modifying the native prototype objects is generally held to
+             // be in extremely poor taste, so we need to do this as invisibly
+             // as possible. To that end, I have added the new method using
+             // `defineProperty` instead of by assigning directly because then
+             // I can edit the ES5 meta-properties.
+             //
+             // NOTE: I commented the next three lines out because their values
+             // are the default ones specified by the ES5.1 standard.
+                //configurable: false,
+                //enumerable: false,
+                //writable: false,
+                value: target
+            });
+            return;
+        };
 
         obj = {
             avar:       avar,
@@ -1588,11 +1586,22 @@
             when:       when
         };
 
+        target = function (f) {
+         // This function is globally available as `Object.prototype.Q`, and
+         // it also acts as the "namespace" for Quanah. It can be used with
+         // any JavaScript value except `null` and `undefined`, and it expects
+         // one argument which is either a function of a single variable or
+         // else an avar whose value is such a function.
+            var x = (this instanceof AVar) ? this : avar({val: this});
+            x.onready = f;
+            return x;
+        };
+
         ply(obj).by(function (key, val) {
          // This function copies the methods and properties of `obj` onto
          // Method Q as a simple means for "export". Because order is not
          // important, the use of `ply` here is justified.
-            defineProperty(Object.prototype.Q, key, {
+            defineProperty(target, key, {
              // NOTE: I commented two of the next three lines out because
              // their values are the default ones specified by the ES5.1
              // standard.
@@ -1603,6 +1612,25 @@
             });
             return;
         });
+
+        if (global.hasOwnProperty('process') && (typeof module === 'object')) {
+         // Export as a Node.js module without irritating namespace nannies.
+         // I have always preferred exporting as an Object prototype method,
+         // but this strategy allows for a little more flexibility because I
+         // am still allowing the end-user to choose on a case-by-case basis.
+            defineProperty(target, 'add_method_q', {
+             // NOTE: I commented two of the next three lines out because
+             // their values are the default ones specified by the ES5.1
+             // standard.
+                //configurable: false,
+                enumerable: true,
+                //writable: false,
+                value: add_method_q
+            });
+            module.exports = target;
+        } else {
+            add_method_q();
+        }
 
         return;
 

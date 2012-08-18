@@ -7,7 +7,7 @@
 //  et al. cannot be run conveniently as part of the current workflow.
 //
 //                                                      ~~ (c) SRW, 02 Jun 2012
-//                                                  ~~ last updated 30 Jul 2012
+//                                                  ~~ last updated 18 Aug 2012
 
 (function (global) {
     'use strict';
@@ -21,6 +21,18 @@
     if (global.hasOwnProperty('CHUBBY')) {
      // Exit early if the `CHUBBY` checker is already defined.
         return;
+    }
+
+    if (Object.prototype.hasOwnProperty('Q') === false) {
+        (function () {
+            /*jslint node: true */
+            try {
+                require('./src/quanah').add_method_q();
+            } catch (err) {
+                throw new Error('Method Q is missing.');
+            }
+            return;
+        }());
     }
 
  // Declarations

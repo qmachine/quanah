@@ -10,6 +10,9 @@ scientific computations using only web browsers and
 about Quanah and applications that use it, but I promise I will write more
 documentation soon!
 
+A [Node.js](http://nodejs.org/) module can be installed via
+[NPM](https://npmjs.org/package/quanah).
+
 There are several "mirrors" available on
 [Bitbucket](https://bitbucket.org/wilkinson/quanah),
 [GitHub](https://github.com/wilkinson/quanah), and

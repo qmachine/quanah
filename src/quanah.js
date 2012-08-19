@@ -58,7 +58,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 18 Aug 2012
+//                                                      ~~ (c) SRW, 19 Aug 2012
 
 (function (global) {
     'use strict';
@@ -71,17 +71,17 @@
 
     /*properties
         JSLINT, adsafe, anon, apply, areready, atob, avar, bitwise, browser,
-        btoa, by, call, cap, charCodeAt, comm, concat, continue, css, debug,
-        defineProperty, devel, done, enumerable, epitaph, eqeq, es5, evil,
-        exit, exports, f, fail, floor, forin, fragment, fromCharCode, get,
-        get_onerror, get_onready, global, hasOwnProperty, ignoreCase, indexOf,
-        init, jobs, join, key, length, multiline, newcap, node, nomen, on,
-        onerror, onready, parse, passfail, plusplus, ply, predef, properties,
-        prototype, push, queue, random, read, ready, regexp, replace, rhino,
-        safe, secret, set, set_onerror, set_onready, shift, slice, sloppy,
-        source, status, stay, stringify, stupid, sub, test, toJSON, toSource,
-        toString, todo, undef, unparam, unshift, val, value, valueOf, vars,
-        volunteer, when, white, windows, write, x
+        btoa, by, call, cap, charAt, charCodeAt, comm, concat, continue, css,
+        debug, defineProperty, devel, done, enumerable, epitaph, eqeq, es5,
+        evil, exit, exports, f, fail, floor, forin, fragment, fromCharCode,
+        get, get_onerror, get_onready, global, hasOwnProperty, ignoreCase,
+        indexOf, init, jobs, join, key, length, multiline, newcap, node, nomen,
+        on, onerror, onready, parse, passfail, plusplus, ply, predef,
+        properties, prototype, push, queue, random, read, ready, regexp,
+        replace, rhino, safe, secret, set, set_onerror, set_onready, shift,
+        slice, sloppy, source, status, stay, stringify, stupid, sub, test,
+        toJSON, toSource, toString, todo, undef, unparam, unshift, val, value,
+        valueOf, vars, volunteer, when, white, windows, write, x
     */
 
  // Prerequisites
@@ -131,9 +131,6 @@
              // but it is a DOM Level 0 method, and it is extremely useful to
              // have around ;-)
                 /*jslint bitwise: true */
-                if ((/^[A-z0-9\+\/\=]*$/).test(x) === false) {
-                    throw new Error('Invalid base64 characters: ' + x);
-                }
                 var a, ch1, ch2, ch3, en1, en2, en3, en4, i, n, y;
                 n = x.length;
                 y = '';
@@ -144,10 +141,21 @@
                  // as currently written. I converted it from a `do..while`
                  // implementation, but I will write it as a `map` soon :-)
                     for (i = 0; i < n; i += 4) {
-                        en1 = a.indexOf(x[i]);
-                        en2 = a.indexOf(x[i + 1]);
-                        en3 = a.indexOf(x[i + 2]);
-                        en4 = a.indexOf(x[i + 3]);
+                     // Surprisingly, my own tests have shown that it is faster
+                     // to use the `charAt` method than to use array indices,
+                     // as of 19 Aug 2012. I _do_ know that `charAt` has better
+                     // support in old browsers, but that doesn't matter much
+                     // because Quanah currently requires ES5 support anyway.
+                        en1 = a.indexOf(x.charAt(i));
+                        en2 = a.indexOf(x.charAt(i + 1));
+                        en3 = a.indexOf(x.charAt(i + 2));
+                        en4 = a.indexOf(x.charAt(i + 3));
+                        if ((en1 < 0) || (en2 < 0) || (en3 < 0) || (en4 < 0)) {
+                         // It also surprised me to find out that testing for
+                         // invalid characters inside the loop is faster than
+                         // validating with a regular expression beforehand.
+                            throw new Error('Invalid base64 characters: ' + x);
+                        }
                         ch1 = ((en1 << 2) | (en2 >> 4));
                         ch2 = (((en2 & 15) << 4) | (en3 >> 2));
                         ch3 = (((en3 & 3) << 6) | en4);
@@ -261,7 +269,8 @@
                         } else if (isNaN(ch3)) {
                             en4 = 64;
                         }
-                        y += (a[en1] + a[en2] + a[en3] + a[en4]);
+                        y += (a.charAt(en1) + a.charAt(en2) + a.charAt(en3) +
+                            a.charAt(en4));
                     }
                 }
                 return y;
@@ -896,11 +905,19 @@
     };
 
     serialize = function (x) {
-     // This is a JSON-based serializer that not only understands functions,
-     // but also understands that functions are objects with properties! It
-     // depends on `btoa`, which unfortunately has issues with UTF-8 strings.
-     // I haven't found a test case yet that proves I need to work around the
-     // problem, but if I do, I will follow the post at http://goo.gl/cciXV.
+     // This function extends the standard `JSON.stringify` function with
+     // support for functions and regular expressions. One of the problems I
+     // address here is that the ES5.1 standard doesn't dictate a format for
+     // representing functions as strings (see section 15.3.4.2). Another
+     // problem is that the standard dictates that _no_ representation be given
+     // at all in certain situations (see section 15.3.4.5). Fortunately, we
+     // can avoid a lot of these situations entirely by using JSLint prior to
+     // invoking the `serialize` function, but it isn't a perfect solution,
+     // since users can currently invoke this function indirectly by calling
+     // `JSON.stringify`. Also, this function depends on `btoa`, which may or
+     // may not have issues with UTF-8 strings in different browsers. I have
+     // not found a test case yet that proves I need to work around the issue,
+     // but if I do, I will follow advice given at http://goo.gl/cciXV.
         /*jslint unparam: true */
         return JSON.stringify(x, function replacer(key, val) {
          // For more information on the use of `replacer` functions with the

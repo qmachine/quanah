@@ -58,7 +58,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 19 Aug 2012
+//                                                      ~~ (c) SRW, 20 Aug 2012
 
 (function (global) {
     'use strict';
@@ -971,6 +971,9 @@
                 $val = '[REGEXP ';
                 if (val.hasOwnProperty('source')) {
                     $val += btoa([
+                     // For now, I am ignoring the non-standard `y` ("sticky")
+                     // flag until I confirm that it won't confuse browsers
+                     // that don't support it.
                         '/', val.source, '/',
                         ((val.global === true) ? 'g' : ''),
                         ((val.ignoreCase === true) ? 'i' : ''),

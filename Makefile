@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on the Quanah library.
 #
-#                                                       ~~ (c) SRW, 18 Aug 2012
+#                                                       ~~ (c) SRW, 02 Sep 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -17,6 +17,7 @@ JSLIBS  :=  libs.js
 QUANAH  :=  src/quanah.js
 SRCJS   :=  $(JSLIBS) $(QUANAH) tools/chubby-checker.js $(wildcard tests/*.js)
 EXEJS   :=  main.js
+MINJS   :=  $(EXEJS:%.js=%-min.js)
 HTML    :=  index.html
 
 CAT     :=  $(call contingent, gcat cat)
@@ -142,18 +143,14 @@ fast: $(EXEJS)
             fi                                                          ;   \
             $(RM) $${QUICK_JS_FILE}
 
-faster:
-	@   QUICK_JS_FILE="$(strip $(call random-prefix, $(EXEJS)))"    ;   \
-            $(call compile-js,                                              \
-                $(filter-out $(JSLIBS), $(SRCJS)), $${QUICK_JS_FILE})   ;   \
-            $(call aside, "$(JS) $${QUICK_JS_FILE}")                    ;   \
-            $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \
+faster: $(MINJS)
+	@   $(call aside, "$(JS) $<")                                   ;   \
+            $(TIME) $(JS) $<                                            ;   \
             if [ $$? -eq 0 ]; then                                          \
                 $(call hilite, 'Success.')                              ;   \
             else                                                            \
                 $(call alert, 'Failure.')                               ;   \
-            fi                                                          ;   \
-            $(RM) $${QUICK_JS_FILE}
+            fi
 
 quick:
 	@   QUICK_JS_FILE="$(strip $(call random-prefix, $(EXEJS)))"    ;   \
@@ -179,6 +176,9 @@ $(HTML): | $(EXEJS)
 
 $(JSLIBS): jslint.js json2.js
 	@   $(CAT) $^ > $@
+
+$(MINJS): $(EXEJS)
+	@   $(call compile-js, $<, $@)
 
 ###
 

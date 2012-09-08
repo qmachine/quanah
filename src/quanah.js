@@ -19,7 +19,7 @@
 //
 //  Open questions:
 //
-//  -   Can users' own JSLINT pragmas circumvent the `isClosed` function?
+//  -   Can users' own JSLINT pragmas circumvent the `is_closed` function?
 //      -   I know that enabling ADsafe in JSLINT can prevent this, but it
 //          also seems to restrict too many other [useful] things ...
 //
@@ -58,7 +58,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 20 Aug 2012
+//                                                      ~~ (c) SRW, 07 Sep 2012
 
 (function (global) {
     'use strict';
@@ -113,7 +113,7 @@
 
  // Declarations
 
-    var atob, AVar, avar, btoa, comm, deserialize, init, isClosed, isFunction,
+    var atob, AVar, avar, btoa, comm, deserialize, init, is_closed, isFunction,
         isRegExp, local_call, ply, remote_call, revive, secret, serialize,
         shallow_copy, stack, sys, update_local, update_remote, uuid, volunteer,
         when;
@@ -469,7 +469,7 @@
         return revive();
     };
 
-    isClosed = function (x) {
+    is_closed = function (x) {
      // This function tests an input argument `x` for references that "close"
      // over external references from another scope. This function solves a
      // very important problem in JavaScript because function serialization is
@@ -578,7 +578,7 @@
              // recursively to make sure none of those are closed, either.
              // Because order isn't important, use of `ply` is justified.
                 if (flag === false) {
-                    flag = isClosed(val);
+                    flag = is_closed(val);
                 }
                 return;
             });
@@ -872,7 +872,7 @@
             } else if ((sys.read === null) || (sys.write === null)) {
              // We can't distribute the computation.
                 local_call(task);
-            } else if (isClosed(task)) {
+            } else if (is_closed(task)) {
              // The task isn't serializable.
                 local_call(task);
             } else {
@@ -934,7 +934,7 @@
              // function as only an object with its own methods and properties
              // that must be preserved as source code also. (We can assume that
              // scope need not be preserved because `serialize` is only called
-             // when `isClosed` returns `false`.)
+             // when `is_closed` returns `false`.)
                 obj = {};
                 $val = '[FUNCTION ';
                 if (isFunction(val.toJSON)) {
@@ -946,7 +946,7 @@
                 } else {
                  // Here, we just hope for the best. This arm shouldn't ever
                  // run, actually, since we've likely already caught problems
-                 // that would land here in the `isClosed` function.
+                 // that would land here in the `is_closed` function.
                     $val += btoa(val);
                 }
                 ply(val).by(function f(key, val) {
@@ -988,7 +988,7 @@
                 } else {
                  // Here, we just hope for the best. This arm shouldn't ever
                  // run, actually, since we've likely already caught problems
-                 // that would land here in the `isClosed` function.
+                 // that would land here in the `is_closed` function.
                     $val += btoa(val);
                 }
                 ply(val, /^$/).by(function f(key, val, standard) {
@@ -1220,7 +1220,7 @@
             };
          //
          // Here, I would like to have a function that checks `f` and `x` to
-         // using `isClosed` to ensure that the results it returns to the
+         // using `is_closed` to ensure that the results it returns to the
          // invoking machine are the same as the results it computed, because
          // it _is_ actually possible to write a serializable function which
          // renders itself unserializable during its evaluation. Specifically,
@@ -1232,7 +1232,7 @@
          // I have included a simple outline of such a function:
          //
          //     when(f, x).areready = function (evt) {
-         //         if (isClosed(f.val) || isClosed(x.val)) {
+         //         if (is_closed(f.val) || is_closed(x.val)) {
          //             return evt.abort('Results will not be returned.');
          //         }
          //         return evt.exit();

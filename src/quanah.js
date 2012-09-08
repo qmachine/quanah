@@ -58,7 +58,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 07 Sep 2012
+//                                                      ~~ (c) SRW, 08 Sep 2012
 
 (function (global) {
     'use strict';
@@ -453,8 +453,10 @@
      // outside the giant anonymous closure. In particular, this allows users
      // to port Quanah for use with any persistent storage system by simply
      // implementing specific routines and providing them to Quanah by way of
-     // this `init` function.
-        ply(obj).by(function (key, val) {
+     // this `init` function. This function itself uses the asynchronous `ply`
+     // idiom and returns an avar.
+        var y = avar({val: obj});
+        y.onready = ply(function (key, val) {
          // This function traverses the input object in search of definitions,
          // but it will only store a definition as a method of the internal
          // `sys` object once per key. If an external definition has already
@@ -466,7 +468,7 @@
             }
             return;
         });
-        return revive();
+        return y;
     };
 
     is_closed = function (x) {

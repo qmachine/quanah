@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on the Quanah library.
 #
-#                                                       ~~ (c) SRW, 09 Sep 2012
+#                                                       ~~ (c) SRW, 10 Sep 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -84,7 +84,7 @@ run: quick
 benchmark: $(EXEJS)
 	@   $(RM) time-data.out                                         ;   \
             for each in $(call available, $(ENGINES)); do                   \
-                $(call aside, $${each})                                 ;   \
+                $(call aside, "$${each}")                               ;   \
                 for i in 1 2 3; do                                          \
                     echo $${each} >>time-data.out 2>&1                  ;   \
                     ($(TIME) $${each} $(EXEJS) >/dev/null 2>&1)             \
@@ -106,7 +106,7 @@ check-jasmine: $(QUANAH)
 check-old: $(EXEJS)
 	@   $(RM) results1.out results2.out                             ;   \
             for each in $(call available, $(ENGINES)); do                   \
-                $(call aside, $${each})                                 ;   \
+                $(call aside, "$${each}")                               ;   \
                 if [ ! -f results1.out ]; then                              \
                     $${each} $(EXEJS) 2>&1 >results1.out                ;   \
                     if [ $$? -eq 0 ]; then                                  \
@@ -155,7 +155,7 @@ faster: $(MINJS)
 quick:
 	@   QUICK_JS_FILE="$(strip $(call random-prefix, $(EXEJS)))"    ;   \
             $(CAT) $(filter-out $(JSLIBS), $(SRCJS)) > $${QUICK_JS_FILE};   \
-            $(call aside, $(JS))                                        ;   \
+            $(call aside, "$(JS)")                                      ;   \
             $(TIME) $(JS) $${QUICK_JS_FILE}                             ;   \
             if [ $$? -eq 0 ]; then                                          \
                 $(call hilite, 'Success.')                              ;   \

@@ -771,7 +771,11 @@
         var f, first, x;
      // Step 1: copy the computation's function and data into fresh instances,
      // define some error handlers, and write the copies to the "filesystem".
-        f = avar({val: obj.f});
+     // If special property values have been added to `x`, they will be copied
+     // onto `f` and `x` via the "copy constructor" idiom. Note that special
+     // properties defined for `f` will be overwritten ...
+        f = avar(obj.x);
+        f.val = obj.f;
         first = true;
         x = avar(obj.x);
         f.onerror = x.onerror = function (message) {
@@ -792,7 +796,7 @@
          // `task` to "inherit" system-specific properties such as QMachine's
          // `box` property automatically. My design here reflects the idea that
          // the execution should follow the data.
-            var task = avar(x);
+            var task = avar(obj.x);
             task.key = uuid();
             task.status = 'waiting';
             task.val = {f: f.key, x: x.key};

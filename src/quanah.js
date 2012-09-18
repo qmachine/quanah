@@ -793,6 +793,7 @@
          // `box` property automatically. My design here reflects the idea that
          // the execution should follow the data.
             var task = avar(x);
+            task.key = uuid();
             task.status = 'waiting';
             task.val = {f: f.key, x: x.key};
             task.onerror = function (message) {

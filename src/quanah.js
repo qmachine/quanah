@@ -788,8 +788,13 @@
         when(f, x).areready = function (evt) {
          // This function creates a `task` object to represent the computation
          // and monitors its status by "polling" the "filesystem" for changes.
-            var task;
-            task = avar({status: 'waiting', val: {f: f.key, x: x.key}});
+         // It initializes using `avar`'s "copy constructor" idiom to enable
+         // `task` to "inherit" system-specific properties such as QMachine's
+         // `box` property automatically. My design here reflects the idea that
+         // the execution should follow the data.
+            var task = avar(x);
+            task.status = 'waiting';
+            task.val = {f: f.key, x: x.key};
             task.onerror = function (message) {
              // This function alerts `f` and `x` that something has gone awry.
                 return evt.fail(message);

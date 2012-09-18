@@ -775,6 +775,7 @@
      // onto `f` and `x` via the "copy constructor" idiom. Note that special
      // properties defined for `f` will be overwritten ...
         f = avar(obj.x);
+        f.key = (obj.f.hasOwnProperty('key')) ? obj.f.key : uuid();
         f.val = obj.f;
         first = true;
         x = avar(obj.x);

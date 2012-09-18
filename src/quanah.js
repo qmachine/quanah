@@ -58,7 +58,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 08 Sep 2012
+//                                                      ~~ (c) SRW, 18 Sep 2012
 
 (function (global) {
     'use strict';
@@ -1118,7 +1118,9 @@
      // the task so that the underlying system (not Quanah) can control system
      // resources itself. Examples will be included in the distribution that
      // will accompany the upcoming publication(s).
-        var task = avar();
+        var args, task;
+        args = Array.prototype.slice.call(arguments);
+        task = avar();
         task.onready = function (evt) {
          // This function retrieves the key of a task from the queue so we
          // can retrieve that task's full description. If no tasks are found,
@@ -1126,7 +1128,7 @@
             if (sys.jobs === null) {
                 return evt.fail('Waiting for a `jobs` definition ...');
             }
-            var temp = sys.jobs();
+            var temp = sys.jobs.apply(null, args);
             temp.onerror = function (message) {
              // This function notifies `task` that something has gone wrong
              // during retrieval and interpretation of its description.

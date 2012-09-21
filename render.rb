@@ -39,6 +39,7 @@ File::open(filename, "w") do |f|
       <span>Fork me on GitHub!</span>
     </a>
     #{markdown.render(IO.read("README.md")).chomp}
+    <script defer src="//quanah.googlecode.com/git/src/quanah.js"></script>
   </body>
 </html>
 EOF

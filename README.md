@@ -3,7 +3,7 @@ Quanah
 
 [Quanah](http://wilkinson.github.com/quanah) is a JavaScript library for
 writing concurrent programs in JavaScript that still run correctly in serial
-execution environments. [QMachine](http://qmachine.org/), for example, uses
+execution environments. [QMachine](https://qmachine.org/), for example, uses
 Quanah to implement a web service that acts as a "supercomputer" for running
 scientific computations using only web browsers and
 [CouchDB](http://couchdb.apache.org/). I am currently writing several papers

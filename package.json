@@ -1,6 +1,6 @@
 {
     "name": "quanah",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Event-driven framework for distributed computing",
     "main": "src/quanah.js",
     "directories": {

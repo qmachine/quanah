@@ -14,7 +14,6 @@
 //  -   remove type-checks in user-unreachable functions where appropriate
 //  -   replace `throw` statements with `evt.fail` statements for robustness
 //  -   rewrite `onready` assignments as `comm` invocations (optional)
-//  -   rewrite `remote_call` in terms of a single avar to be like `volunteer`
 //  -   verify correct getter/setter handling in `shallow_copy`
 //
 //  Open questions:
@@ -58,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 18 Sep 2012
+//                                                      ~~ (c) SRW, 21 Sep 2012
 
 (function (global) {
     'use strict';
@@ -72,16 +71,16 @@
     /*properties
         JSLINT, adsafe, anon, apply, areready, atob, avar, bitwise, browser,
         btoa, by, call, cap, charAt, charCodeAt, comm, concat, continue, css,
-        debug, defineProperty, devel, done, enumerable, epitaph, eqeq, es5,
-        evil, exit, exports, f, fail, floor, forin, fragment, fromCharCode,
-        get, get_onerror, get_onready, global, hasOwnProperty, ignoreCase,
-        indexOf, init, jobs, join, key, length, multiline, newcap, node, nomen,
-        on, onerror, onready, parse, passfail, plusplus, ply, predef,
-        properties, prototype, push, queue, random, read, ready, regexp,
-        replace, rhino, safe, secret, set, set_onerror, set_onready, shift,
-        slice, sloppy, source, status, stay, stringify, stupid, sub, test,
-        toJSON, toSource, toString, todo, undef, unparam, unshift, val, value,
-        valueOf, vars, volunteer, when, white, windows, write, x
+        debug, def, defineProperty, devel, done, enumerable, epitaph, eqeq,
+        es5, evil, exit, exports, f, fail, forin, fragment, fromCharCode, get,
+        get_onerror, get_onready, global, hasOwnProperty, ignoreCase, indexOf,
+        join, key, length, multiline, newcap, node, nomen, on, onerror,
+        onready, parse, passfail, plusplus, ply, predef, properties, prototype,
+        push, queue, random, ready, regexp, remote_call, replace, rhino, safe,
+        secret, set, set_onerror, set_onready, shift, slice, sloppy, source,
+        stay, stringify, stupid, sub, test, toJSON, toSource, toString, todo,
+        undef, unparam, unshift, val, value, valueOf, vars, when, white,
+        windows, x
     */
 
  // Prerequisites
@@ -113,10 +112,9 @@
 
  // Declarations
 
-    var atob, AVar, avar, btoa, comm, deserialize, init, is_closed, isFunction,
-        isRegExp, local_call, ply, remote_call, revive, secret, serialize,
-        shallow_copy, stack, sys, update_local, update_remote, uuid, volunteer,
-        when;
+    var atob, AVar, avar, btoa, comm, def, deserialize, is_closed, isFunction,
+        isRegExp, local_call, ply, queue, revive, secret, serialize,
+        shallow_copy, sys, uuid, when;
 
  // Definitions
 
@@ -310,7 +308,7 @@
                 inside.ready = true;
                 if (inside.queue.length > 0) {
                     inside.ready = false;
-                    stack.unshift({f: inside.queue.shift(), x: x});
+                    queue.unshift({f: inside.queue.shift(), x: x});
                 }
                 break;
             case 'fail':
@@ -364,7 +362,7 @@
                     inside.queue.push(args[0]);
                     if (inside.ready === true) {
                         inside.ready = false;
-                        stack.unshift({f: inside.queue.shift(), x: x});
+                        queue.unshift({f: inside.queue.shift(), x: x});
                     }
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
@@ -385,7 +383,7 @@
                 break;
             case 'stay':
              // A computation that depends on this avar has been postponed,
-             // but that computation will be put back into the stack directly
+             // but that computation will be put back into the queue directly
              // by `local_call`. Thus, nothing actually needs to happen here;
              // we just need to wait. For consistency with `exit` and `fail`,
              // I allow `stay` to take a message argument, but right now it
@@ -408,6 +406,29 @@
      // halts because no events remain to trigger execution. Another advantage
      // is that I can externally trigger a `revive` by invoking `x.comm()`.
         return revive();
+    };
+
+    def = function (obj) {
+     // This function enables the user to redefine "internal" functions from
+     // outside the giant anonymous closure. In particular, this allows users
+     // to port Quanah for use with any persistent storage system by simply
+     // implementing specific routines and providing them to Quanah by way of
+     // this `def` function. This function itself uses the asynchronous `ply`
+     // idiom and returns an avar.
+        var y = avar({val: obj});
+        y.onready = ply(function (key, val) {
+         // This function traverses the input object in search of definitions,
+         // but it will only store a definition as a method of the internal
+         // `sys` object once per key. If an external definition has already
+         // been assigned internally, it cannot be redefined. The policy here
+         // is for simplicity, but it does add a small measure of security.
+         // Because order isn't important here, the use of `ply` is justified.
+            if ((sys[key] === null) && (isFunction(val))) {
+                sys[key] = val;
+            }
+            return;
+        });
+        return y;
     };
 
     deserialize = function ($x) {
@@ -446,29 +467,6 @@
             }
             return (f !== undefined) ? f : val;
         });
-    };
-
-    init = function (obj) {
-     // This function enables the user to redefine "internal" functions from
-     // outside the giant anonymous closure. In particular, this allows users
-     // to port Quanah for use with any persistent storage system by simply
-     // implementing specific routines and providing them to Quanah by way of
-     // this `init` function. This function itself uses the asynchronous `ply`
-     // idiom and returns an avar.
-        var y = avar({val: obj});
-        y.onready = ply(function (key, val) {
-         // This function traverses the input object in search of definitions,
-         // but it will only store a definition as a method of the internal
-         // `sys` object once per key. If an external definition has already
-         // been assigned internally, it cannot be redefined. The policy here
-         // is for simplicity, but it does add a small measure of security.
-         // Because order isn't important here, the use of `ply` is justified.
-            if ((sys[key] === null) && (isFunction(val))) {
-                sys[key] = val;
-            }
-            return;
-        });
-        return y;
     };
 
     is_closed = function (x) {
@@ -653,12 +651,12 @@
                  // that explain why leaving execution guarantees to chance is
                  // perfectly acceptable when the probability approachs 1 :-)
                  //
-                 // NOTE: Don't push back onto the stack until _after_ you send
+                 // NOTE: Don't push back onto the queue until _after_ you send
                  // the `stay` message. Invoking `comm` also invokes `revive`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
                     obj.x.comm({stay: message, secret: secret});
-                    stack.push(obj);
+                    queue.push(obj);
                     return;
                 }
             };
@@ -758,110 +756,12 @@
         return y;
     };
 
-    remote_call = function (obj) {
-     // This function distributes computations to remote execution nodes by
-     // constructing a task that represents the computation, writing it to a
-     // shared storage, polling for changes to its status, and then reading
-     // the new values back into the local variables. My strategy is to use
-     // a bunch of temporary avars that only execute locally -- on this part
-     // I must be very careful, because remote calls should be able to make
-     // remote calls of their own, but execution of a remote call should not
-     // require remote calls of its own! A publication is forthcoming, and at
-     // that point I'll simply use a self-citation as an explanation :-)
-        var f, first, x;
-     // Step 1: copy the computation's function and data into fresh instances,
-     // define some error handlers, and write the copies to the "filesystem".
-     // If special property values have been added to `x`, they will be copied
-     // onto `f` and `x` via the "copy constructor" idiom. Note that special
-     // properties defined for `f` will be overwritten ...
-        f = avar(obj.x);
-        f.key = (obj.f.hasOwnProperty('key')) ? obj.f.key : uuid();
-        f.val = obj.f;
-        first = true;
-        x = avar(obj.x);
-        f.onerror = x.onerror = function (message) {
-         // This function tells the original `x` that something has gone awry.
-            if (first === true) {
-                first = false;
-                obj.x.comm({fail: message, secret: secret});
-            }
-            return;
-        };
-        f.onready = x.onready = update_remote;
-     // Step 2: Use a `when` statement to represent the remote computation and
-     // track its execution status on whatever system is using Quanah.
-        when(f, x).areready = function (evt) {
-         // This function creates a `task` object to represent the computation
-         // and monitors its status by "polling" the "filesystem" for changes.
-         // It initializes using `avar`'s "copy constructor" idiom to enable
-         // `task` to "inherit" system-specific properties such as QMachine's
-         // `box` property automatically. My design here reflects the idea that
-         // the execution should follow the data.
-            var task = avar(obj.x);
-            task.key = uuid();
-            task.status = 'waiting';
-            task.val = {f: f.key, x: x.key};
-            task.onerror = function (message) {
-             // This function alerts `f` and `x` that something has gone awry.
-                return evt.fail(message);
-            };
-            task.onready = update_remote;
-            task.onready = function (evt) {
-             // This function polls for changes in the `status` property using
-             // a variation on the `update_local` function as a non-blocking
-             // `while` loop -- hooray for disposable avars!
-                var temp = sys.read(task);
-                temp.onerror = function (message) {
-                 // This alerts `task` that something has gone awry.
-                    return evt.fail(message);
-                };
-                temp.onready = function (temp_evt) {
-                 // This function analyzes the results of the `read` operation
-                 // to determine if the `task` computation is ready to proceed.
-                    switch (temp.status) {
-                    case 'done':
-                        task.val = temp.val;
-                        evt.exit();
-                        break;
-                    case 'failed':
-                        evt.fail(temp.val.epitaph);
-                        break;
-                    default:
-                        evt.stay('Waiting for results ...');
-                    }
-                    return temp_evt.exit();
-                };
-                return;
-            };
-            task.onready = function (task_evt) {
-             // This function ends the enclosing `when` statement.
-                task_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-     // Step 3: Update the local instances of `f` and `x` by retrieving the
-     // remote versions' representations. If possible, these operations will
-     // run concurrently.
-        f.onready = x.onready = update_local;
-     // Step 4: Use a `when` statement to wait for the updates in Step 3 to
-     // finish before copying the new values into the original `obj` argument.
-        when(f, x).areready = function (evt) {
-         // This function copies the new values into the old object. Please
-         // note that we cannot simply write `obj.foo = foo` because we would
-         // lose the original avar's internal state!
-            obj.f = f.val;
-            obj.x.val = x.val;
-            obj.x.comm({done: [], secret: secret});
-            return evt.exit();
-        };
-        return;
-    };
+    queue = [];
 
     revive = function () {
      // This function contains the execution center for Quanah. It's pretty
      // simple, really -- it just runs the first available task in its queue
-     // (`stack`), and it selects an execution context conditionally. That's
+     // (`queue`), and it selects an execution context conditionally. That's
      // all it does. It makes no attempt to run every task in the queue every
      // time it is called, because instead Quanah uses a strategy in which it
      // tries to call `revive` as many times as necessary to process an entire
@@ -874,7 +774,7 @@
      // for execution using conditional tests that determine whether a given
      // computation can be distributed to external resources for execution, but
      // it can always fall back to executing on the invoking machine :-)
-        var task = stack.shift();
+        var task = queue.shift();
         if (task !== undefined) {
             if (global.hasOwnProperty('JSON') === false) {
              // We can't serialize the computation anyway.
@@ -882,7 +782,7 @@
             } else if (global.hasOwnProperty('JSLINT') === false) {
              // We can't decide if the computation can be serialized.
                 local_call(task);
-            } else if ((sys.read === null) || (sys.write === null)) {
+            } else if (isFunction(sys.remote_call) === false) {
              // We can't distribute the computation.
                 local_call(task);
             } else if (is_closed(task)) {
@@ -890,7 +790,7 @@
                 local_call(task);
             } else {
              // The task is serializable, and we are able to distribute it :-)
-                remote_call(task);
+                sys.remote_call(task, secret);
             }
         }
         return;
@@ -1044,60 +944,11 @@
         return y;
     };
 
-    stack = [];
-
     sys = {
      // This object contains stubs for methods and properties that can be
-     // defined externally using the `Q.init` method. For more information,
-     // read the comments in the `init` function's definition.
-        jobs:   null,
-        read:   null,
-        write:  null
-    };
-
-    update_local = function (evt) {
-     // This function is used in the `remote_call` and `volunteer` functions
-     // to update the local copy of an avar so that its `val` property matches
-     // the one from its remote representation. It is written as a function of
-     // `evt` because it is intended to be assigned to `onready`.
-        if (sys.read === null) {
-            return evt.stay('Waiting for a `read` definition ...');
-        }
-        var local, temp;
-        local = this;
-        temp = sys.read(local);
-        temp.onerror = function (message) {
-         // This function tells `local` that something has gone awry.
-            return evt.fail(message);
-        };
-        temp.onready = function (temp_evt) {
-         // Here, we copy the remote representation into the local one.
-            shallow_copy(temp, local);
-            temp_evt.exit();
-            return evt.exit();
-        };
-        return;
-    };
-
-    update_remote = function (evt) {
-     // This function is used in the `remote_call` and `volunteer` functions
-     // to update the remote copy of an avar so that its `val` property matches
-     // the one from its local representation. It is written as a function of
-     // `evt` because it is intended to be assigned to `onready`.
-        if (sys.write === null) {
-            return evt.stay('Waiting for a `write` definition ...');
-        }
-        var temp = sys.write(this);
-        temp.onerror = function (message) {
-         // This tells the local avar (`this`) that something has gone awry.
-            return evt.fail(message);
-        };
-        temp.onready = function (temp_evt) {
-         // This function just releases execution for the local avar (`this`).
-            temp_evt.exit();
-            return evt.exit();
-        };
-        return;
+     // defined externally using the `Q.def` method. For more information,
+     // read the comments in the `def` function's definition.
+        remote_call:    null
     };
 
     uuid = function () {
@@ -1119,155 +970,6 @@
             y += Math.random().toString(16).slice(2, 34 - y.length);
         }
         return y;
-    };
-
-    volunteer = function () {
-     // This function, combined with `remote_call`, provides the remote code
-     // execution mechanism in Quanah. When `remote_call` on one machine sends
-     // a serialized task to another machine, that other machine runs it with
-     // the `volunteer` function. This function outputs the avar representing
-     // the task so that the underlying system (not Quanah) can control system
-     // resources itself. Examples will be included in the distribution that
-     // will accompany the upcoming publication(s).
-        var args, task;
-        args = Array.prototype.slice.call(arguments);
-        task = avar();
-        task.onready = function (evt) {
-         // This function retrieves the key of a task from the queue so we
-         // can retrieve that task's full description. If no tasks are found,
-         // we will simply check back later :-)
-            if (sys.jobs === null) {
-                return evt.fail('Waiting for a `jobs` definition ...');
-            }
-            var temp = sys.jobs.apply(null, args);
-            temp.onerror = function (message) {
-             // This function notifies `task` that something has gone wrong
-             // during retrieval and interpretation of its description.
-                return evt.fail(message);
-            };
-            temp.onready = function (temp_evt) {
-             // This function chooses a task from the queue and runs it.
-                var queue = temp.val;
-                if ((queue instanceof Array) === false) {
-                 // This seems like a common problem that will occur whenever
-                 // users begin implementing custom storage mechanisms.
-                    return temp_evt.fail('`jobs` should return an array');
-                }
-                if (queue.length === 0) {
-                 // Here, we choose to `fail` not because this is a dreadful
-                 // occurrence or something, but because this decision allows
-                 // us to avoid running subsequent functions whose assumptions
-                 // depend precisely on having found a task to run. If we were
-                 // instead to `stay` and wait for something to do, it would
-                 // be much harder to tune Quanah externally.
-                    return temp_evt.fail('Nothing to do ...');
-                }
-             // Here, we grab a random entry from the queue, rather than the
-             // first element in the queue. Why? Well, recall that tasks cannot
-             // enter the "global" queue until the avars they will transform
-             // are ready; this immediately implies that no task in the remote
-             // queue can ever run out of order anyway. Unfortunately, without
-             // fancy server-side transactional logic, workers can potentially
-             // execute the same job redundantly, especially when there are a
-             // large number of workers and a small number of jobs. This isn't
-             // a big deal for an opportunistic system, and it may even be a
-             // desirable "inefficiency" because it means the invoking machine
-             // will get an answer faster. In some cases, though, such as for
-             // batch jobs that take roughly the same amount of time to run, we
-             // need to "jitter" the queue a little to avoid deadlock.
-                task.key = queue[Math.floor(Math.random() * queue.length)];
-                temp_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-        task.onready = update_local;
-        task.onready = function (evt) {
-         // This function changes the `status` property of the local `task`
-         // object we just synced from remote; the next step, obviously, is
-         // to sync back to remote so that the abstract task will disappear
-         // from the "waiting" queue.
-            task.status = 'running';
-            return evt.exit();
-        };
-        task.onready = update_remote;
-        task.onready = function (evt) {
-         // This function executes the abstract task by recreating `f` and `x`
-         // and running them in the local environment. Since we know `task` is
-         // serializable, we cannot simply add its deserialized form to the
-         // local machine's queue (`stack`), because `revive` would just send
-         // it back out for remote execution again. Thus, we deliberately close
-         // over local variables like `avar` in order to restrict execution to
-         // the current environment. The transform defined in `task.val.f` is
-         // still able to distribute its own sub-tasks for remote execution.
-            var f, first, x;
-            f = avar({key: task.val.f});
-            first = true;
-            x = avar({key: task.val.x});
-            f.onerror = x.onerror = function (message) {
-             // This function runs if execution of the abstract task fails.
-             // The use of a `first` value prevents this function from running
-             // more than once, because aside from annoying the programmer by
-             // returning lots of error messages on his or her screen, such a
-             // situation can also wreak all kinds of havoc for reentrancy.
-                var temp_f, temp_x;
-                if (first) {
-                    first = false;
-                    task.val.epitaph = message;
-                    task.status = 'failed';
-                    temp_f = avar(f);
-                    temp_x = avar(x);
-                    temp_f = temp_x = update_remote;
-                    when(temp_f, temp_x).areready = function (temp_evt) {
-                     // This function runs only when the error messages have
-                     // finished syncing to remote storage successfully.
-                        temp_evt.exit();
-                        return evt.exit();
-                    };
-                }
-                return;
-            };
-            f.onready = x.onready = update_local;
-            when(f, x).areready = function (evt) {
-             // This function contains the _actual_ execution. (Boring, huh?)
-                f.val.call(x, evt);
-                return;
-            };
-         //
-         // Here, I would like to have a function that checks `f` and `x` to
-         // using `is_closed` to ensure that the results it returns to the
-         // invoking machine are the same as the results it computed, because
-         // it _is_ actually possible to write a serializable function which
-         // renders itself unserializable during its evaluation. Specifically,
-         // if the results are not serializable and we are therefore unable to
-         // return an accurate representation of the results, then I want to
-         // send a special signal to the invoking machine to let it know that,
-         // although no error has occurred, results will not be returned; the
-         // invoking machine would then execute the "offending" task itself.
-         // I have included a simple outline of such a function:
-         //
-         //     when(f, x).areready = function (evt) {
-         //         if (is_closed(f.val) || is_closed(x.val)) {
-         //             return evt.abort('Results will not be returned.');
-         //         }
-         //         return evt.exit();
-         //     };
-         //
-            f.onready = x.onready = update_remote;
-            when(f, x).areready = function (temp_evt) {
-             // This function only executes when the task has successfully
-             // executed and the transformed values of `f` and `x` are synced
-             // back to remote storage. Thus, we are now free to send the
-             // signal for successful completion to the invoking machine by
-             // updating the `status` property locally and syncing to remote.
-                task.status = 'done';
-                temp_evt.exit();
-                return evt.exit();
-            };
-            return;
-        };
-        task.onready = update_remote;
-        return task;
     };
 
     when = function () {
@@ -1623,11 +1325,10 @@
         };
 
         obj = {
-            avar:       avar,
-            init:       init,
-            ply:        ply,
-            volunteer:  volunteer,
-            when:       when
+            avar:   avar,
+            def:    def,
+            ply:    ply,
+            when:   when
         };
 
         target = function (f) {

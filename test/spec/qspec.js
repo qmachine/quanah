@@ -12,7 +12,7 @@
 //  in the describe(...) blocks; everything prior is just helpers.
 //
 //                                                      ~~ (c) DER, 06 Apr 2012
-//                                                      update SRW, 31 Jul 2012
+//                                                      update SRW, 21 Sep 2012
 
 (function () {
     'use strict';
@@ -146,11 +146,11 @@
          // Needs a better "should" string...
             var api, thing;
             api = {
-                avar: 'function',
-                init: 'function',
-                ply:  'function',
-                volunteer: 'function',
-                when : 'function'
+                avar:   'function',
+                def:    'function',
+                ply:    'function',
+                //volunteer: 'function',
+                when :  'function'
             };
             for (thing in api) {
                 if (api.hasOwnProperty(thing)) {

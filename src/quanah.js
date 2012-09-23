@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 21 Sep 2012
+//                                                      ~~ (c) SRW, 23 Sep 2012
 
 (function (global) {
     'use strict';
@@ -126,8 +126,11 @@
             atob = function (x) {
              // This function decodes a string which has been encoded using
              // base64 encoding. It isn't part of JavaScript or any standard,
-             // but it is a DOM Level 0 method, and it is extremely useful to
-             // have around ;-)
+             // but it _is_ a DOM Level 0 method, and it is extremely useful
+             // to have around. Unfortunately, it isn't available in Node.js,
+             // the Web Worker contexts of Chrome 21 or Safari 6, or common
+             // server-side developer shells like Spidermonkey, D8 / V8, or
+             // JavaScriptCore.
                 /*jslint bitwise: true */
                 var a, ch1, ch2, ch3, en1, en2, en3, en4, i, n, y;
                 n = x.length;
@@ -242,7 +245,10 @@
              // This function encodes binary data into a base64 string. It
              // isn't part of JavaScript or any standard, but it _is_ a DOM
              // Level 0 method, and it is extremely useful to have around.
-             // Unfortunately, it throws an error in most browsers if you feed
+             // Unfortunately, it isn't available in Node.js, the Web Worker
+             // contexts of Chrome 21 or Safari 6, or common server-side
+             // developer shells like Spidermonkey, D8 / V8, or JavaScriptCore.
+             // Also, it throws an error in most (?) browsers if you feed
              // it Unicode --> http://goo.gl/3fLFs.
                 /*jslint bitwise: true */
                 var a, ch1, ch2, ch3, en1, en2, en3, en4, i, n, y;

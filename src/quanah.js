@@ -14,7 +14,7 @@
 //  -   remove type-checks in user-unreachable functions where appropriate
 //  -   replace `throw` statements with `evt.fail` statements for robustness
 //  -   rewrite `onready` assignments as `comm` invocations (optional)
-//  -   verify correct getter/setter handling in `shallow_copy`
+//  -   verify correct getter/setter handling in `copy`
 //
 //  Open questions:
 //
@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 23 Sep 2012
+//                                                      ~~ (c) SRW, 05 Oct 2012
 
 (function (global) {
     'use strict';
@@ -112,9 +112,9 @@
 
  // Declarations
 
-    var atob, AVar, avar, btoa, comm, def, deserialize, is_closed, isFunction,
-        isRegExp, local_call, ply, queue, revive, secret, serialize,
-        shallow_copy, sys, uuid, when;
+    var atob, AVar, avar, btoa, comm, copy, def, deserialize, is_closed,
+        isFunction, isRegExp, local_call, ply, queue, revive, secret,
+        serialize, sys, uuid, when;
 
  // Definitions
 
@@ -218,7 +218,7 @@
         } else {
             temp = spec;
         }
-        shallow_copy(temp, that);
+        copy(temp, that);
         if (that.hasOwnProperty('key') === false) {
          // NOTE: The `key` property lacks "secure" attributes in this case.
             that.key = uuid();
@@ -414,6 +414,27 @@
         return revive();
     };
 
+    copy = function (x, y) {
+     // This function copies the properties of `x` to `y`, specifying `y` as
+     // object literal if it was not provided as an input argument. It does
+     // not perform a "deep copy", which means that properties whose values
+     // are objects will be "copied by reference" rather than by value. Right
+     // now, I see no reason to worry about deep copies or getters / setters.
+        if (y === undefined) {
+         // At one point, I used a test here that `arguments.length === 1`,
+         // but it offended JSLint:
+         //     "Do not mutate parameter 'y' when using 'arguments'."
+            y = {};
+        }
+        var key;
+        for (key in x) {
+            if (x.hasOwnProperty(key)) {
+                y[key] = x[key];
+            }
+        }
+        return y;
+    };
+
     def = function (obj) {
      // This function enables the user to redefine "internal" functions from
      // outside the giant anonymous closure. In particular, this allows users
@@ -466,7 +487,7 @@
                      // conditionally, and that way might be clearer, too ...
                         /*jslint evil: true */
                         f = ((new Function('return ' + atob(code)))());
-                        shallow_copy(deserialize(atob(props)), f);
+                        copy(deserialize(atob(props)), f);
                         return;
                     });
                 }
@@ -929,27 +950,6 @@
         });
     };
 
-    shallow_copy = function (x, y) {
-     // This function copies the properties of `x` to `y`, specifying `y` as
-     // object literal if it was not provided as an input argument. It does
-     // not perform a "deep copy", which means that properties whose values
-     // are objects will be "copied by reference" rather than by value. Right
-     // now, I see no reason to worry about deep copies or getters / setters.
-        if (y === undefined) {
-         // At one point, I used a test here that `arguments.length === 1`,
-         // but it offended JSLint:
-         //     "Do not mutate parameter 'y' when using 'arguments'."
-            y = {};
-        }
-        var key;
-        for (key in x) {
-            if (x.hasOwnProperty(key)) {
-                y[key] = x[key];
-            }
-        }
-        return y;
-    };
-
     sys = {
      // This object contains stubs for methods and properties that can be
      // defined externally using the `Q.def` method. For more information,
@@ -1244,7 +1244,7 @@
          // Thus, providing this function allows Quanah to use its own format
          // for serialization without making it impossibly hard for users to
          // implement the abstract filesystem routines.
-            return JSON.parse(serialize(shallow_copy(this)));
+            return JSON.parse(serialize(copy(this)));
         }
     });
 

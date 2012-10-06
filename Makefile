@@ -4,7 +4,7 @@
 #
 #   This contains live instructions for development on the Quanah library.
 #
-#                                                       ~~ (c) SRW, 10 Sep 2012
+#                                                       ~~ (c) SRW, 05 Oct 2012
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -58,7 +58,7 @@ define random-prefix
 endef
 
 .PHONY: all clean clobber distclean reset run
-.INTERMEDIATE: jslint.js json2.js
+.INTERMEDIATE: json2.js
 .SILENT: ;
 
 all: run
@@ -174,7 +174,7 @@ $(EXEJS): $(SRCJS)
 $(HTML): | $(EXEJS)
 	@   $(WEBPAGE) -o $@ $(EXEJS)
 
-$(JSLIBS): jslint.js json2.js
+$(JSLIBS): json2.js
 	@   $(CAT) $^ > $@
 
 $(MINJS): $(EXEJS)
@@ -186,14 +186,6 @@ $(MINJS): $(EXEJS)
 #   my personal machine, and I highly recommend it for rapid development. If
 #   you don't have the same personal settings, though, these directions will
 #   still fall back to our trusty friend 'curl' :-)
-
-jslint.js:
-	@   CROCKHUB="https://raw.github.com/douglascrockford"          ;   \
-            if [ -f $(CODEBANK)/lib/JavaScript/jslint.js ]; then            \
-                $(CP) $(CODEBANK)/lib/JavaScript/jslint.js $@           ;   \
-            else                                                            \
-                $(CURL) -o $@ $${CROCKHUB}/JSLint/master/jslint.js      ;   \
-            fi
 
 json2.js:
 	@   CROCKHUB="https://raw.github.com/douglascrockford"          ;   \

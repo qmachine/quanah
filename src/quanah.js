@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 05 Oct 2012
+//                                                      ~~ (c) SRW, 10 Oct 2012
 
 (function (global) {
     'use strict';
@@ -70,17 +70,17 @@
 
     /*properties
         JSLINT, adsafe, anon, apply, areready, atob, avar, bitwise, browser,
-        btoa, by, call, cap, charAt, charCodeAt, comm, concat, continue, css,
-        debug, def, defineProperty, devel, done, enumerable, epitaph, eqeq,
-        es5, evil, exit, exports, f, fail, forin, fragment, fromCharCode, get,
-        get_onerror, get_onready, global, hasOwnProperty, ignoreCase, indexOf,
-        join, key, length, multiline, newcap, node, nomen, on, onerror,
-        onready, parse, passfail, plusplus, ply, predef, properties, prototype,
-        push, queue, random, ready, regexp, remote_call, replace, rhino, safe,
-        secret, set, set_onerror, set_onready, shift, slice, sloppy, source,
-        stay, stringify, stupid, sub, test, toJSON, toSource, toString, todo,
-        undef, unparam, unshift, val, value, valueOf, vars, when, white,
-        windows, x
+        btoa, by, call, cap, charAt, charCodeAt, comm, concat, configurable,
+        continue, css, debug, def, defineProperty, devel, done, enumerable,
+        epitaph, eqeq, es5, evil, exit, exports, f, fail, forin, fragment,
+        fromCharCode, get, get_onerror, get_onready, global, hasOwnProperty,
+        ignoreCase, indexOf, join, key, length, multiline, newcap, node, nomen,
+        on, onerror, onready, parse, passfail, plusplus, ply, predef,
+        properties, prototype, push, queue, random, ready, regexp, remote_call,
+        replace, rhino, safe, secret, set, set_onerror, set_onready, shift,
+        slice, sloppy, source, stay, stringify, stupid, sub, test, toJSON,
+        toSource, toString, todo, undef, unparam, unshift, val, value, valueOf,
+        vars, when, white, windows, writable, x
     */
 
  // Prerequisites
@@ -187,10 +187,11 @@
      // receives through its `comm` method.
         var state, temp, that;
         state = {
-            epitaph:    null,
-            onerror:    null,
-            queue:      [],
-            ready:      true
+         // NOTE: Do I _need_ to quote these property names?
+            'epitaph':  null,
+            'onerror':  null,
+            'queue':    [],
+            'ready':    true
         };
         that = this;
         Object.defineProperty(that, 'comm', {
@@ -220,12 +221,30 @@
         }
         copy(temp, that);
         if (that.hasOwnProperty('key') === false) {
-         // NOTE: The `key` property lacks "secure" attributes in this case.
-            that.key = uuid();
+            Object.defineProperty(that, 'key', {
+             // NOTE: The `key` property lacks "secure" attributes in this
+             // case because it doesn't necessarily receive secure attributes
+             // inside `copy` -- things need to match. The advantage to doing
+             // things this way, however, is that `key` will always be called
+             // `key` no matter how the minifier operates ...
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: uuid()
+            });
         }
         if (that.hasOwnProperty('val') === false) {
-         // NOTE: The `val` property lacks "secure" attributes in this case.
-            that.val = null;
+            Object.defineProperty(that, 'val', {
+             // NOTE: The `val` property lacks "secure" attributes in this
+             // case because it doesn't necessarily receive secure attributes
+             // inside `copy` -- things need to match. The advantage to doing
+             // things this way, however, is that `val` will always be called
+             // `val` no matter how the minifier operates ...
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: null
+            });
         }
         return that;
     };
@@ -314,7 +333,7 @@
                 inside.ready = true;
                 if (inside.queue.length > 0) {
                     inside.ready = false;
-                    queue.unshift({f: inside.queue.shift(), x: x});
+                    queue.unshift({'f': inside.queue.shift(), 'x': x});
                 }
                 break;
             case 'fail':
@@ -354,7 +373,7 @@
              // store the handler and also fire it immediately.
                 inside.onerror = args[0];
                 if (inside.epitaph !== null) {
-                    x.comm({fail: inside.epitaph, secret: secret});
+                    x.comm({'fail': inside.epitaph, 'secret': secret});
                 }
                 break;
             case 'set_onready':
@@ -368,7 +387,7 @@
                     inside.queue.push(args[0]);
                     if (inside.ready === true) {
                         inside.ready = false;
-                        queue.unshift({f: inside.queue.shift(), x: x});
+                        queue.unshift({'f': inside.queue.shift(), 'x': x});
                     }
                 } else if (args[0] instanceof AVar) {
                     when(args[0], x).areready = function (evt) {
@@ -382,8 +401,8 @@
                     };
                 } else {
                     x.comm({
-                        fail: 'Assigned value must be a function',
-                        secret: secret
+                        'fail': 'Assigned value must be a function',
+                        'secret': secret
                     });
                 }
                 break;
@@ -401,8 +420,8 @@
              // In such a case, we may try to rely on user-submitted reports,
              // but right now we just hope we can capture the error ...
                 x.comm({
-                    fail: 'Invalid `comm` message "' + message + '"',
-                    secret: secret
+                    'fail': 'Invalid `comm` message "' + message + '"',
+                    'secret': secret
                 });
             }
         }
@@ -442,7 +461,7 @@
      // implementing specific routines and providing them to Quanah by way of
      // this `def` function. This function itself uses the asynchronous `ply`
      // idiom and returns an avar.
-        var y = avar({val: obj});
+        var y = avar({'val': obj});
         y.onready = ply(function (key, val) {
          // This function traverses the input object in search of definitions,
          // but it will only store a definition as a method of the internal
@@ -559,45 +578,45 @@
              // to negate JSLINT's output.
                 flag = (false === global.JSLINT($f, {
                  // JSLINT configuration options, as of version 2012-07-27:
-                    adsafe:     false,  //- enforce ADsafe rules?
-                    anon:       true,   //- allow `function()`?
-                    bitwise:    true,   //- allow use of bitwise operators?
-                    browser:    false,  //- assume browser as JS environment?
-                    cap:        true,   //- allow uppercase HTML?
+                    'adsafe':   false,  //- enforce ADsafe rules?
+                    'anon':     true,   //- allow `function()`?
+                    'bitwise':  true,   //- allow use of bitwise operators?
+                    'browser':  false,  //- assume browser as JS environment?
+                    'cap':      true,   //- allow uppercase HTML?
                     //confusion:true,   //- allow inconsistent type usage?
                     'continue': true,   //- allow continuation statement?
-                    css:        false,  //- allow CSS workarounds?
-                    debug:      false,  //- allow debugger statements?
-                    devel:      false,  //- allow output logging?
-                    eqeq:       true,   //- allow `==` instead of `===`?
-                    es5:        true,   //- allow ECMAScript 5 syntax?
-                    evil:       false,  //- allow the `eval` statement?
-                    forin:      true,   //- allow unfiltered `for..in`?
-                    fragment:   false,  //- allow HTML fragments?
-                    //indent:   4,
-                    //maxerr:   50,
-                    //maxlen:   80,
-                    newcap:     true,   //- constructors must be capitalized?
-                    node:       false,  //- assume Node.js as JS environment?
-                    nomen:      true,   //- allow names' dangling underscores?
-                    on:         false,  //- allow HTML event handlers
-                    passfail:   true,   //- halt the scan on the first error?
-                    plusplus:   true,   //- allow `++` and `--` usage?
-                    predef:     {},     //- predefined global variables
-                    properties: false,  //- require JSLINT /*properties */?
-                    regexp:     true,   //- allow `.` in regexp literals?
-                    rhino:      false,  //- assume Rhino as JS environment?
-                    safe:       false,  //- enforce safe subset of ADsafe?
-                    sloppy:     true,   //- ES5 strict mode pragma is optional?
-                    stupid:     true,   //- allow `*Sync` calls in Node.js?
-                    sub:        true,   //- allow all forms of subset notation?
-                    todo:       true,   //- allow comments that start with TODO
-                    undef:      false,  //- allow out-of-order definitions?
-                    unparam:    true,   //- allow unused parameters?
-                    vars:       true,   //- allow multiple `var` statements?
-                    white:      true,   //- allow sloppy whitespace?
-                    //widget:   false,  //- assume Yahoo widget JS environment?
-                    windows:    false   //- assume Windows OS?
+                    'css':      false,  //- allow CSS workarounds?
+                    'debug':    false,  //- allow debugger statements?
+                    'devel':    false,  //- allow output logging?
+                    'eqeq':     true,   //- allow `==` instead of `===`?
+                    'es5':      true,   //- allow ECMAScript 5 syntax?
+                    'evil':     false,  //- allow the `eval` statement?
+                    'forin':    true,   //- allow unfiltered `for..in`?
+                    'fragment': false,  //- allow HTML fragments?
+                    //'indent': 4,
+                    //'maxerr': 50,
+                    //'maxlen': 80,
+                    'newcap':   true,   //- constructors must be capitalized?
+                    'node':     false,  //- assume Node.js as JS environment?
+                    'nomen':    true,   //- allow names' dangling underscores?
+                    'on':       false,  //- allow HTML event handlers
+                    'passfail': true,   //- halt the scan on the first error?
+                    'plusplus': true,   //- allow `++` and `--` usage?
+                    'predef':   {},     //- predefined global variables
+                    'properties': false,//- require JSLINT /*properties */?
+                    'regexp':   true,   //- allow `.` in regexp literals?
+                    'rhino':    false,  //- assume Rhino as JS environment?
+                    'safe':     false,  //- enforce safe subset of ADsafe?
+                    'sloppy':   true,   //- ES5 strict mode pragma is optional?
+                    'stupid':   true,   //- allow `*Sync` calls in Node.js?
+                    'sub':      true,   //- allow all forms of subset notation?
+                    'todo':     true,   //- allow comments that start with TODO
+                    'undef':    false,  //- allow out-of-order definitions?
+                    'unparam':  true,   //- allow unused parameters?
+                    'vars':     true,   //- allow multiple `var` statements?
+                    'white':    true,   //- allow sloppy whitespace?
+                    //'widget': false,  //- assume Yahoo widget JS environment?
+                    'windows':  false   //- assume Windows OS?
                 }));
             }
             ply(x).by(function (key, val) {
@@ -645,11 +664,11 @@
              // send messages to `obj.x` for execution control. Methods can
              // be replaced by the user from within the calling function `f`
              // without affecting the execution of computations :-)
-                exit: function (message) {
+                'exit': function (message) {
                  // This function indicates successful completion.
-                    return obj.x.comm({done: message, secret: secret});
+                    return obj.x.comm({'done': message, 'secret': secret});
                 },
-                fail: function (message) {
+                'fail': function (message) {
                  // This function indicates a failure, and it is intended to
                  // replace the `throw new Error(...)` idiom, primarily because
                  // capturing errors that are thrown during remote execution
@@ -662,9 +681,9 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace `throw` with `fail` in
                  // their programs to solve the remote error capture problem.
-                    return obj.x.comm({fail: message, secret: secret});
+                    return obj.x.comm({'fail': message, 'secret': secret});
                 },
-                stay: function (message) {
+                'stay': function (message) {
                  // This function allows a user to postpone execution, and it
                  // is particularly useful for delaying execution until some
                  // condition is met -- it can be used to write non-blocking
@@ -682,7 +701,7 @@
                  // the `stay` message. Invoking `comm` also invokes `revive`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
-                    obj.x.comm({stay: message, secret: secret});
+                    obj.x.comm({'stay': message, 'secret': secret});
                     queue.push(obj);
                     return;
                 }
@@ -954,7 +973,10 @@
      // This object contains stubs for methods and properties that can be
      // defined externally using the `Q.def` method. For more information,
      // read the comments in the `def` function's definition.
-        remote_call:    null
+     //
+     // NOTE: Do I need to quote the property name here?
+     //
+        remote_call: null
     };
 
     uuid = function () {
@@ -1003,7 +1025,7 @@
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
         x = [];
-        y = avar({val: args});
+        y = avar({'val': args});
         while (stack.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
@@ -1041,7 +1063,7 @@
              // This function passes `message` to each avar in `x`. For the
              // other elements, there isn't much we can do, so we ignore them.
                 if (val instanceof AVar) {
-                    val.comm({fail: message, secret: secret});
+                    val.comm({'fail': message, 'secret': secret});
                 }
                 return;
             });
@@ -1057,7 +1079,7 @@
              // return a reference to the next function in the avar's queue,
              // because `comm` itself doesn't return anything.
                 var temp = {};
-                y.comm({get_onready: temp, secret: secret});
+                y.comm({'get_onready': temp, 'secret': secret});
                 return temp.onready;
             },
             set: function (f) {
@@ -1065,7 +1087,7 @@
              // and it stores it in the queue for `y` to execute later.
                 /*jslint unparam: true */
                 if (f instanceof AVar) {
-                    y.comm({set_onready: f, secret: secret});
+                    y.comm({'set_onready': f, 'secret': secret});
                     return;
                 }
                 var count, egress, g, n, ready;
@@ -1145,7 +1167,7 @@
                     }
                     return;
                 });
-                return y.comm({set_onready: g, secret: secret});
+                return y.comm({'set_onready': g, 'secret': secret});
             }
         });
         Object.defineProperty(y, ((args.length < 2) ? 'is' : 'are') + 'ready', {
@@ -1180,7 +1202,7 @@
          // a reference to the private `onerror` value, since `comm` itself
          // doesn't return anything.
             var temp = {};
-            this.comm({get_onerror: temp, secret: secret});
+            this.comm({'get_onerror': temp, 'secret': secret});
             return temp.onerror;
         },
         set: function (f) {
@@ -1188,7 +1210,7 @@
          // that it can be stored as a handler for `this.onerror`. We don't
          // actually need to use `isFunction` because if it's not a function,
          // it will never run anyway -- see the `comm` definition.
-            return this.comm({set_onerror: f, secret: secret});
+            return this.comm({'set_onerror': f, 'secret': secret});
         }
     });
 
@@ -1202,7 +1224,7 @@
          // a reference to the private `onready` value, since `comm` itself
          // doesn't return anything.
             var temp = {};
-            this.comm({get_onready: temp, secret: secret});
+            this.comm({'get_onready': temp, 'secret': secret});
             return temp.onready;
         },
         set: function (f) {
@@ -1212,7 +1234,7 @@
          // the `comm` definition. Because there's only one place in the code
          // that can manipulate an avar's queue, assumptions about that queue
          // should be located as near there as possible to avoid oversight.
-            return this.comm({set_onready: f, secret: secret});
+            return this.comm({'set_onready': f, 'secret': secret});
         }
     });
 

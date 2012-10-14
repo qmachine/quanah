@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 10 Oct 2012
+//                                                      ~~ (c) SRW, 14 Oct 2012
 
 (function (global) {
     'use strict';
@@ -1384,6 +1384,16 @@
                 value: val
             });
             return;
+        });
+
+        Object.defineProperty(AVar.prototype, 'Q', {
+         // NOTE: I commented two of the next three lines out because
+         // their values are the default ones specified by the ES5.1
+         // standard.
+            //configurable: false,
+            //enumerable: true,
+            //writable: false,
+            value: target
         });
 
         if (global.hasOwnProperty('process') && (typeof module === 'object')) {

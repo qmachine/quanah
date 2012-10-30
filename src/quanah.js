@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 14 Oct 2012
+//                                                      ~~ (c) SRW, 29 Oct 2012
 
 (function (global) {
     'use strict';

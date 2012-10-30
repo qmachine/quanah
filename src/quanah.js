@@ -544,7 +544,7 @@
      // from others who may have battled the same problems :-)
         /*jslint unparam: true */
         if ((predef instanceof Object) === false) {
-            predef = (isFunction(user_def.predef)) ? user_def.predef() : {};
+            predef = (isFunction(user_def.predef)) ? user_def.predef(x) : {};
         }
         var $f, flag, left, right;
         flag = false;

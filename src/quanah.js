@@ -114,7 +114,7 @@
 
     var atob, AVar, avar, btoa, comm, copy, def, deserialize, is_closed,
         isFunction, isRegExp, local_call, ply, queue, revive, secret,
-        serialize, sys, uuid, when;
+        serialize, user_def, uuid, when;
 
  // Definitions
 
@@ -465,12 +465,12 @@
         y.onready = ply(function (key, val) {
          // This function traverses the input object in search of definitions,
          // but it will only store a definition as a method of the internal
-         // `sys` object once per key. If an external definition has already
-         // been assigned internally, it cannot be redefined. The policy here
-         // is for simplicity, but it does add a small measure of security.
+         // `user_def` object once per key. If an external definition has
+         // already been assigned internally, it cannot be redefined. This
+         // policy here is as much for simplicity as for security.
          // Because order isn't important here, the use of `ply` is justified.
-            if ((sys[key] === null) && (isFunction(val))) {
-                sys[key] = val;
+            if ((user_def[key] === null) && (isFunction(val))) {
+                user_def[key] = val;
             }
             return;
         });
@@ -515,7 +515,7 @@
         });
     };
 
-    is_closed = function (x) {
+    is_closed = function (x, predef) {
      // This function tests an input argument `x` for references that "close"
      // over external references from another scope. This function solves a
      // very important problem in JavaScript because function serialization is
@@ -543,6 +543,9 @@
      // only one solution to the serialization problem, and I welcome feedback
      // from others who may have battled the same problems :-)
         /*jslint unparam: true */
+        if ((predef instanceof Object) === false) {
+            predef = (isFunction(user_def.predef)) ? user_def.predef() : {};
+        }
         var $f, flag, left, right;
         flag = false;
         left = '(function () {\nreturn ';
@@ -602,7 +605,7 @@
                     'on':       false,  //- allow HTML event handlers
                     'passfail': true,   //- halt the scan on the first error?
                     'plusplus': true,   //- allow `++` and `--` usage?
-                    'predef':   {},     //- predefined global variables
+                    'predef':   predef, //- predefined global variables
                     'properties': false,//- require JSLINT /*properties */?
                     'regexp':   true,   //- allow `.` in regexp literals?
                     'rhino':    false,  //- assume Rhino as JS environment?
@@ -828,7 +831,7 @@
             } else if (global.hasOwnProperty('JSLINT') === false) {
              // We can't decide if the computation can be serialized.
                 local_call(task);
-            } else if (isFunction(sys.remote_call) === false) {
+            } else if (isFunction(user_def.remote_call) === false) {
              // We can't distribute the computation.
                 local_call(task);
             } else if (is_closed(task)) {
@@ -836,7 +839,7 @@
                 local_call(task);
             } else {
              // The task is serializable, and we are able to distribute it :-)
-                sys.remote_call(task, secret);
+                user_def.remote_call(task, secret);
             }
         }
         return;
@@ -969,13 +972,14 @@
         });
     };
 
-    sys = {
+    user_def = {
      // This object contains stubs for methods and properties that can be
      // defined externally using the `Q.def` method. For more information,
      // read the comments in the `def` function's definition.
      //
-     // NOTE: Do I need to quote the property name here?
+     // NOTE: Do I need to quote the property names here?
      //
+        predef: null,
         remote_call: null
     };
 

@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 29 Oct 2012
+//                                                      ~~ (c) SRW, 30 Oct 2012
 
 (function (global) {
     'use strict';
@@ -627,7 +627,7 @@
              // recursively to make sure none of those are closed, either.
              // Because order isn't important, use of `ply` is justified.
                 if (flag === false) {
-                    flag = is_closed(val);
+                    flag = is_closed(val, predef);
                 }
                 return;
             });

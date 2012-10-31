@@ -59,7 +59,7 @@
 //
 //                                                      ~~ (c) SRW, 30 Oct 2012
 
-(function (global) {
+(function (global, hood) {
     'use strict';
 
  // Pragmas
@@ -504,8 +504,7 @@
                      // matter, calling the regular expression twice may be
                      // slower than calling it once and processing its output
                      // conditionally, and that way might be clearer, too ...
-                        /*jslint evil: true */
-                        f = ((new Function('return ' + atob(code)))());
+                        f = hood(atob(code));
                         copy(deserialize(atob(props)), f);
                         return;
                     });
@@ -1468,6 +1467,16 @@
 
     return (typeof this.global === 'object') ? this.global : this;
 
-}, null, this)));
+}, null, this), function ($f) {
+    'use strict';
+
+ // This is a sandbox for resuscitating function code safely. I will explain
+ // more later ...
+
+    /*jslint evil: true, indent: 4, maxlen: 80 */
+
+    return (new Function('return ' + $f))();
+
+}));
 
 //- vim:set syntax=javascript:

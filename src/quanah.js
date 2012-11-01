@@ -69,18 +69,18 @@
     /*global JSLINT: false */
 
     /*properties
-        JSLINT, adsafe, anon, apply, areready, atob, avar, bitwise, browser,
-        btoa, by, call, cap, charAt, charCodeAt, comm, concat, configurable,
-        continue, css, debug, def, defineProperty, devel, done, enumerable,
-        epitaph, eqeq, es5, evil, exit, exports, f, fail, forin, fragment,
-        fromCharCode, get, get_onerror, get_onready, global, hasOwnProperty,
-        ignoreCase, indexOf, join, key, length, multiline, newcap, node, nomen,
-        on, onerror, onready, parse, passfail, plusplus, ply, predef,
-        properties, prototype, push, queue, random, ready, regexp, remote_call,
-        replace, rhino, safe, secret, set, set_onerror, set_onready, shift,
-        slice, sloppy, source, stay, stringify, stupid, sub, test, toJSON,
-        toSource, toString, todo, undef, unparam, unshift, val, value, valueOf,
-        vars, when, white, windows, writable, x
+        JSLINT, adsafe, allow, anon, apply, areready, atob, avar, bitwise,
+        browser, btoa, by, call, callback, cap, charAt, charCodeAt, comm,
+        concat, configurable, continue, css, debug, def, defineProperty, devel,
+        done, enumerable, epitaph, eqeq, es5, evil, exit, exports, f, fail,
+        forin, fragment, fromCharCode, get, get_onerror, get_onready, global,
+        hasOwnProperty, ignoreCase, indexOf, join, key, length, multiline,
+        newcap, node, nomen, on, onerror, onready, parse, passfail, plusplus,
+        ply, predef, properties, prototype, push, queue, random, ready, regexp,
+        remote_call, replace, rhino, safe, secret, set, set_onerror,
+        set_onready, shift, shmockford, slice, sloppy, source, stay, stringify,
+        stupid, sub, test, toJSON, toSource, toString, todo, undef, unparam,
+        unshift, val, value, valueOf, vars, when, white, windows, writable, x
     */
 
  // Prerequisites
@@ -514,7 +514,7 @@
         });
     };
 
-    is_closed = function (x, predef) {
+    is_closed = function (x, options) {
      // This function tests an input argument `x` for references that "close"
      // over external references from another scope. This function solves a
      // very important problem in JavaScript because function serialization is
@@ -542,8 +542,12 @@
      // only one solution to the serialization problem, and I welcome feedback
      // from others who may have battled the same problems :-)
         /*jslint unparam: true */
-        if ((predef instanceof Object) === false) {
-            predef = (isFunction(user_def.predef)) ? user_def.predef(x) : {};
+        if ((options instanceof Object) === false) {
+            if (isFunction(user_def.shmockford)) {
+                options = user_def.shmockford(x);
+            } else {
+                options = {};
+            }
         }
         var $f, flag, left, right;
         flag = false;
@@ -578,7 +582,7 @@
              // returns `false` because the scan fails for some reason, the
              // answer to our question would be `true`, which is why we have
              // to negate JSLINT's output.
-                flag = (false === global.JSLINT($f, {
+                flag = (false === global.JSLINT($f, copy(options.allow, {
                  // JSLINT configuration options, as of version 2012-07-27:
                     'adsafe':   false,  //- enforce ADsafe rules?
                     'anon':     true,   //- allow `function()`?
@@ -604,7 +608,7 @@
                     'on':       false,  //- allow HTML event handlers
                     'passfail': true,   //- halt the scan on the first error?
                     'plusplus': true,   //- allow `++` and `--` usage?
-                    'predef':   predef, //- predefined global variables
+                    'predef':   {},     //- predefined global variables
                     'properties': false,//- require JSLINT /*properties */?
                     'regexp':   true,   //- allow `.` in regexp literals?
                     'rhino':    false,  //- assume Rhino as JS environment?
@@ -619,19 +623,19 @@
                     'white':    true,   //- allow sloppy whitespace?
                     //'widget': false,  //- assume Yahoo widget JS environment?
                     'windows':  false   //- assume Windows OS?
-                }));
+                })));
             }
             ply(x).by(function (key, val) {
              // This function examines all methods and properties of `x`
              // recursively to make sure none of those are closed, either.
              // Because order isn't important, use of `ply` is justified.
                 if (flag === false) {
-                    flag = is_closed(val, predef);
+                    flag = is_closed(val, options);
                 }
                 return;
             });
         }
-        return flag;
+        return (isFunction(options.callback)) ? options.callback(flag) : flag;
     };
 
     isFunction = function (f) {
@@ -978,8 +982,8 @@
      //
      // NOTE: Do I need to quote the property names here?
      //
-        predef: null,
-        remote_call: null
+        remote_call: null,
+        shmockford: null
     };
 
     uuid = function () {

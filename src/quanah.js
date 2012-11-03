@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 30 Oct 2012
+//                                                      ~~ (c) SRW, 03 Nov 2012
 
 (function (global, hood) {
     'use strict';
@@ -86,10 +86,11 @@
  // Prerequisites
 
     if (Object.prototype.hasOwnProperty('Q')) {
-     // Exit early because the framework is either already present or else
-     // would overwrite existing extensions to the Object prototype object.
-     // This may throw an error in the future to help remind other people
-     // not to squat on this particular "namespace" ;-)
+     // Exit early to avoid overwriting the existing extension. Hopefully the
+     // conflict is because Method Q has already been loaded, but there's not
+     // a good way to be certain. Preserving idempotency is just as important
+     // as playing nice with other libraries, though, and so for now, exiting
+     // cleanly is the best course of action.
         return;
     }
 
@@ -324,6 +325,7 @@
                 }
             }
         }
+        secret = {};
         if (special === true) {
             switch (message) {
             case 'done':

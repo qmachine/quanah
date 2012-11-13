@@ -57,7 +57,7 @@
 //          prototype definitions use ES5 getters and setters, too. I would
 //          need to abandon most (if not all) use of getters and setters ...
 //
-//                                                      ~~ (c) SRW, 03 Nov 2012
+//                                                      ~~ (c) SRW, 13 Nov 2012
 
 (function (global, hood) {
     'use strict';
@@ -1400,7 +1400,7 @@
          // their values are the default ones specified by the ES5.1
          // standard.
             //configurable: false,
-            //enumerable: true,
+            //enumerable: false,
             //writable: false,
             value: target
         });

@@ -1351,11 +1351,11 @@
              // `defineProperty` instead of by assigning directly because then
              // I can edit the ES5 meta-properties.
              //
-             // NOTE: I commented the next three lines out because their values
-             // are the default ones specified by the ES5.1 standard.
+             // NOTE: I commented two out of the next three lines out because
+             // their values are the defaults specified by the ES5.1 standard.
                 //configurable: false,
                 //enumerable: false,
-                //writable: false,
+                writable: true,
                 value: target
             });
             return target;
@@ -1396,9 +1396,8 @@
         });
 
         Object.defineProperty(AVar.prototype, 'Q', {
-         // NOTE: I commented two of the next three lines out because
-         // their values are the default ones specified by the ES5.1
-         // standard.
+         // NOTE: I commented the next three lines out because their values are
+         // the default ones specified by the ES5.1 standard.
             //configurable: false,
             //enumerable: false,
             //writable: false,

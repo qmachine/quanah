@@ -1,18 +1,19 @@
 {
-    "name": "quanah",
-    "version": "0.0.12",
+    "author": "Sean Wilkinson",
     "description": "Event-driven framework for distributed computing",
-    "main": "src/quanah.js",
     "directories": {
         "test": "tests"
     },
+    "license": "Apache License 2.0",
+    "main": "src/quanah.js",
+    "name": "quanah",
     "scripts": {
         "test": "make check"
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/wilkinson/quanah.git"
-    },
-    "author": "Sean Wilkinson",
-    "license": "Apache License 2.0"
+    "repositories": [
+        {"type": "git", "url": "https://bitbucket.org/wilkinson/quanah.git"},
+        {"type": "git", "url": "https://code.google.com/p/quanah/"},
+        {"type": "git", "url": "https://github.com/wilkinson/quanah.git"}
+    ],
+    "version": "0.0.13"
 }

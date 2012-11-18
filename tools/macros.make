@@ -7,6 +7,7 @@
 #   in general, I recommend that you not edit these unless you absolutely must!
 #
 #                                                       ~~ (c) SRW, 03 Sep 2011
+#                                                   ~~ last updated 17 Nov 2012
 
 SHELL   :=  sh
 
@@ -87,5 +88,16 @@ define contingent
         contingent $(1)                                                     \
     )
 endef
+
+define show-usage-info
+    printf '%s\n' 'Usage: $(MAKE) [options] [target] ...'               ;   \
+    printf '%s\n' '  where "high-level" targets include'                ;   \
+    $(SED) -n 's/^.PHONY:\([^$$]*\)$$/\1/p' $(MAKEFILE_LIST) | \
+        $(XARGS) printf '    %s\n' $(APPS) | $(SORT)
+endef
+
+SED     :=  $(call contingent, gsed sed)
+SORT    :=  $(call contingent, gsort sort) -u
+XARGS   :=  $(call contingent, xargs)
 
 #-  vim:set syntax=make:

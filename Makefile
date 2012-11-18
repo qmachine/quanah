@@ -16,6 +16,8 @@ RM      :=  $(call contingent, grm rm) -rf
 .PHONY: all clean clobber distclean reset run
 .SILENT: ;
 
+'': help;
+
 all: run
 
 clean: reset
@@ -25,6 +27,9 @@ clobber: clean
 distclean: clobber
 	@   $(RM) $(addprefix $(PROJECT_ROOT)/, \
                 .d8_history .v8_history ./node_modules/ npm-debug.log *.tgz)
+
+help:
+	@   $(call show-usage-info)
 
 reset:
 	@   $(call contingent, clear)

@@ -1,18 +1,18 @@
 //- JavaScript source code
 
-//- qspec.js ~~
+//- quanah-spec.js ~~
 //
 //  Jasmine (http://pivotal.github.com/jasmine/) BDD Specs for Quanah, written
 //  in an effort to:
 //    * Provide a degree of documentation
-//    * Learn the damn thing
+//    * Learn the darn thing
 //    * Provide a way to catch changes made in Quanah's API
 //
 //  The actually interesting, i.e. expressive of Quanah's use, code takes place
 //  in the describe(...) blocks; everything prior is just helpers.
 //
 //                                                      ~~ (c) DER, 06 Apr 2012
-//                                                      update SRW, 21 Sep 2012
+//                                                      update SRW, 17 Nov 2012
 
 (function () {
     'use strict';
@@ -380,12 +380,6 @@
 
         });
 
-    });
-
-    describe('Original Tests', function () {
-     // This function needs documentation.
-        // ...
-        return;
     });
 
  // That's all, folks!

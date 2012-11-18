@@ -2,144 +2,48 @@
 
 //- quanah-spec.js ~~
 //
-//  Jasmine (http://pivotal.github.com/jasmine/) BDD Specs for Quanah, written
-//  in an effort to:
-//    * Provide a degree of documentation
-//    * Learn the darn thing
-//    * Provide a way to catch changes made in Quanah's API
+//  These tests were originally contributed by David Robbins on 06 April 2012
+//  for use with Jasmine (http://pivotal.github.com/jasmine/). The current form
+//  is designed for use with Mocha (https://github.com/visionmedia/mocha) as
+//  part of an NPM-based workflow.
 //
-//  The actually interesting, i.e. expressive of Quanah's use, code takes place
-//  in the describe(...) blocks; everything prior is just helpers.
-//
-//                                                      ~~ (c) DER, 06 Apr 2012
-//                                                      update SRW, 17 Nov 2012
+//                                                      ~~ (c) SRW, 17 Nov 2012
 
 (function () {
     'use strict';
 
  // Pragmas
 
-    /*global
-        beforeEach: false,
-        console: false,
-        describe: false,
-        expect: false,
-        it: false,
-        jasmine: false,
-        runs: false,
-        waitsFor: false,
-        xit: false
-    */
+    /*global beforeEach: false, describe: false, it: false */
 
-    /*jshint */
-
-    /*jslint indent: 4, maxlen: 80 */
-
- // Prerequisites
-
-    if (Object.prototype.hasOwnProperty('Q') === false) {
-        throw new Error('Method Q is missing.');
-    }
+    /*jslint indent: 4, maxlen: 80, node: true */
 
  // Declarations
 
-    var Q, getAvars, toType, onerror;
+    var expect;
 
  // Definitions
 
-    Q = Object.prototype.Q;
+    expect = require('expect.js');
 
-    getAvars = function (x) {
-     // Returns an avar whose val is an array of avars, with one for each
-     // of the arguments (or each element of the first argument if it is
-     // an array.
-        var arg, args, avars, i, temp;
-        avars = [];
-        args = (toType(x) === 'array') ? x : arguments;
-        for (i in args) {
-            if (args.hasOwnProperty(i)) {
-                arg = args[i];
-                temp = Q.avar({val: arg});
-                temp.onerror = onerror;
-                avars.push(temp);
-            }
-        }
-        temp = Q.avar({val: avars});
-        temp.onerror = onerror;
-        return temp;
-    };
-
-    toType = function (obj) {
-     // This function needs documentation.
-        return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
-    };
-
-    onerror = function (msg) {
-     // This function needs documentation.
-        console.error(msg);
-        return;
-    };
-
- // Invocations
-
-    beforeEach(function () {
-     // This function needs documentation.
-        var customMatchers, setMatcherMessage;
-        customMatchers = {};
-        setMatcherMessage = function (message, matcher_context) {
-         // This function needs documentation.
-            matcher_context.message = function () {
-             // This function needs documentation.
-                return message;
-            };
-            return;
-        };
-        customMatchers.toBeA = function (expected_type) {
-         // This function needs documentation.
-            return toType(this.actual) === expected_type;
-        };
-        customMatchers.toBeAFunction = function () {
-         // This function needs documentation.
-            return toType(this.actual) === 'function';
-        };
-        customMatchers.toBeAObject = function () {
-         // This function needs documentation.
-            return toType(this.actual) === 'object';
-        };
-        customMatchers.toBeAUuid = function () {
-         // This function needs documentation.
-            return (this.actual.match(/[0-9abcdef]{32}/)) !== null;
-        };
-        customMatchers.toContainPrefixes = function (expected) {
-         // This function needs documentation.
-            var key;
-            for (key in expected) {
-                if (expected.hasOwnProperty(key) &&
-                        (this.actual[key] !== expected[key])) {
-                    setMatcherMessage('Expected ' + this.actual[key] +
-                            ' to be ' + expected[key] + ', with prefix ' +
-                            key + '.', this);
-                    return false;
-                }
-            }
-            return true;
-        };
-        this.addMatchers(customMatchers);
-        return;
-    });
+ // Tests
 
     describe('Quanah', function () {
-
      // This is the actual specification :-)
+        var avar;
+        beforeEach(function () {
+         // This function needs documentation.
+            Object.prototype.Q = require('../src/quanah');
+            avar = Object.prototype.Q.avar;
+            return;
+        });
 
         it('should be awesome', function () {
-            expect(true).toBeTruthy();
-            return;
+            expect(true).to.equal(true);
         });
 
         it('should place function Q on the Object prototype', function () {
             expect(Object.prototype.hasOwnProperty('Q')).toBeTruthy();
-            return;
         });
 
         it('should provide the Quanah API', function () {
@@ -157,10 +61,7 @@
                     expect(typeof Q[thing]).toBe(api[thing]);
                 }
             }
-            return;
         });
-
-        return;
 
     });
 

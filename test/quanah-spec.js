@@ -42,35 +42,673 @@
             expect(true).to.equal(true);
         });
 
-        it('should place function Q on the Object prototype', function () {
-            expect(Object.prototype.hasOwnProperty('Q')).toBeTruthy();
+        it('should be a function', function () {
+            expect(Object.prototype.Q).to.be.a('function');
         });
 
-        it('should provide the Quanah API', function () {
-         // Needs a better "should" string...
-            var api, thing;
-            api = {
-                avar:   'function',
-                def:    'function',
-                ply:    'function',
-                //volunteer: 'function',
-                when :  'function'
-            };
-            for (thing in api) {
-                if (api.hasOwnProperty(thing)) {
-                    expect(typeof Q[thing]).toBe(api[thing]);
-                }
-            }
+        it('should have its own `avar` method', function () {
+            expect(Object.prototype.Q).to.have.property('avar');
+            expect(Object.prototype.Q.avar).to.be.a('function');
         });
+
+        it('should have its own `def` method', function () {
+            expect(Object.prototype.Q).to.have.property('def');
+            expect(Object.prototype.Q.def).to.be.a('function');
+        });
+
+        it('should have its own `when` method', function () {
+            expect(Object.prototype.Q).to.have.property('when');
+            expect(Object.prototype.Q.when).to.be.a('function');
+        });
+
+        it('should directly transform boolean literals', function (done) {
+            (true).Q(function (evt) {
+             // This function needs documentation.
+                this.val = (this.val === true);
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                expect(this.val).to.equal(true);
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should directly transform number literals', function (done) {
+            (2).Q(function (evt) {
+             // This function needs documentation.
+                this.val += 2;
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                expect(this.val).to.equal(4);
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should directly transform object literals', function (done) {
+            ({a: 2}).Q(function (evt) {
+             // This function needs documentation.
+                this.val.a += 2;
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                expect(this.val.a).to.equal(4);
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should directly transform string literals', function (done) {
+            ('Hello').Q(function (evt) {
+             // This function needs documentation.
+                this.val += ' world!';
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                expect(this.val).to.equal('Hello world!');
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should be able to replace an avar\'s `val`', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                x.val = Math.PI;
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                expect(this.val).to.equal(Math.PI);
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should be able to replace `this.val`', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                this.val = Math.PI;
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                expect(x.val).to.equal(Math.PI);
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should survive deliberate failures', function (done) {
+            var x = avar({val: 'This test fails deliberately :-)'});
+            x.Q(function (evt) {
+             // This function needs documentation.
+                return evt.fail(x.val);
+            }).on('error', function (message) {
+             // This function needs documentation.
+                expect(message).to.equal(x.val);
+                return done();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                console.log('This should _NOT_ appear in the output!');
+                return evt.exit();
+            });
+        });
+
+        it('should allow `.on` and `.Q` commutatively', function (done) {
+            var x = avar({val: 'This test fails deliberately :-)'});
+            x.Q(function (evt) {
+             // This function needs documentation.
+                return evt.fail(x.val);
+            }).Q(function (evt) {
+             // This function needs documentation.
+                console.log('This should _NOT_ appear in the output!');
+                return evt.exit();
+            }).on('error', function (message) {
+             // This function needs documentation.
+                expect(message).to.equal(x.val);
+                return done();
+            });
+        });
+
+        it('should survive unexpected failures', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                x.val('Hi mom!');
+                return evt.exit();
+            }).Q(function (evt) {
+             // This function needs documentation.
+                console.log('This should _NOT_ appear in the output!');
+                return evt.exit();
+            }).on('error', function (message) {
+             // This function needs documentation.
+                return done();
+            });
+        });
+
+        it('should wait for "nested avars" to finish', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                var temp = avar();
+                temp.Q(function (temp_evt) {
+                 // This function needs documentation.
+                    temp.val = Math.random();
+                    return temp_evt.exit();
+                }).Q(function (temp_evt) {
+                 // This function needs documentation.
+                    temp_evt.exit();
+                    return evt.exit();
+                });
+                return;
+            }).Q(function (evt) {
+             // This function needs documentation.
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should relay error messages from "nested avars"', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                var temp = avar({val: 'This fails deliberately.'});
+                temp.Q(function (temp_evt) {
+                 // This function needs documentation.
+                    return temp_evt.fail(temp.val);
+                }).Q(function (temp_evt) {
+                 // This function needs documentation.
+                    console.log('This should _NOT_ appear in the output!');
+                    temp_evt.exit();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    return evt.fail(message);
+                });
+                return;
+            }).Q(function (evt) {
+             // This function needs documentation.
+                console.log('This should _NOT_ appear in the output!');
+                return evt.exit();
+            }).on('error', function (message) {
+             // This function needs documentation.
+                expect(message).to.equal('This fails deliberately.');
+                return done();
+            });
+        });
+
+        it('should always present the same `key`', function (done) {
+            var f, results;
+            f = function (evt) {
+             // This function needs documentation.
+                results.push(this.key);
+                return evt.exit();
+            };
+            results = [];
+            (Math.random()).Q(f).Q(f).Q(f).Q(f).Q(f).Q(function (evt) {
+             // This function needs documentation.
+                var first, i;
+                first = results[0];
+                for (i = 0; i < results.length; i += 1) {
+                    if (results[i] !== first) {
+                        return evt.fail('Test failed.');
+                    }
+                }
+                done();
+                return evt.exit();
+            }).on('error', function (message) {
+             // This function needs documentation.
+                console.error('Error:', message);
+                return;
+            });
+        });
+
+        it('should not affect assignment to a `Q` property', function () {
+            ({}).Q = 5;
+        });
+
+        describe('An avar', function () {
+         // This function needs documentation.
+            var x;
+            beforeEach(function () {
+             // This function needs documentation.
+                x = avar();
+                return;
+            });
+            it('should have a `comm` instance method', function () {
+                expect(x).to.have.property('comm');
+                expect(x.comm).to.be.a('function');
+            });
+            it('should have a `key` instance property', function () {
+                expect(x).to.have.property('key');
+                expect(x.key).to.be.a('string');
+            });
+            it('should have a `val` instance property', function () {
+                expect(x).to.have.property('val');
+                expect(x.val).to.equal(null);
+            });
+            it('should have an `on` prototype method', function () {
+                expect(x.constructor.prototype).to.have.property('on');
+                expect(x.on).to.be.a('function');
+            });
+            it('should have a `revive` prototype method', function () {
+                expect(x.constructor.prototype).to.have.property('revive');
+                expect(x.revive).to.be.a('function');
+            });
+            it('should have a `toString` prototype method', function () {
+                expect(x.constructor.prototype).to.have.property('toString');
+                expect(x.toString).to.be.a('function');
+            });
+            it('should have a `valueOf` prototype method', function () {
+                expect(x.constructor.prototype).to.have.property('valueOf');
+                expect(x.valueOf).to.be.a('function');
+            });
+            return;
+        });
+
+        describe('The `when` method', function () {
+         // This function needs documentation.
+            var f, fa, when, x, xa, y, ya, z, za;
+            beforeEach(function () {
+             // This function needs documentation.
+                f = function (evt) {
+                 // This function needs documentation.
+                    var i, n, y;
+                    n = this.val.length;
+                    y = 0;
+                    for (i = 0; i < n; i += 1) {
+                        y += this.val[i];
+                    }
+                    this.val = y;
+                    return evt.exit();
+                };
+                fa = avar({val: f});
+                when = Object.prototype.Q.when;
+                x = 2;
+                xa = avar({val: x});
+                y = 3;
+                ya = avar({val: y});
+                z = 4;
+                za = avar({val: z});
+                return;
+            });
+
+            it('should work for "afunc(avar)"', function (done) {
+                when(xa).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(2);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(var)"', function (done) {
+                when(x).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(2);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(avar, avar)"', function (done) {
+                when(xa, ya).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(avar, var)"', function (done) {
+                when(xa, y).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(var, avar)"', function (done) {
+                when(x, ya).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(var, var)"', function (done) {
+                when(x, y).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(avar, avar, avar)"', function (done) {
+                when(xa, ya, za).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(avar, avar, var)"', function (done) {
+                when(xa, ya, z).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(avar, var, avar)"', function (done) {
+                when(xa, y, za).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(var, avar, avar)"', function (done) {
+                when(x, ya, za).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(var, avar, var)"', function (done) {
+                when(x, ya, z).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "afunc(var, var, var)"', function (done) {
+                when(x, y, z).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar)"', function (done) {
+                when(xa).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(2);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var)"', function (done) {
+                when(x).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(2);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar, avar)"', function (done) {
+                when(xa, ya).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar, var)"', function (done) {
+                when(xa, y).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var, avar)"', function (done) {
+                when(x, ya).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var, var)"', function (done) {
+                when(x, y).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(5);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar, avar, avar)"', function (bye) {
+                when(xa, ya, za).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    bye();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar, avar, var)"', function (done) {
+                when(xa, ya, z).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar, var, avar)"', function (done) {
+                when(xa, y, za).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(avar, var, var)"', function (done) {
+                when(xa, y, z).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var, avar, avar)"', function (done) {
+                when(x, ya, za).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var, avar, var)"', function (done) {
+                when(x, ya, z).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var, var, avar)"', function (done) {
+                when(x, y, za).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work for "function(var, var, var)"', function (done) {
+                when(x, y, z).Q(f).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+            it('should work via `apply`', function (done) {
+                when.apply(null, [xa, ya, za]).Q(fa).Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(9);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+        });
+
+        return;
 
     });
 
+/*
     describe('Quanah AVars', function () {
+
+        var avar;
+
+        beforeEach(function () {
+         // This function needs documentation.
+            Object.prototype.Q = require('../src/quanah');
+            avar = Object.prototype.Q.avar;
+            return;
+        });
 
         describe('AVar Creation', function () {
 
             it('should allow creation of AVars with no spec', function () {
-                var x = Q.avar();
+                var x = avar();
                 expect(x).toBeAObject();
                 expect(x.key).toBeAUuid();
                 expect(x.val).toBeNull();
@@ -205,7 +843,6 @@
             });
 
             it('does not execute next onready w/o evt.exit call', function () {
-                /*jslint unparam: true */
                 x.onready = function (evt) {
                     this.val = "value";
                 };
@@ -282,6 +919,8 @@
         });
 
     });
+
+*/
 
  // That's all, folks!
 

@@ -2,7 +2,7 @@
 
 //- quanah.js ~~
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 15 Nov 2012
+//                                                  ~~ last updated 06 Dec 2012
 
 (function () {
     'use strict';
@@ -83,7 +83,7 @@
                         return;
                     });
                 } else {
-                    that.comm({fail: 'Assigned value must be a function.'});
+                    that.comm({fail: 'Transformation must be a function.'});
                 }
                 break;
             case 'done':

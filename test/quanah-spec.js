@@ -8,6 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
+//                                                  ~~ last updated 05 Dec 2012
 
 (function () {
     'use strict';
@@ -335,6 +336,21 @@
                 za = avar({val: z});
                 return;
             });
+
+         /*
+            it('should work when no vars are given', function (done) {
+                when().Q(function (evt) {
+                 // This function needs documentation.
+                    expect(this.val).to.equal(null);
+                    done();
+                    return evt.exit();
+                }).on('error', function (message) {
+                 // This function needs documentation.
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+         */
 
             it('should work for "afunc(avar)"', function (done) {
                 when(xa).Q(fa).Q(function (evt) {

@@ -3,12 +3,11 @@ Quanah
 
 [Quanah](http://wilkinson.github.com/quanah) is a JavaScript library for
 writing concurrent programs in JavaScript that still run correctly in serial
-execution environments. [QMachine](https://qmachine.org/), for example, uses
-Quanah to implement a web service that acts as a "supercomputer" for running
-scientific computations using only web browsers and
-[CouchDB](http://couchdb.apache.org/). I am currently writing several papers
-about Quanah and applications that use it, but I promise I will write more
-documentation soon!
+execution environments. [QMachine](https://www.qmachine.org/), for example,
+uses Quanah extensively to implement a web service that acts as a supercomputer
+that uses web browsers as computational nodes. I am currently writing several
+papers about Quanah and applications that use it, but I promise I will write
+more documentation soon!
 
 A [Node.js](http://nodejs.org/) module can be installed via
 [NPM](https://npmjs.org/package/quanah).
@@ -16,5 +15,7 @@ A [Node.js](http://nodejs.org/) module can be installed via
 There are several "mirrors" available on
 [Bitbucket](https://bitbucket.org/wilkinson/quanah),
 [GitHub](https://github.com/wilkinson/quanah), and
-[Google Code](https://quanah.googlecode.com).
+[Google Code](https://quanah.googlecode.com). Various project statistics are
+available on [GitHub](https://github.com/wilkinson/quanah/graphs) and
+[Ohloh](https://www.ohloh.net/p/quanah), too.
 

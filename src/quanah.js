@@ -2,7 +2,7 @@
 
 //- quanah.js ~~
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 06 Dec 2012
+//                                                  ~~ last updated 13 Jan 2013
 
 (function () {
     'use strict';
@@ -33,7 +33,8 @@
  // Definitions
 
     AVar = function AVar(obj) {
-     // This function needs documentation.
+     // This function constructs "avars", which are a generic container for
+     // asynchronous variables.
         var key, state, that;
         state = {
             epitaph:    null,
@@ -48,7 +49,9 @@
             }
         }
         that.comm = function (obj) {
-         // This function needs documentation.
+         // This function provides a mechanism for manipulating the internal
+         // state of an avar without providing direct access to that state. It
+         // was inspired by the message-passing style used in Objective-C.
             var args, key, message;
             for (key in obj) {
                 if (obj.hasOwnProperty(key)) {
@@ -155,7 +158,8 @@
     };
 
     avar = function (obj) {
-     // This function needs documentation.
+     // This function enables the user to avoid the `new` keyword, which is
+     // useful because OOP in JS is not typically well-understood by users.
         return new AVar(obj);
     };
 
@@ -178,7 +182,10 @@
     };
 
     is_Function = function (f) {
-     // This function needs documentation.
+     // This function returns `true` only if and only if the input argument
+     // `f` is a function. The second condition is necessary to avoid a false
+     // positive when `f` is a regular expression. Please note that an avar
+     // whose `val` property is a function will still return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
     };
 

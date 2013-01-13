@@ -164,14 +164,20 @@
     };
 
     can_run_remotely = function (task) {
-     // This function needs documentation.
+     // This function exists to keep the abstraction in `revive` as clean and
+     // close to English as possible. It tests for the existence of particular
+     // user-defined functions so that `revive` can decide whether to use local
+     // or remote execution for a given task.
         return ((is_Function(user_defs.can_run_remotely))   &&
                 (is_Function(user_defs.run_remotely))       &&
                 (user_defs.can_run_remotely(task)));
     };
 
     def = function (obj) {
-     // This function needs documentation.
+     // This function enables the user to redefine "internal" functions from
+     // outside the giant anonymous closure. In particular, this allows users
+     // to "port" Quanah as a concurrency model for use with almost any storage
+     // or messaging system.
         var key;
         for (key in obj) {
             if ((obj.hasOwnProperty(key)) && (user_defs[key] === null)) {
@@ -203,7 +209,21 @@
     queue = [];
 
     revive = function () {
-     // This function needs documentation.
+     // This function contains the execution center for Quanah. It's pretty
+     // simple, really -- it just runs the first available task in its queue
+     // (`queue`), and it selects an execution context conditionally. That's
+     // all it does. It makes no attempt to run every task in the queue every
+     // time it is called, because instead Quanah uses a strategy in which it
+     // tries to call `revive` as many times as necessary to process an entire
+     // program correctly. For example, every time an avar receives a `comm`
+     // message, `revive` will run. Because `revive` only runs a single task
+     // from the queue for each invocation, its queue can be shared safely
+     // across multiple execution "contexts" simultaneously, and it makes no
+     // difference if the separate contexts are due to recursion or to special
+     // objects such as Web Workers. The `revive` function selects a context
+     // for execution using conditional tests that determine whether a given
+     // computation can be distributed to external resources for execution, and
+     // if they cannot be distributed, execution occurs on the local machine.
         var task = queue.shift();
         if (task !== undefined) {
             if (can_run_remotely(task)) {
@@ -287,7 +307,10 @@
     };
 
     run_remotely = function (task) {
-     // This function needs documentation.
+     // This function exists only to forward input arguments to a user-defined
+     // function which may or may not ever be provided. JS doesn't crash in a
+     // situation like this because `can_run_remotely` tests for the existence
+     // of the user-defined method before delegating to `run_remotely`.
         user_defs.run_remotely(task);
         return;
     };
@@ -319,7 +342,23 @@
     };
 
     when = function () {
-     // This function needs documentation.
+     // This function takes any number of arguments, any number of which may
+     // be avars, and outputs a special "compound" avar whose `val` property is
+     // an array of the original input arguments. The compound avar also has a
+     // slightly modified form of `Object.prototype.Q` placed directly onto it
+     // as an instance method; this provides a nice way of distinguishing a
+     // "normal" avar from a compound one. It no longer creates the instance
+     // methods `isready`/`areready` because, even though those were really
+     // pretty and had a nice interpretation in English, the use of setters was
+     // confusing to many of my peers. Any functions that are fed into the `Q`
+     // method will wait for all input arguments' outstanding queues to empty
+     // before executing, and exiting will allow each of the inputs to begin
+     // working through its individual queue again. Also, a compound avar can
+     // still be used as a prerequisite to execution even when the compound
+     // avar depends on one of the other prerequisites, and although the
+     // immediate usefulness of this ability may not be obvious, it will turn
+     // out to be crucially important for expressing certain concurrency
+     // patterns idiomatically :-)
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
@@ -354,20 +393,24 @@
             }
         }
         y.Q = function (f) {
-         // This function needs documentation.
+         // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
                 y.comm({add_to_queue: f});
                 return y;
             }
             var blocker, count, egress, i, m, n, ready;
             blocker = function (evt) {
-             // This function needs documentation.
+             // This function stores the `evt` argument into an array so we can
+             // prevent further execution involving `val` until after we call
+             // the input argument `f`.
                 egress.push(evt);
                 count();
                 return;
             };
             count = function () {
-             // This function needs documentation.
+             // This function is a simple counting semaphore that closes over
+             // some private state variables in order to delay the execution of
+             // `f` until certain conditions are satisfied.
                 m += 1;
                 if (m === n) {
                     ready = true;
@@ -438,7 +481,9 @@
  // Prototype definitions
 
     AVar.prototype.on = function () {
-     // This function needs documentation.
+     // This function's only current use is to allow users to set custom error
+     // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
+     // am hoping to leave myself plenty of room to grow later :-)
         this.comm({'on': Array.prototype.slice.call(arguments)});
         return this;
     };

@@ -523,6 +523,7 @@
     Object.prototype.Q.when = when;
 
     (function () {
+     // This function only runs in Node.js.
         /*jslint node: true */
         if (typeof module === 'object') {
             module.exports = Object.prototype.Q;

@@ -1,8 +1,11 @@
 //- JavaScript source code
 
 //- quanah.js ~~
+//
+//  This file is also available at http://git.io/q.js :-P
+//
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 13 Jan 2013
+//                                                  ~~ last updated 17 Jan 2013
 
 (function () {
     'use strict';

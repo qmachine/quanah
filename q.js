@@ -2,7 +2,7 @@
 
 //- quanah.js ~~
 //
-//  This file is also available at http://git.io/q.js :-P
+//  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
 //                                                  ~~ last updated 17 Jan 2013

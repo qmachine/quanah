@@ -1,0 +1,8 @@
+{
+    "dependencies": {},
+    "main": [
+        "./src/quanah.js"
+    ],
+    "name": "quanah",
+    "version": "0.0.14"
+}

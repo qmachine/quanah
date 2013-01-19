@@ -7,5 +7,6 @@
 .bowerrc
 .hgignore
 component.json
+npm-debug.log
 
 #-  vim:set syntax=gitconfig:

@@ -2,7 +2,10 @@
 
 #-  .npmignore ~~
 #                                                       ~~ (c) SRW, 18 Aug 2012
+#                                                   ~~ last updated 19 Jan 2013
 
+.bowerrc
 .hgignore
+component.json
 
 #-  vim:set syntax=gitconfig:

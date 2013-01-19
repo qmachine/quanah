@@ -4,7 +4,7 @@
     "description": "Event-driven framework for distributed computing",
     "devDependencies": {
         "expect.js": "0.2.0",
-        "mocha": "1.7.0"
+        "mocha": "1.8.1"
     },
     "engines": {
         "node": ">= 0.8.x"
@@ -22,5 +22,5 @@
     "scripts": {
         "test": "./node_modules/mocha/bin/mocha"
     },
-    "version": "0.0.14"
+    "version": "0.1.0"
 }

@@ -5,6 +5,7 @@
 #   This contains live instructions for development on the Quanah library.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
+#                                                   ~~ last updated 20 Jan 2013
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -38,7 +39,9 @@ run: test
 
 ###
 
-.PHONY: test
+.PHONY: check test
+
+check: test
 
 test: $(PROJECT_ROOT)/node_modules/
 	@   $(NPM) test

@@ -2,6 +2,7 @@
 
 //- puts.js ~~
 //                                                      ~~ (c) SRW, 17 Nov 2012
+//                                                  ~~ last updated 23 Jan 2013
 
 (function (global) {
     'use strict';
@@ -9,6 +10,10 @@
  // Pragmas
 
     /*jslint indent: 4, maxlen: 80 */
+
+    /*properties alert, apply, call, console, hasOwnProperty, join, log,
+        postMessage, print, println, prototype, puts, stdout, system
+    */
 
  // Out-of-scope definitions
 
@@ -112,13 +117,34 @@
 
 }(Function.prototype.call.call(function (that) {
     'use strict';
- // See the bottom of "quanah.js" for documentation.
+
+ // This strict anonymous closure encapsulates the logic for detecting which
+ // object in the environment should be treated as _the_ global object. It's
+ // not as easy as you may think -- strict mode disables the `call` method's
+ // default behavior of replacing `null` with the global object. Luckily, we
+ // can work around that by passing a reference to the enclosing scope as an
+ // argument at the same time and testing to see if strict mode has done its
+ // deed. This task is not hard in the usual browser context because we know
+ // that the global object is `window`, but CommonJS implementations such as
+ // RingoJS confound the issue by modifying the scope chain, running scripts
+ // in sandboxed contexts, and using identifiers like `global` carelessly ...
+
     /*jslint indent: 4, maxlen: 80 */
     /*global global: true */
+    /*properties global */
     if (this === null) {
+
+     // Strict mode has captured us, but we already passed a reference :-)
+
         return (typeof global === 'object') ? global : that;
+
     }
+
+ // Strict mode isn't supported in this environment, but we need to make sure
+ // we don't get fooled by Rhino's `global` function.
+
     return (typeof this.global === 'object') ? this.global : this;
+
 }, null, this)));
 
 //- vim:set syntax=javascript:

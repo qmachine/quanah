@@ -4,8 +4,11 @@
 //
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
+//  NOTE: What happens in Quanah if a variable which has already failed is used
+//  in a `when` statement? Does the `when` fail immediately, as expected?
+//
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 17 Jan 2013
+//                                                  ~~ last updated 06 Feb 2013
 
 (function () {
     'use strict';

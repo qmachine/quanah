@@ -24,7 +24,7 @@
 
  // Prerequisites
 
-    if (Object.prototype.hasOwnProperty('Q') === true) {
+    if (Object.prototype.hasOwnProperty('Q')) {
      // Exit early if Quanah's "Method Q" is already present.
         return;
     }
@@ -37,7 +37,7 @@
  // Definitions
 
     AVar = function AVar(obj) {
-     // This function constructs "avars", which are a generic container for
+     // This function constructs "avars", which are generic containers for
      // asynchronous variables.
         var key, state, that;
         state = {
@@ -62,9 +62,6 @@
                     args = [].concat(obj[key]);
                     message = key;
                 }
-            }
-            if (args === undefined) {
-                return;
             }
             switch (message) {
             case 'add_to_queue':
@@ -146,8 +143,10 @@
                 break;
             default:
              // When this arm is chosen, either an error exists in Quanah or
-             // else a user is re-programming Quanah's guts; in both cases, it
-             // is probably useful to capture the error ...
+             // else a user is re-programming Quanah's guts; in either case, it
+             // may be useful to capture the error. Another possibility is that
+             // a user is trying to trigger `revive` using an obsolete idiom
+             // that involved calling `that.comm` without any arguments.
                 that.comm({fail: 'Invalid `comm` message "' + message + '"'});
             }
             return revive();
@@ -378,11 +377,11 @@
                 Array.prototype.push.apply(stack, temp.val);
             } else {
              // This arm ensures that elements are unique.
-                flag = true;
-                for (i = 0; (flag === true) && (i < x.length); i += 1) {
-                    flag = (temp !== x[i]);
+                flag = false;
+                for (i = 0; (flag === false) && (i < x.length); i += 1) {
+                    flag = (temp === x[i]);
                 }
-                if (flag === true) {
+                if (flag === false) {
                     x.push(temp);
                 }
             }
@@ -415,7 +414,6 @@
             m = 0;
             n = x.length;
             ready = false;
-         // NOTE: Do not change `x.length` to `n` in the next line!
             for (i = 0; i < n; i += 1) {
                 if (x[i] instanceof AVar) {
                     x[i].Q(blocker);
@@ -427,7 +425,7 @@
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
-             // function will be put into `y`'s queue, but it won't not run
+             // function will be put into `y`'s queue, but it will not run
              // until `ready` is `true`.
                 if (ready === false) {
                     return evt.stay('Acquiring "lock" ...');

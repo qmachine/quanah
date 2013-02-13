@@ -943,7 +943,7 @@
                     return evt.exit();
                 };
                 waitsFor(function () {
-                    x.comm();
+                    x.revive();
                     return done;
                 }, 'Never finished.', 3000);
                 runs(function () {

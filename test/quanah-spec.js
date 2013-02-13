@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 05 Dec 2012
+//                                                  ~~ last updated 12 Feb 2013
 
 (function () {
     'use strict';
@@ -63,7 +63,7 @@
         });
 
         it('should directly transform boolean literals', function (done) {
-            (true).Q(function (evt) {
+            true.Q(function (evt) {
              // This function needs documentation.
                 this.val = (this.val === true);
                 return evt.exit();
@@ -306,6 +306,25 @@
             it('should have a `valueOf` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('valueOf');
                 expect(x.valueOf).to.be.a('function');
+            });
+            return;
+        });
+
+        describe('The `AVar.prototype.toString` method', function () {
+         // This function needs documentation.
+            var x;
+            beforeEach(function () {
+             // This function needs documentation.
+                x = avar();
+                return;
+            });
+            it('should propagate arguments for buffers', function () {
+                x.val = new Buffer('hello');
+                expect(x.toString('base64')).to.equal('aGVsbG8=');
+            });
+            it('should propagate arguments for numbers', function () {
+                x.val = 34;
+                expect(x.toString(8)).to.equal('42');
             });
             return;
         });

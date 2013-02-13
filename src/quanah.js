@@ -353,6 +353,9 @@
      // NOTE: What happens here if an avar which has already failed is used in
      // a `when` statement? Does the `when` fail immediately, as expected?
      //
+     // NOTE: The instance method `Q` that gets added to a compound avar is not
+     // a perfect substitute for the instance `comm` method it already has ...
+     //
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
@@ -481,10 +484,8 @@
     };
 
     AVar.prototype.revive = function () {
-     // This function is syntactic sugar for triggering a `revive` from code
-     // external to this giant anonymous closure. Currently, the same effect
-     // can be achieved by invoking the `comm` instance method of an avar,
-     // but that technique is deprecated.
+     // This function is an efficient syntactic sugar for triggering `revive`
+     // from code external to this giant anonymous closure.
         return revive();
     };
 

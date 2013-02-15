@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 12 Feb 2013
+//                                                  ~~ last updated 15 Feb 2013
 
 (function () {
     'use strict';
@@ -204,6 +204,32 @@
                     temp_evt.exit();
                     return evt.exit();
                 });
+                return;
+            }).Q(function (evt) {
+             // This function needs documentation.
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should wait for short async operations', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                process.nextTick(evt.exit);
+                return;
+            }).Q(function (evt) {
+             // This function needs documentation.
+                done();
+                return evt.exit();
+            });
+        });
+
+        it('should wait for long[er] async operations', function (done) {
+            var x = avar();
+            x.Q(function (evt) {
+             // This function needs documentation.
+                setTimeout(evt.exit, 1000);
                 return;
             }).Q(function (evt) {
              // This function needs documentation.

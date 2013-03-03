@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 15 Feb 2013
+//                                                  ~~ last updated 02 Mar 2013
 
 (function () {
     'use strict';
@@ -229,7 +229,7 @@
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
-                setTimeout(evt.exit, 1000);
+                setTimeout(evt.exit, 0);
                 return;
             }).Q(function (evt) {
              // This function needs documentation.

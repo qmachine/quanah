@@ -11,7 +11,8 @@ more documentation soon!
 
 A [Node.js](http://nodejs.org/) module can be installed via
 [NPM](https://npmjs.org/package/quanah). Quanah is also available in
-[Bower](http://twitter.github.com/bower/).
+[Bower](http://twitter.github.com/bower/) and
+[MinervaJS](http://minervajs.org/site/index.html#!/view/quanah).
 
 There are several "mirrors" available on
 [Bitbucket](https://bitbucket.org/wilkinson/quanah),

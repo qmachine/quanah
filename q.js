@@ -5,7 +5,7 @@
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 17 Jan 2013
+//                                                  ~~ last updated 12 Feb 2013
 
 (function () {
     'use strict';
@@ -24,19 +24,20 @@
 
  // Prerequisites
 
-    if (Object.prototype.hasOwnProperty('Q') === true) {
+    if (Object.prototype.hasOwnProperty('Q')) {
+     // Exit early if Quanah's "Method Q" is already present.
         return;
     }
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, def, is_Function, quanah, queue, revive,
+    var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
         run_locally, run_remotely, user_defs, uuid, when;
 
  // Definitions
 
     AVar = function AVar(obj) {
-     // This function constructs "avars", which are a generic container for
+     // This function constructs "avars", which are generic containers for
      // asynchronous variables.
         var key, state, that;
         state = {
@@ -61,9 +62,6 @@
                     args = [].concat(obj[key]);
                     message = key;
                 }
-            }
-            if (args === undefined) {
-                return;
             }
             switch (message) {
             case 'add_to_queue':
@@ -145,8 +143,10 @@
                 break;
             default:
              // When this arm is chosen, either an error exists in Quanah or
-             // else a user is re-programming Quanah's guts; in both cases, it
-             // is probably useful to capture the error ...
+             // else a user is re-programming Quanah's guts; in either case, it
+             // may be useful to capture the error. Another possibility is that
+             // a user is trying to trigger `revive` using an obsolete idiom
+             // that involved calling `that.comm` without any arguments.
                 that.comm({fail: 'Invalid `comm` message "' + message + '"'});
             }
             return revive();
@@ -196,17 +196,6 @@
      // positive when `f` is a regular expression. Please note that an avar
      // whose `val` property is a function will still return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
-    };
-
-    quanah = function (f) {
-     // This function acts as the "namespace" for Quanah, but it is far
-     // more useful when assigned to `Object.prototype.Q`, because then
-     // it can be used as a method of any native value except `null` and
-     // `undefined`. It expects its argument to be a function of a single
-     // variable or else an avar whose `val` property is such a function.
-        var x = (this instanceof AVar) ? this : avar({val: this});
-        x.comm({'add_to_queue': f});
-        return x;
     };
 
     queue = [];
@@ -325,18 +314,16 @@
 
     uuid = function () {
      // This function generates random hexadecimal UUIDs of length 32.
-        var y = Math.random().toString(16);
-        if (y.length === 1) {
+        var y = Math.random().toString(16).slice(2, 32);
+        if (y === '') {
          // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
          // has some weird quirks due to its ActionScript roots.
-            y = '';
             while (y.length < 32) {
                 y += (Math.random() * 1e16).toString(16);
             }
             y = y.slice(0, 32);
         } else {
          // Every other JS implementation I have tried will use this instead.
-            y = y.slice(2, 32);
             while (y.length < 32) {
                 y += Math.random().toString(16).slice(2, 34 - y.length);
             }
@@ -362,6 +349,13 @@
      // immediate usefulness of this ability may not be obvious, it will turn
      // out to be crucially important for expressing certain concurrency
      // patterns idiomatically :-)
+     //
+     // NOTE: What happens here if an avar which has already failed is used in
+     // a `when` statement? Does the `when` fail immediately, as expected?
+     //
+     // NOTE: The instance method `Q` that gets added to a compound avar is not
+     // a perfect substitute for the instance `comm` method it already has ...
+     //
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
@@ -386,11 +380,11 @@
                 Array.prototype.push.apply(stack, temp.val);
             } else {
              // This arm ensures that elements are unique.
-                flag = true;
-                for (i = 0; (flag === true) && (i < x.length); i += 1) {
-                    flag = (temp !== x[i]);
+                flag = false;
+                for (i = 0; (flag === false) && (i < x.length); i += 1) {
+                    flag = (temp === x[i]);
                 }
-                if (flag === true) {
+                if (flag === false) {
                     x.push(temp);
                 }
             }
@@ -407,8 +401,7 @@
              // prevent further execution involving `val` until after we call
              // the input argument `f`.
                 egress.push(evt);
-                count();
-                return;
+                return count();
             };
             count = function () {
              // This function is a simple counting semaphore that closes over
@@ -424,7 +417,6 @@
             m = 0;
             n = x.length;
             ready = false;
-         // NOTE: Do not change `x.length` to `n` in the next line!
             for (i = 0; i < n; i += 1) {
                 if (x[i] instanceof AVar) {
                     x[i].Q(blocker);
@@ -436,7 +428,7 @@
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
-             // function will be put into `y`'s queue, but it won't not run
+             // function will be put into `y`'s queue, but it will not run
              // until `ready` is `true`.
                 if (ready === false) {
                     return evt.stay('Acquiring "lock" ...');
@@ -474,7 +466,7 @@
                         return evt.stay(message);
                     }
                 });
-                return;                 //- NOTE: I removed an extra `revive`.
+                return;
             }});
             return y;
         };
@@ -492,10 +484,8 @@
     };
 
     AVar.prototype.revive = function () {
-     // This function is syntactic sugar for triggering a `revive` from code
-     // external to this giant anonymous closure. Currently, the same effect
-     // can be achieved by invoking `x.comm()` for some avar `x`, but that
-     // technique is deprecated.
+     // This function is an efficient syntactic sugar for triggering `revive`
+     // from code external to this giant anonymous closure.
         return revive();
     };
 
@@ -517,7 +507,16 @@
 
  // Out-of-scope definitions
 
-    Object.prototype.Q = quanah;
+    Object.prototype.Q = function (f) {
+     // This function acts as a "namespace" for Quanah as well as its most
+     // important syntactic sugar -- "Method Q". This function can be used as
+     // a method of any native value except `null` or `undefined`. It expects
+     // its argument to be a function of a single variable or else an avar with
+     // such a function as its `val`.
+        var x = (this instanceof AVar) ? this : avar({val: this});
+        x.comm({'add_to_queue': f});
+        return x;
+    };
 
     Object.prototype.Q.avar = avar;
 
@@ -526,7 +525,10 @@
     Object.prototype.Q.when = when;
 
     (function () {
-     // This function only runs in Node.js.
+     // This function runs in Node.js, PhantomJS, and RingoJS, which means it
+     // may work with other CommonJS-ish package loaders, too. I am not certain
+     // whether this function adds much value, however, because the mere act of
+     // loading Quanah loads "Method Q" anyway ...
         /*jslint node: true */
         if (typeof module === 'object') {
             module.exports = Object.prototype.Q;

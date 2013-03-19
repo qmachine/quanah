@@ -5,7 +5,7 @@
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 12 Feb 2013
+//                                                  ~~ last updated 18 Mar 2013
 
 (function () {
     'use strict';
@@ -38,7 +38,7 @@
 
     AVar = function AVar(obj) {
      // This function constructs "avars", which are generic containers for
-     // asynchronous variables.
+     // "asynchronous variables".
         var key, state, that;
         state = {
             epitaph:    null,
@@ -87,7 +87,7 @@
                         return;
                     });
                 } else {
-                    that.comm({fail: 'Transformation must be a function.'});
+                    that.comm({'fail': 'Transformation must be a function.'});
                 }
                 break;
             case 'done':
@@ -128,7 +128,7 @@
                  // immediately.
                     state.onerror = args[1];
                     if (state.epitaph !== null) {
-                        that.comm({fail: state.epitaph});
+                        that.comm({'fail': state.epitaph});
                     }
                 }
                 break;
@@ -147,7 +147,7 @@
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `revive` using an obsolete idiom
              // that involved calling `that.comm` without any arguments.
-                that.comm({fail: 'Invalid `comm` message "' + message + '"'});
+                that.comm({'fail': 'Invalid `comm` message "' + message + '"'});
             }
             return revive();
         };
@@ -392,7 +392,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
-                y.comm({add_to_queue: f});
+                y.comm({'add_to_queue': f});
                 return y;
             }
             var blocker, count, egress, i, m, n, ready;
@@ -424,7 +424,7 @@
                     count();
                 }
             }
-            y.comm({add_to_queue: function (evt) {
+            y.comm({'add_to_queue': function (evt) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
@@ -441,8 +441,7 @@
                     exit: function (message) {
                      // This function signals successful completion :-)
                         var i, n;
-                        n = egress.length;
-                        for (i = 0; i < n; i += 1) {
+                        for (i = 0, n = egress.length; i < n; i += 1) {
                             egress[i].exit(message);
                         }
                         return evt.exit(message);
@@ -450,17 +449,15 @@
                     fail: function (message) {
                      // This function signals a failed execution :-(
                         var i, n;
-                        n = egress.length;
-                        for (i = 0; i < n; i += 1) {
+                        for (i = 0, n = egress.length; i < n; i += 1) {
                             egress[i].fail(message);
                         }
                         return evt.fail(message);
                     },
                     stay: function (message) {
-                     // This function delays execution until later.
+                     // This function postpones execution temporarily.
                         var i, n;
-                        n = egress.length;
-                        for (i = 0; i < n; i += 1) {
+                        for (i = 0, n = egress.length; i < n; i += 1) {
                             egress[i].stay(message);
                         }
                         return evt.stay(message);
@@ -485,20 +482,37 @@
 
     AVar.prototype.revive = function () {
      // This function is an efficient syntactic sugar for triggering `revive`
-     // from code external to this giant anonymous closure.
+     // from code external to this giant anonymous closure. Note that it does
+     // not use `this`, which means that it may be a vestigial definition from
+     // when I worried too much about limiting users' direct access to internal
+     // functions.
         return revive();
     };
 
     AVar.prototype.toString = function () {
-     // This function delegates to the avar's `val` property if possible.
-        if ((this.val === null) || (this.val === undefined)) {
-            return this.val;
+     // This function delegates to the avar's `val` property if possible. The
+     // code here differs from the code for `AVar.prototype.valueOf` because it
+     // assumes that the returned value should have a particular type (string).
+     // My reasoning here is that, if the returned value were not a string, the
+     // JS engine will coerce it to a string; for the `null` and `undefined`
+     // cases, we can circumvent that coercion and thereby improve performance.
+        if (this.val === null) {
+            return 'null';
+        }
+        if (this.val === undefined) {
+            return 'undefined';
         }
         return this.val.toString.apply(this.val, arguments);
     };
 
     AVar.prototype.valueOf = function () {
-     // This function delegates to the avar's `val` property if possible.
+     // This function delegates to the avar's `val` property. It would be easy
+     // simply to return the value of the avar's `val` and let the JS engine
+     // decide what to do with it, but that approach assumes that no value's
+     // `valueOf` method ever uses input arguments. That assumption could be
+     // supported by a careful reading of the ES5.1 standard (June 2011), but
+     // the priority here is correctness -- not performance -- and therefore
+     // this method has been designed for generic use.
         if ((this.val === null) || (this.val === undefined)) {
             return this.val;
         }

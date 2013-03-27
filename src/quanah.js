@@ -5,12 +5,14 @@
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 22 Mar 2013
+//                                                  ~~ last updated 27 Mar 2013
 
 (function () {
     'use strict';
 
  // Pragmas
+
+    /*jshint maxparams: 1, quotmark: single, strict: true */
 
     /*jslint indent: 4, maxlen: 80 */
 

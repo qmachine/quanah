@@ -5,21 +5,23 @@
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 18 Mar 2013
+//                                                  ~~ last updated 27 Mar 2013
 
 (function () {
     'use strict';
 
  // Pragmas
 
+    /*jshint maxparams: 1, quotmark: single, strict: true */
+
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
         Q, add_to_queue, apply, avar, call, can_run_remotely, comm, concat,
-        def, done, epitaph, exit, exports, f, fail, hasOwnProperty, key,
-        length, on, onerror, prototype, push, queue, random, ready, revive,
-        run_remotely, shift, slice, stay, toString, unshift, val, valueOf,
-        when, x
+        configurable, def, defineProperty, done, epitaph, exit, exports, f,
+        fail, hasOwnProperty, key, length, on, onerror, prototype, push, queue,
+        random, ready, revive, run_remotely, shift, slice, stay, toString,
+        unshift, val, value, valueOf, when, writable, x
     */
 
  // Prerequisites
@@ -521,16 +523,36 @@
 
  // Out-of-scope definitions
 
-    Object.prototype.Q = function (f) {
+    (function (method_Q) {
+     // This function uses ES5.1 property descriptors if they are available in
+     // order to hide "Method Q" from `for .. in` loops. I did this originally
+     // as an attempt to reduce conflicts with jQuery et al., but it also has
+     // security implications that I will need to revisit in the near future.
+        if (Object.hasOwnProperty('defineProperty')) {
+            Object.defineProperty(Object.prototype, 'Q', {
+             // NOTE: ES5.1 property descriptors' values default to `false`.
+                configurable: true,
+                //enumerable: false,
+                writable: true,
+                value: method_Q
+            });
+        } else {
+            Object.prototype.Q = method_Q;
+        }
+        return;
+    }(function method_Q(f) {
      // This function acts as a "namespace" for Quanah as well as its most
      // important syntactic sugar -- "Method Q". This function can be used as
      // a method of any native value except `null` or `undefined`. It expects
      // its argument to be a function of a single variable or else an avar with
      // such a function as its `val`.
+        if (Object.prototype.Q !== method_Q) {
+            throw new Error('"Method Q" is not available.');
+        }
         var x = (this instanceof AVar) ? this : avar({val: this});
         x.comm({'add_to_queue': f});
         return x;
-    };
+    }));
 
     Object.prototype.Q.avar = avar;
 

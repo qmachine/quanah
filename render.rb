@@ -2,7 +2,7 @@
 
 #-  render.rb ~~
 #                                                       ~~ (c) SRW, 18 Aug 2012
-#                                                   ~~ last updated 12 Mar 2013
+#                                                   ~~ last updated 04 Apr 2013
 
 require "date"
 require "redcarpet"
@@ -40,6 +40,11 @@ File::open(filename, "w") do |f|
       <span>Fork me on GitHub!</span>
     </a>
     #{markdown.render(IO.read("README.md")).chomp}
+    <p>
+      Note that this page has already loaded Quanah, which means that you can
+      open your browser's developer console and experiment without even leaving
+      this page :-)
+    </p>
     <script defer src="//quanah.googlecode.com/git/src/quanah.js"></script>
   </body>
 </html>

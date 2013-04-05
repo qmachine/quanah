@@ -1,7 +1,7 @@
 Quanah
 ======
 
-[Quanah](http://wilkinson.github.com/quanah) is a JavaScript library for
+[Quanah](http://wilkinson.github.io/quanah) is a JavaScript library for
 writing concurrent programs in JavaScript that still run correctly in serial
 execution environments. [QMachine](https://www.qmachine.org/), for example,
 uses Quanah extensively to implement a web service that acts as a supercomputer
@@ -11,7 +11,7 @@ more documentation soon!
 
 A [Node.js](http://nodejs.org/) module can be installed via
 [NPM](https://npmjs.org/package/quanah). Quanah is also available in
-[Bower](http://twitter.github.com/bower/) and
+[Bower](http://twitter.github.io/bower/) and
 [MinervaJS](http://minervajs.org/site/index.html#!/view/quanah).
 
 There are several "mirrors" available on

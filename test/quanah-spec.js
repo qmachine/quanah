@@ -3,12 +3,12 @@
 //- quanah-spec.js ~~
 //
 //  These tests were originally contributed by David Robbins on 06 April 2012
-//  for use with Jasmine (http://pivotal.github.com/jasmine/). The current form
+//  for use with Jasmine (http://pivotal.github.io/jasmine/). The current form
 //  is designed for use with Mocha (https://github.com/visionmedia/mocha) as
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 02 Mar 2013
+//                                                  ~~ last updated 05 Apr 2013
 
 (function () {
     'use strict';

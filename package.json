@@ -1,5 +1,8 @@
 {
-    "author": "Sean Wilkinson",
+    "author": {
+        "name": "Sean Wilkinson",
+        "email": "sean@mathbiol.org"
+    },
     "dependencies": {},
     "description": "Event-driven framework for distributed computing",
     "devDependencies": {

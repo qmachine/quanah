@@ -19,13 +19,11 @@
     "name": "quanah",
     "optionalDependencies": {},
     "private": false,
-    "repositories": [
-        {"type": "git", "url": "https://bitbucket.org/wilkinson/quanah.git"},
-        {"type": "git", "url": "https://code.google.com/p/quanah/"},
+    "repository": [
         {"type": "git", "url": "https://github.com/wilkinson/quanah.git"}
     ],
     "scripts": {
         "test": "./node_modules/mocha/bin/mocha"
     },
-    "version": "0.1.4"
+    "version": "0.1.5"
 }

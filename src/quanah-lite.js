@@ -18,8 +18,9 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        apply, avar, def, hasOwnProperty, prototype, QUANAH, sync, toJSON,
-        toString, val, valueOf
+        apply, avar, comm, def, epitaph, hasOwnProperty, key, length, onerror,
+        prototype, QUANAH, queue, random, ready, revive, slice, sync, toString,
+        val, valueOf
     */
 
  // Prerequisites
@@ -31,15 +32,36 @@
 
  // Declarations
 
-    var AVar, avar, def, sync;
+    var AVar, avar, def, revive, sync, uuid;
 
  // Definitions
 
-    AVar = function AVar() {
+    AVar = function AVar(obj) {
      // This function needs documentation.
-        var that;
+        var key, state, that;
+        state = {
+            epitaph:    null,
+            onerror:    null,
+            queue:      [],
+            ready:      true
+        };
         that = this;
-        // ...
+        for (key in obj) {
+            if ((obj.hasOwnProperty(key)) && (key !== 'comm')) {
+                that[key] = obj[key];
+            }
+        }
+        that.comm = function (obj) {
+         // This function needs documentation.
+            // ...
+            return;
+        };
+        if (that.hasOwnProperty('key') === false) {
+            that.key = uuid();
+        }
+        if (that.hasOwnProperty('val') === false) {
+            that.val = null;
+        }
         return that;
     };
 
@@ -55,6 +77,12 @@
         return;
     };
 
+    revive = function () {
+     // This function needs documentation.
+        // ...
+        return;
+    };
+
     sync = function () {
      // This function needs documentation.
         var y = avar();
@@ -62,7 +90,35 @@
         return y;
     };
 
+    uuid = function () {
+     // This function generates random hexadecimal UUIDs of length 32.
+        var y = Math.random().toString(16).slice(2, 32);
+        if (y === '') {
+         // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
+         // has some weird quirks due to its ActionScript roots.
+            while (y.length < 32) {
+                y += (Math.random() * 1e16).toString(16);
+            }
+            y = y.slice(0, 32);
+        } else {
+         // Every other JS implementation I have tried will use this instead.
+            while (y.length < 32) {
+                y += Math.random().toString(16).slice(2, 34 - y.length);
+            }
+        }
+        return y;
+    };
+
  // Prototype definitions
+
+    AVar.prototype.revive = function () {
+     // This function is an efficient syntactic sugar for triggering `revive`
+     // from code external to this giant anonymous closure. Note that it does
+     // not use `this`, which means that it may be a vestigial definition from
+     // when I worried too much about limiting users' direct access to internal
+     // functions.
+        return revive();
+    };
 
     AVar.prototype.toString = function () {
      // This function delegates to the avar's `val` property if possible. The

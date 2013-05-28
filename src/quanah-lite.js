@@ -83,9 +83,17 @@
                 (state.can_run_remotely(task)));
     };
 
-    def = function () {
-     // This function needs documentation.
-        // ...
+    def = function (obj) {
+     // This function enables the user to redefine "internal" functions from
+     // outside the giant anonymous closure. In particular, this allows users
+     // to "port" Quanah as a concurrency model for use with almost any storage
+     // or messaging system.
+        var key;
+        for (key in obj) {
+            if ((obj.hasOwnProperty(key)) && (state[key] === null)) {
+                state[key] = obj[key];
+            }
+        }
         return;
     };
 

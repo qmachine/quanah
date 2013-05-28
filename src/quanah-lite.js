@@ -6,7 +6,7 @@
 //  namely, "Method Q".
 //
 //                                                      ~~ (c) SRW, 25 May 2013
-//                                                  ~~ last updated 25 May 2013
+//                                                  ~~ last updated 27 May 2013
 
 (function (global) {
     'use strict';
@@ -125,8 +125,10 @@
      // code here differs from the code for `AVar.prototype.valueOf` because it
      // assumes that the returned value should have a particular type (string).
      // My reasoning here is that, if the returned value were not a string, the
-     // JS engine will coerce it to a string; for the `null` and `undefined`
-     // cases, we can circumvent that coercion and thereby improve performance.
+     // JS engine would still coerce it to a string, but not until after the
+     // JIT compiler's type inference freaked out. Since we know that these
+     // values should eventually become strings anyway, we can circumvent that
+     // coercion and thereby improve performance.
         if (this.val === null) {
             return 'null';
         }

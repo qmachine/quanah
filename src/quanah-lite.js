@@ -21,7 +21,7 @@
         add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
         done, epitaph, exit, f, fail, hasOwnProperty, key, length, onerror,
         prototype, push, Q, QUANAH, queue, random, ready, revive, run_remotely,
-        shift, slice, stay, sync, toString, unshift, val, valueOf, x
+        shift, slice, stay, sync, toString, unshift, val, valueOf, wait_for, x
     */
 
  // Prerequisites
@@ -34,7 +34,7 @@
  // Declarations
 
     var AVar, avar, can_run_remotely, def, global_queue, is_Function, revive,
-        run_locally, run_remotely, sync, user_defs, uuid;
+        run_locally, run_remotely, user_defs, uuid;
 
  // Definitions
 
@@ -79,13 +79,11 @@
                         global_queue.unshift({f: state.queue.shift(), x: that});
                     }
                 } else if (args[0] instanceof AVar) {
-                    sync(args[0], that).Q(function (evt) {
+                    args[0].sync(that).Q(function (evt) {
                      // This function allows Quanah to postpone execution of
-                     // the given task until both `f` and `x` are ready.
-                        var f, x;
-                        f = this.val[0].val;
-                        x = this.val[1];
-                        f.call(x, evt);
+                     // the given task until both `f` and `x` are ready. The
+                     // following line is given in the form `f.call(x, evt)`.
+                        (this.val[0].val).call(this.val[1], evt);
                         return;
                     });
                 } else {
@@ -309,17 +307,6 @@
         return;
     };
 
-    sync = function () {
-     // This function takes the place of Quanah's `when` function. It has been
-     // renamed here because the idiom that inspired the previous name is no
-     // longer available anyway (`when(x, y).areready` ...).
-        var args, y;
-        args = Array.prototype.slice.call(arguments);
-        y = avar();
-        // ...
-        return y;
-    };
-
     user_defs = {can_run_remotely: null, run_remotely: null};
 
     uuid = function () {
@@ -350,9 +337,6 @@
      // work for any native value except `null` or `undefined`. It expects its
      // argument to be a function of a single variable or else an avar with
      // such a function as its `val`.
-        if (AVar.prototype.Q !== method_Q) {
-            throw new Error('"Method Q" is not available.');
-        }
         var x = (this instanceof AVar) ? this : avar({val: this});
         x.comm({'add_to_queue': f});
         return x;
@@ -360,11 +344,16 @@
 
     AVar.prototype.revive = function () {
      // This function is an efficient syntactic sugar for triggering `revive`
-     // from code external to this giant anonymous closure. Note that it does
-     // not use `this`, which means that it may be a vestigial definition from
-     // when I worried too much about limiting users' direct access to internal
-     // functions.
-        return revive();
+     // from code external to this giant anonymous closure. Because `this` is
+     // returned, this method is "chainable".
+        revive();
+        return this;
+    };
+
+    AVar.prototype.sync = function () {
+     // This function will fill the niche of Quanah's `when` function.
+        // ...
+        return this;
     };
 
     AVar.prototype.toString = function () {
@@ -401,7 +390,7 @@
 
  // Out-of-scope definitions
 
-    global.QUANAH = {avar: avar, def: def, sync: sync};
+    global.QUANAH = {avar: avar, def: def};
 
  // That's all, folks!
 
@@ -426,11 +415,8 @@
     /*properties global */
 
     if (this === null) {
-
      // Strict mode has captured us, but we already passed a reference :-)
-
         return (typeof global === 'object') ? global : that;
-
     }
 
  // Strict mode isn't supported in this environment, but we need to make sure

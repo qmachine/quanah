@@ -5,7 +5,7 @@
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 27 Mar 2013
+//                                                  ~~ last updated 28 May 2013
 
 (function () {
     'use strict';
@@ -81,11 +81,9 @@
                 } else if (args[0] instanceof AVar) {
                     when(args[0], that).Q(function (evt) {
                      // This function allows Quanah to postpone execution of
-                     // the given task until both `f` and `x` are ready.
-                        var f, x;
-                        f = this.val[0].val;
-                        x = this.val[1];
-                        f.call(x, evt);
+                     // the given task until both `f` and `x` are ready. The
+                     // following line is given in the form `f.call(x, evt)`.
+                        (this.val[0].val).call(this.val[1], evt);
                         return;
                     });
                 } else {

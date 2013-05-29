@@ -18,10 +18,10 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        apply, avar, call, can_run_remotely, comm, def, done, epitaph, exit, f,
-        fail, global_queue, hasOwnProperty, key, length, onerror, prototype,
-        push, QUANAH, queue, random, ready, revive, run_remotely, shift, slice,
-        stay, sync, toString, val, valueOf, x
+        add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
+        done, epitaph, exit, f, fail, hasOwnProperty, key, length, onerror,
+        prototype, push, Q, QUANAH, queue, random, ready, revive, run_remotely,
+        shift, slice, stay, sync, toString, unshift, val, valueOf, x
     */
 
  // Prerequisites
@@ -33,13 +33,14 @@
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, def, is_Function, revive, run_locally,
-        run_remotely, state, sync, uuid;
+    var AVar, avar, can_run_remotely, def, global_queue, is_Function, revive,
+        run_locally, run_remotely, sync, user_defs, uuid;
 
  // Definitions
 
     AVar = function AVar(obj) {
-     // This function needs documentation.
+     // This function constructs "avars", which are generic containers for
+     // "asynchronous variables".
         var key, state, that;
         state = {
             epitaph:    null,
@@ -54,9 +55,103 @@
             }
         }
         that.comm = function (obj) {
-         // This function needs documentation.
-            // ...
-            return;
+         // This function provides a mechanism for manipulating the internal
+         // state of an avar without providing direct access to that state. It
+         // was inspired by the message-passing style used in Objective-C.
+            var args, key, message;
+            for (key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    args = [].concat(obj[key]);
+                    message = key;
+                }
+            }
+            switch (message) {
+            case 'add_to_queue':
+             // The next transformation to be applied to this avar will be put
+             // into an instance-specific queue before it ends up in the main
+             // task queue (`global_queue`). Because retriggering execution by
+             // sending `done` messages recursively requires a lot of extra
+             // overhead, we'll just go ahead and retrigger execution directly.
+                if (is_Function(args[0])) {
+                    state.queue.push(args[0]);
+                    if (state.ready === true) {
+                        state.ready = false;
+                        global_queue.unshift({f: state.queue.shift(), x: that});
+                    }
+                } else if (args[0] instanceof AVar) {
+                    sync(args[0], that).Q(function (evt) {
+                     // This function allows Quanah to postpone execution of
+                     // the given task until both `f` and `x` are ready.
+                        var f, x;
+                        f = this.val[0].val;
+                        x = this.val[1];
+                        f.call(x, evt);
+                        return;
+                    });
+                } else {
+                    that.comm({'fail': 'Transformation must be a function.'});
+                }
+                break;
+            case 'done':
+             // A computation involving this avar has succeeded, and we will
+             // now prepare to run the next computation that depends on it by
+             // transferring it into the `revive` queue.
+                state.ready = true;
+                if (state.queue.length > 0) {
+                    state.ready = false;
+                    global_queue.unshift({f: state.queue.shift(), x: that});
+                }
+                break;
+            case 'fail':
+             // A computation involving this avar has failed, and we will now
+             // suspend all computations that depend on it indefinitely by
+             // overwriting the queue with a fresh one. This is also important
+             // because the garbage collector can't free the memory unless we
+             // release these references. We will also try to call `onerror`
+             // if one has been defined.
+                if (state.epitaph === null) {
+                 // We don't want to overwrite the original error by accident,
+                 // since that would be an utter nightmare for debugging.
+                    state.epitaph = args;
+                }
+                state.queue = [];
+                state.ready = false;
+                if (is_Function(state.onerror)) {
+                    state.onerror.apply(that, state.epitaph);
+                }
+                break;
+            case 'on':
+             // This one is an experiment ...
+                if ((args[0] === 'error') && (is_Function(args[1]))) {
+                 // A computation has defined an `onerror` handler for this
+                 // avar, but we need to make sure that it hasn't already
+                 // failed in some previous computation. If the avar has
+                 // already failed, we will store the handler and also fire it
+                 // immediately.
+                    state.onerror = args[1];
+                    if (state.epitaph !== null) {
+                        that.comm({'fail': state.epitaph});
+                    }
+                }
+                break;
+            case 'stay':
+             // A computation that depends on this avar has been postponed,
+             // but that computation will be put back into the queue directly
+             // by `local_call`. Thus, nothing actually needs to happen here;
+             // we just need to wait. For consistency with `exit` and `fail`,
+             // I allow `stay` to take a message argument, but right now it
+             // doesn't actually do anything. In the future, however, I may
+             // enable a verbose mode for debugging that outputs the message.
+                break;
+            default:
+             // When this arm is chosen, either an error exists in Quanah or
+             // else a user is re-programming Quanah's guts; in either case, it
+             // may be useful to capture the error. Another possibility is that
+             // a user is trying to trigger `revive` using an obsolete idiom
+             // that involved calling `that.comm` without any arguments.
+                that.comm({'fail': 'Invalid `comm` message "' + message + '"'});
+            }
+            return revive();
         };
         if (that.hasOwnProperty('key') === false) {
             that.key = uuid();
@@ -78,9 +173,9 @@
      // close to English as possible. It tests for the existence of particular
      // user-defined functions so that `revive` can decide whether to use local
      // or remote execution for a given task.
-        return ((is_Function(state.can_run_remotely))   &&
-                (is_Function(state.run_remotely))       &&
-                (state.can_run_remotely(task)));
+        return ((is_Function(user_defs.can_run_remotely))   &&
+                (is_Function(user_defs.run_remotely))       &&
+                (user_defs.can_run_remotely(task)));
     };
 
     def = function (obj) {
@@ -90,12 +185,14 @@
      // or messaging system.
         var key;
         for (key in obj) {
-            if ((obj.hasOwnProperty(key)) && (state[key] === null)) {
-                state[key] = obj[key];
+            if ((obj.hasOwnProperty(key)) && (user_defs[key] === null)) {
+                user_defs[key] = obj[key];
             }
         }
         return;
     };
+
+    global_queue = [];
 
     is_Function = function (f) {
      // This function returns `true` only if and only if the input argument
@@ -108,20 +205,20 @@
     revive = function () {
      // This function contains the execution center for Quanah. It's pretty
      // simple, really -- it just runs the first available task in its queue
-     // (`queue`), and it selects an execution context conditionally. That's
-     // all it does. It makes no attempt to run every task in the queue every
-     // time it is called, because instead Quanah uses a strategy in which it
-     // tries to call `revive` as many times as necessary to process an entire
-     // program correctly. For example, every time an avar receives a `comm`
-     // message, `revive` will run. Because `revive` only runs a single task
-     // from the queue for each invocation, its queue can be shared safely
+     // (`global_queue`), and it selects an execution context conditionally.
+     // That's all it does. It makes no attempt to run every task in the queue
+     // every time it is called, because instead Quanah uses a strategy in
+     // which it tries to call `revive` as many times as necessary to process
+     // an entire program correctly. For example, every time an avar receives a
+     // `comm` message, `revive` will run. Because `revive` only runs a single
+     // task from the queue for each invocation, its queue can be shared safely
      // across multiple execution "contexts" simultaneously, and it makes no
      // difference if the separate contexts are due to recursion or to special
      // objects such as Web Workers. The `revive` function selects a context
      // for execution using conditional tests that determine whether a given
      // computation can be distributed to external resources for execution, and
      // if they cannot be distributed, execution occurs on the local machine.
-        var task = state.global_queue.shift();
+        var task = global_queue.shift();
         if (task !== undefined) {
             if (can_run_remotely(task)) {
                 run_remotely(task);
@@ -185,7 +282,7 @@
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
                     obj.x.comm({'stay': message});
-                    state.global_queue.push(obj);
+                    global_queue.push(obj);
                     return;
                 }
             };
@@ -208,24 +305,22 @@
      // function which may or may not ever be provided. JS doesn't crash in a
      // situation like this because `can_run_remotely` tests for the existence
      // of the user-defined method before delegating to `run_remotely`.
-        state.run_remotely(task);
+        user_defs.run_remotely(task);
         return;
-    };
-
-    state = {
-        can_run_remotely: null,
-        global_queue: [],
-        run_remotely: null
     };
 
     sync = function () {
      // This function takes the place of Quanah's `when` function. It has been
      // renamed here because the idiom that inspired the previous name is no
      // longer available anyway (`when(x, y).areready` ...).
-        var y = avar();
+        var args, y;
+        args = Array.prototype.slice.call(arguments);
+        y = avar();
         // ...
         return y;
     };
+
+    user_defs = {can_run_remotely: null, run_remotely: null};
 
     uuid = function () {
      // This function generates random hexadecimal UUIDs of length 32.
@@ -247,6 +342,21 @@
     };
 
  // Prototype definitions
+
+    AVar.prototype.Q = function method_Q(f) {
+     // This function is the infamous "Method Q" that acted as a "namespace"
+     // for previous versions of Quanah. Here, it is defined as a prototype
+     // method for avars, but if you assign it to `Object.prototype.Q`, it will
+     // work for any native value except `null` or `undefined`. It expects its
+     // argument to be a function of a single variable or else an avar with
+     // such a function as its `val`.
+        if (AVar.prototype.Q !== method_Q) {
+            throw new Error('"Method Q" is not available.');
+        }
+        var x = (this instanceof AVar) ? this : avar({val: this});
+        x.comm({'add_to_queue': f});
+        return x;
+    };
 
     AVar.prototype.revive = function () {
      // This function is an efficient syntactic sugar for triggering `revive`
@@ -291,11 +401,7 @@
 
  // Out-of-scope definitions
 
-    global.QUANAH = {
-        avar:   avar,
-        def:    def,
-        sync:   sync
-    };
+    global.QUANAH = {avar: avar, def: def, sync: sync};
 
  // That's all, folks!
 

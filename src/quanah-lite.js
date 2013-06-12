@@ -6,7 +6,7 @@
 //  namely, "Method Q".
 //
 //                                                      ~~ (c) SRW, 25 May 2013
-//                                                  ~~ last updated 28 May 2013
+//                                                  ~~ last updated 12 Jun 2013
 
 (function (global) {
     'use strict';
@@ -351,8 +351,11 @@
     };
 
     AVar.prototype.sync = function () {
-     // This function will fill the niche of Quanah's `when` function.
-        // ...
+     // This function will fill the niche of Quanah's `when` function. The idea
+     // will be to use it like `Array.prototype.concat` (`[].concat(x, y, z)`):
+     //
+     //     avar().sync(x, y, z).Q(f).on('error', g);
+     //
         return this;
     };
 

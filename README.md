@@ -21,3 +21,5 @@ There are several "mirrors" available on
 available on [GitHub](https://github.com/wilkinson/quanah/graphs) and
 [Ohloh](https://www.ohloh.net/p/quanah), too.
 
+[![Build Status](https://travis-ci.org/wilkinson/quanah.png)](https://travis-ci.org/wilkinson/quanah)
+

@@ -23,3 +23,5 @@ available on [GitHub](https://github.com/wilkinson/quanah/graphs) and
 
 [![Build Status](https://travis-ci.org/wilkinson/quanah.png)](https://travis-ci.org/wilkinson/quanah)
 
+[![NPM version](https://badge.fury.io/js/quanah.png)](http://badge.fury.io/js/quanah)
+

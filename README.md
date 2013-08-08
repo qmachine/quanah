@@ -1,5 +1,4 @@
-Quanah
-======
+# Quanah [![Build Status](https://travis-ci.org/wilkinson/quanah.png)](https://travis-ci.org/wilkinson/quanah) [![Build Status](https://drone.io/github.com/wilkinson/quanah/status.png)](https://drone.io/github.com/wilkinson/quanah/latest) [![NPM version](https://badge.fury.io/js/quanah.png)](http://badge.fury.io/js/quanah)
 
 [Quanah](http://wilkinson.github.io/quanah) is a JavaScript library for
 writing concurrent programs in JavaScript that still run correctly in serial
@@ -20,6 +19,4 @@ There are several "mirrors" available on
 [Google Code](https://quanah.googlecode.com). Various project statistics are
 available on [GitHub](https://github.com/wilkinson/quanah/graphs) and
 [Ohloh](https://www.ohloh.net/p/quanah), too.
-
-[![Build Status](https://travis-ci.org/wilkinson/quanah.png)](https://travis-ci.org/wilkinson/quanah)
 

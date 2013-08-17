@@ -6,7 +6,7 @@
 //  namely, "Method Q".
 //
 //                                                      ~~ (c) SRW, 25 May 2013
-//                                                  ~~ last updated 12 Jun 2013
+//                                                  ~~ last updated 17 Jun 2013
 
 (function (global) {
     'use strict';
@@ -356,7 +356,39 @@
      //
      //     avar().sync(x, y, z).Q(f).on('error', g);
      //
-        return this;
+     // It will always run locally.
+     //
+        var args, block, count, egress, i, n, x, y;
+        args = Array.prototype.slice.call(arguments);
+        block = function (evt) {
+         // This function needs documentation.
+            egress.push(evt);
+            x -= 1;
+            return;
+        };
+        egress = [];
+        n = x = args.length;
+        y = avar(this);
+        for (i = 0; i < n; i += 1) {
+            if (args[i] instanceof AVar) {
+                args[i].Q(block);
+            } else {
+                x -= 1;
+            }
+        }
+        y.Q = function (f) {
+         // This function needs documentation.
+
+        };
+
+        y.Q(function (evt) {
+         // This function needs documentation.
+
+        }).Q(function (evt) {
+         // This function needs documentation.
+
+        });
+        return y;
     };
 
     AVar.prototype.toString = function () {

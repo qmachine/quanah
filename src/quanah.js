@@ -54,7 +54,7 @@
                 that[key] = obj[key];
             }
         }
-        that.comm = function (obj) {
+        that.comm = function comm(obj) {
          // This function provides a mechanism for manipulating the internal
          // state of an avar without providing direct access to that state. It
          // was inspired by the message-passing style used in Objective-C.
@@ -87,13 +87,14 @@
                         return;
                     });
                 } else {
-                    that.comm({'fail': 'Transformation must be a function.'});
+                    comm({'fail': 'Transformation must be a function.'});
                 }
                 break;
             case 'done':
              // A computation involving this avar has succeeded, and we will
              // now prepare to run the next computation that depends on it by
-             // transferring it into the `revive` queue.
+             // transferring it from the avar's individual queue into the
+             // global `queue` used by the `revive` function.
                 state.ready = true;
                 if (state.queue.length > 0) {
                     state.ready = false;
@@ -128,7 +129,7 @@
                  // immediately.
                     state.onerror = args[1];
                     if (state.epitaph !== null) {
-                        that.comm({'fail': state.epitaph});
+                        comm({'fail': state.epitaph});
                     }
                 }
                 break;
@@ -146,8 +147,8 @@
              // else a user is re-programming Quanah's guts; in either case, it
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `revive` using an obsolete idiom
-             // that involved calling `that.comm` without any arguments.
-                that.comm({'fail': 'Invalid `comm` message "' + message + '"'});
+             // that involved calling `comm` without any arguments.
+                comm({'fail': 'Invalid `comm` message "' + message + '"'});
             }
             return revive();
         };

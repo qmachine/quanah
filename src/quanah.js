@@ -5,7 +5,7 @@
 //  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 28 May 2013
+//                                                  ~~ last updated 17 Aug 2013
 
 (function () {
     'use strict';
@@ -157,6 +157,9 @@
         if (that.hasOwnProperty('val') === false) {
             that.val = null;
         }
+     // At this point, we will never use `key` or `obj` again, and the `comm`
+     // instance method shadows those names, but I'm not sure if we need to
+     // destroy the references ourselves explicitly for garbage collection ...
         return that;
     };
 
@@ -313,7 +316,9 @@
     };
 
     uuid = function () {
-     // This function generates random hexadecimal UUIDs of length 32.
+     // This function generates random hexadecimal strings of length 32. These
+     // strings don't satisfy RFC 4122 or anything, but they're conceptually
+     // the same as UUIDs.
         var y = Math.random().toString(16).slice(2, 32);
         if (y === '') {
          // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin

@@ -201,19 +201,19 @@
     revive = function () {
      // This function contains the execution center for Quanah. It's pretty
      // simple, really -- it just runs the first available task in its queue
-     // (`queue`), and it selects an execution context conditionally. That's
-     // all it does. It makes no attempt to run every task in the queue every
-     // time it is called, because instead Quanah uses a strategy in which it
-     // tries to call `revive` as many times as necessary to process an entire
-     // program correctly. For example, every time an avar receives a `comm`
-     // message, `revive` will run. Because `revive` only runs a single task
-     // from the queue for each invocation, its queue can be shared safely
-     // across multiple execution "contexts" simultaneously, and it makes no
-     // difference if the separate contexts are due to recursion or to special
-     // objects such as Web Workers. The `revive` function selects a context
-     // for execution using conditional tests that determine whether a given
-     // computation can be distributed to external resources for execution, and
-     // if they cannot be distributed, execution occurs on the local machine.
+     // (`queue`) in an execution context appropriate for that particular task.
+     // That's all it does. It makes no attempt to run every task in the queue
+     // every time it is called, because instead it assumes it will be called
+     // repeatedly until the entire program has executed. For example, every
+     // time an avar receives a `comm` message, `revive` will run. Because
+     // `revive` only runs a single task from its queue for each invocation,
+     // that queue can be shared safely across multiple execution contexts
+     // simultaneously, and it makes no difference if the separate contexts are
+     // due to recursion or to special objects such as Web Workers. The
+     // `revive` function selects an execution context using conditional tests
+     // that determine whether a given task can be distributed faithfully to
+     // external resources for execution or not; if a task cannot be
+     // distributed faithfully, then it will be executed by the local machine.
         var task = queue.shift();
         if (task !== undefined) {
             if (can_run_remotely(task)) {

@@ -14,11 +14,11 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        Q, add_to_queue, apply, avar, call, can_run_remotely, comm, concat,
+        add_to_queue, apply, avar, call, can_run_remotely, comm, concat,
         configurable, def, defineProperty, done, epitaph, exit, exports, f,
-        fail, hasOwnProperty, key, length, on, onerror, prototype, push, queue,
-        random, ready, revive, run_remotely, shift, slice, stay, sync,
-        toString, unshift, val, value, valueOf, writable, x
+        fail, hasOwnProperty, key, length, on, onerror, prototype, push, Q,
+        QUANAH, queue, random, ready, revive, run_remotely, shift, slice, stay,
+        sync, toString, unshift, val, value, valueOf, writable, x
     */
 
  // Prerequisites
@@ -32,7 +32,7 @@
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, def, is_Function, quanah, queue, revive,
+    var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
         run_locally, run_remotely, sync, user_defs, uuid;
 
  // Definitions
@@ -41,12 +41,7 @@
      // This function constructs "avars", which are generic containers for
      // "asynchronous variables".
         var key, state, that;
-        state = {
-            epitaph:    null,
-            onerror:    null,
-            queue:      [],
-            ready:      true
-        };
+        state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
         for (key in obj) {
             if ((obj.hasOwnProperty(key)) && (key !== 'comm')) {
@@ -75,7 +70,7 @@
                     state.queue.push(args[0]);
                     if (state.ready === true) {
                         state.ready = false;
-                        queue.unshift({f: state.queue.shift(), x: that});
+                        queue.unshift({'f': state.queue.shift(), 'x': that});
                     }
                 } else if (args[0] instanceof AVar) {
                     sync(args[0], that).Q(function (evt) {
@@ -97,7 +92,7 @@
                 state.ready = true;
                 if (state.queue.length > 0) {
                     state.ready = false;
-                    queue.unshift({f: state.queue.shift(), x: that});
+                    queue.unshift({'f': state.queue.shift(), 'x': that});
                 }
                 break;
             case 'fail':
@@ -200,8 +195,6 @@
      // whose `val` property is a function will still return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
     };
-
-    quanah = {};
 
     queue = [];
 
@@ -312,10 +305,7 @@
         return;
     };
 
-    user_defs = {
-        can_run_remotely:   null,
-        run_remotely:       null
-    };
+    user_defs = {'can_run_remotely': null, 'run_remotely': null};
 
     uuid = function () {
      // This function generates random hexadecimal strings of length 32. These
@@ -367,7 +357,7 @@
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
         x = [];
-        y = avar({val: args});
+        y = avar({'val': args});
         while (stack.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
@@ -445,7 +435,7 @@
                  // the `egress` array so that invocations of the control
                  // statements `exit`, `fail`, and `stay` are forwarded to
                  // all of the original arguments given to `sync`.
-                    exit: function (message) {
+                    'exit': function (message) {
                      // This function signals successful completion :-)
                         var i, n;
                         for (i = 0, n = egress.length; i < n; i += 1) {
@@ -453,7 +443,7 @@
                         }
                         return evt.exit(message);
                     },
-                    fail: function (message) {
+                    'fail': function (message) {
                      // This function signals a failed execution :-(
                         var i, n;
                         for (i = 0, n = egress.length; i < n; i += 1) {
@@ -461,7 +451,7 @@
                         }
                         return evt.fail(message);
                     },
-                    stay: function (message) {
+                    'stay': function (message) {
                      // This function postpones execution temporarily.
                         var i, n;
                         for (i = 0, n = egress.length; i < n; i += 1) {
@@ -497,18 +487,16 @@
         if (AVar.prototype.Q !== method_Q) {
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
-        var x = (this instanceof AVar) ? this : avar({val: this});
+        var x = (this instanceof AVar) ? this : avar({'val': this});
         x.comm({'add_to_queue': f});
         return x;
     };
 
     AVar.prototype.revive = function () {
-     // This function is an efficient syntactic sugar for triggering `revive`
-     // from code external to this giant anonymous closure. Note that it does
-     // not use `this`, which means that it may be a vestigial definition from
-     // when I worried too much about limiting users' direct access to internal
-     // functions.
-        return revive();
+     // This function is a chainable syntactic sugar for triggering `revive`
+     // from code external to this giant anonymous closure.
+        revive();
+        return this;
     };
 
     AVar.prototype.toString = function () {
@@ -543,25 +531,19 @@
 
  // Out-of-scope definitions
 
-    quanah = {
-        avar:   avar,
-        def:    def,
-        sync:   sync
-    };
-
-    (function () {
+    (function (obj) {
      // This function runs in Node.js, PhantomJS, and RingoJS, which means it
      // may work with other CommonJS-ish package loaders, too. I am not certain
      // whether this function adds much value, however, because the mere act of
      // loading Quanah loads "Method Q" anyway ...
         /*jslint node: true */
         if (typeof module === 'object') {
-            module.exports = quanah;
+            module.exports = obj;
         } else {
-            global.quanah = quanah;
+            global.QUANAH = obj;
         }
         return;
-    }());
+    }({'avar': avar, 'def': def, 'sync': sync}));
 
  // That's all, folks!
 

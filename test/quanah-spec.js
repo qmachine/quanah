@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 05 Apr 2013
+//                                                  ~~ last updated 17 Sep 2013
 
 (function () {
     'use strict';
@@ -31,11 +31,13 @@
 
     describe('Quanah', function () {
      // This is the actual specification :-)
-        var avar;
+
+        var avar, quanah;
+
         beforeEach(function () {
          // This function needs documentation.
-            Object.prototype.Q = require('../src/quanah');
-            avar = Object.prototype.Q.avar;
+            avar = require('../src/quanah').avar;
+            quanah = require('../src/quanah');
             return;
         });
 
@@ -43,75 +45,23 @@
             expect(true).to.equal(true);
         });
 
-        it('should be a function', function () {
-            expect(Object.prototype.Q).to.be.a('function');
+        it('should be an object', function () {
+            expect(quanah).to.be.an('object');
         });
 
         it('should have its own `avar` method', function () {
-            expect(Object.prototype.Q).to.have.property('avar');
-            expect(Object.prototype.Q.avar).to.be.a('function');
+            expect(quanah).to.have.property('avar');
+            expect(quanah.avar).to.be.a('function');
         });
 
         it('should have its own `def` method', function () {
-            expect(Object.prototype.Q).to.have.property('def');
-            expect(Object.prototype.Q.def).to.be.a('function');
+            expect(quanah).to.have.property('def');
+            expect(quanah.def).to.be.a('function');
         });
 
-        it('should have its own `when` method', function () {
-            expect(Object.prototype.Q).to.have.property('when');
-            expect(Object.prototype.Q.when).to.be.a('function');
-        });
-
-        it('should directly transform boolean literals', function (done) {
-            true.Q(function (evt) {
-             // This function needs documentation.
-                this.val = (this.val === true);
-                return evt.exit();
-            }).Q(function (evt) {
-             // This function needs documentation.
-                expect(this.val).to.equal(true);
-                done();
-                return evt.exit();
-            });
-        });
-
-        it('should directly transform number literals', function (done) {
-            (2).Q(function (evt) {
-             // This function needs documentation.
-                this.val += 2;
-                return evt.exit();
-            }).Q(function (evt) {
-             // This function needs documentation.
-                expect(this.val).to.equal(4);
-                done();
-                return evt.exit();
-            });
-        });
-
-        it('should directly transform object literals', function (done) {
-            ({a: 2}).Q(function (evt) {
-             // This function needs documentation.
-                this.val.a += 2;
-                return evt.exit();
-            }).Q(function (evt) {
-             // This function needs documentation.
-                expect(this.val.a).to.equal(4);
-                done();
-                return evt.exit();
-            });
-        });
-
-        it('should directly transform string literals', function (done) {
-            ('Hello').Q(function (evt) {
-             // This function needs documentation.
-                this.val += ' world!';
-                return evt.exit();
-            }).Q(function (evt) {
-             // This function needs documentation.
-                expect(this.val).to.equal('Hello world!');
-                done();
-                return evt.exit();
-            });
+        it('should have its own `sync` method', function () {
+            expect(quanah).to.have.property('sync');
+            expect(quanah.sync).to.be.a('function');
         });
 
         it('should be able to replace an avar\'s `val`', function (done) {
@@ -177,14 +127,15 @@
         it('should survive unexpected failures', function (done) {
             var x = avar();
             x.Q(function (evt) {
-             // This function needs documentation.
+             // This fails because `x.val` is not a function to simulate a
+             // programming error (as opposed to an uncaught `throw`).
                 x.val('Hi mom!');
                 return evt.exit();
             }).Q(function (evt) {
              // This function needs documentation.
                 console.log('This should _NOT_ appear in the output!');
                 return evt.exit();
-            }).on('error', function (message) {
+            }).on('error', function () {
              // This function needs documentation.
                 return done();
             });
@@ -215,7 +166,7 @@
         it('should wait for short async operations', function (done) {
             var x = avar();
             x.Q(function (evt) {
-             // This function needs documentation.
+             // NOTE: Should we also test `setImmediate`?
                 process.nextTick(evt.exit);
                 return;
             }).Q(function (evt) {
@@ -275,7 +226,7 @@
                 return evt.exit();
             };
             results = [];
-            (Math.random()).Q(f).Q(f).Q(f).Q(f).Q(f).Q(function (evt) {
+            avar({val: Math.random()}).Q(f).Q(f).Q(f).Q(f).Q(function (evt) {
              // This function needs documentation.
                 var first, i;
                 first = results[0];
@@ -293,9 +244,11 @@
             });
         });
 
+     /*
         it('should not affect assignment to a `Q` property', function () {
             ({}).Q = 5;
         });
+     */
 
         describe('An avar', function () {
          // This function needs documentation.
@@ -304,6 +257,9 @@
              // This function needs documentation.
                 x = avar();
                 return;
+            });
+            it('should have a constructor called "AVar"', function () {
+                expect(x.constructor.name).to.equal('AVar');
             });
             it('should have a `comm` instance method', function () {
                 expect(x).to.have.property('comm');
@@ -320,6 +276,10 @@
             it('should have an `on` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('on');
                 expect(x.on).to.be.a('function');
+            });
+            it('should have a `Q` prototype method', function () {
+                expect(x.constructor.prototype).to.have.property('Q');
+                expect(x.constructor.prototype.Q).to.be.a('function');
             });
             it('should have a `revive` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('revive');
@@ -355,9 +315,11 @@
             return;
         });
 
-        describe('The `when` method', function () {
+     /**/
+
+        describe('The `sync` method', function () {
          // This function needs documentation.
-            var f, fa, when, x, xa, y, ya, z, za;
+            var f, fa, sync, x, xa, y, ya, z, za;
             beforeEach(function () {
              // This function needs documentation.
                 f = function (evt) {
@@ -372,7 +334,7 @@
                     return evt.exit();
                 };
                 fa = avar({val: f});
-                when = Object.prototype.Q.when;
+                sync = quanah.sync;
                 x = 2;
                 xa = avar({val: x});
                 y = 3;
@@ -384,7 +346,7 @@
 
          /*
             it('should work when no vars are given', function (done) {
-                when().Q(function (evt) {
+                sync().Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(null);
                     done();
@@ -398,7 +360,7 @@
          */
 
             it('should work for "afunc(avar)"', function (done) {
-                when(xa).Q(fa).Q(function (evt) {
+                sync(xa).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(2);
                     done();
@@ -411,7 +373,7 @@
             });
 
             it('should work for "afunc(var)"', function (done) {
-                when(x).Q(fa).Q(function (evt) {
+                sync(x).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(2);
                     done();
@@ -424,7 +386,7 @@
             });
 
             it('should work for "afunc(avar, avar)"', function (done) {
-                when(xa, ya).Q(fa).Q(function (evt) {
+                sync(xa, ya).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -437,7 +399,7 @@
             });
 
             it('should work for "afunc(avar, var)"', function (done) {
-                when(xa, y).Q(fa).Q(function (evt) {
+                sync(xa, y).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -450,7 +412,7 @@
             });
 
             it('should work for "afunc(var, avar)"', function (done) {
-                when(x, ya).Q(fa).Q(function (evt) {
+                sync(x, ya).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -463,7 +425,7 @@
             });
 
             it('should work for "afunc(var, var)"', function (done) {
-                when(x, y).Q(fa).Q(function (evt) {
+                sync(x, y).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -476,7 +438,7 @@
             });
 
             it('should work for "afunc(avar, avar, avar)"', function (done) {
-                when(xa, ya, za).Q(fa).Q(function (evt) {
+                sync(xa, ya, za).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -489,7 +451,7 @@
             });
 
             it('should work for "afunc(avar, avar, var)"', function (done) {
-                when(xa, ya, z).Q(fa).Q(function (evt) {
+                sync(xa, ya, z).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -502,7 +464,7 @@
             });
 
             it('should work for "afunc(avar, var, avar)"', function (done) {
-                when(xa, y, za).Q(fa).Q(function (evt) {
+                sync(xa, y, za).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -515,7 +477,7 @@
             });
 
             it('should work for "afunc(var, avar, avar)"', function (done) {
-                when(x, ya, za).Q(fa).Q(function (evt) {
+                sync(x, ya, za).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -528,7 +490,7 @@
             });
 
             it('should work for "afunc(var, avar, var)"', function (done) {
-                when(x, ya, z).Q(fa).Q(function (evt) {
+                sync(x, ya, z).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -541,7 +503,7 @@
             });
 
             it('should work for "afunc(var, var, var)"', function (done) {
-                when(x, y, z).Q(fa).Q(function (evt) {
+                sync(x, y, z).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -554,7 +516,7 @@
             });
 
             it('should work for "function(avar)"', function (done) {
-                when(xa).Q(f).Q(function (evt) {
+                sync(xa).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(2);
                     done();
@@ -567,7 +529,7 @@
             });
 
             it('should work for "function(var)"', function (done) {
-                when(x).Q(f).Q(function (evt) {
+                sync(x).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(2);
                     done();
@@ -580,7 +542,7 @@
             });
 
             it('should work for "function(avar, avar)"', function (done) {
-                when(xa, ya).Q(f).Q(function (evt) {
+                sync(xa, ya).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -593,7 +555,7 @@
             });
 
             it('should work for "function(avar, var)"', function (done) {
-                when(xa, y).Q(f).Q(function (evt) {
+                sync(xa, y).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -606,7 +568,7 @@
             });
 
             it('should work for "function(var, avar)"', function (done) {
-                when(x, ya).Q(f).Q(function (evt) {
+                sync(x, ya).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -619,7 +581,7 @@
             });
 
             it('should work for "function(var, var)"', function (done) {
-                when(x, y).Q(f).Q(function (evt) {
+                sync(x, y).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(5);
                     done();
@@ -632,7 +594,7 @@
             });
 
             it('should work for "function(avar, avar, avar)"', function (bye) {
-                when(xa, ya, za).Q(f).Q(function (evt) {
+                sync(xa, ya, za).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     bye();
@@ -645,7 +607,7 @@
             });
 
             it('should work for "function(avar, avar, var)"', function (done) {
-                when(xa, ya, z).Q(f).Q(function (evt) {
+                sync(xa, ya, z).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -658,7 +620,7 @@
             });
 
             it('should work for "function(avar, var, avar)"', function (done) {
-                when(xa, y, za).Q(f).Q(function (evt) {
+                sync(xa, y, za).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -671,7 +633,7 @@
             });
 
             it('should work for "function(avar, var, var)"', function (done) {
-                when(xa, y, z).Q(f).Q(function (evt) {
+                sync(xa, y, z).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -684,7 +646,7 @@
             });
 
             it('should work for "function(var, avar, avar)"', function (done) {
-                when(x, ya, za).Q(f).Q(function (evt) {
+                sync(x, ya, za).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -697,7 +659,7 @@
             });
 
             it('should work for "function(var, avar, var)"', function (done) {
-                when(x, ya, z).Q(f).Q(function (evt) {
+                sync(x, ya, z).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -710,7 +672,7 @@
             });
 
             it('should work for "function(var, var, avar)"', function (done) {
-                when(x, y, za).Q(f).Q(function (evt) {
+                sync(x, y, za).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -723,7 +685,7 @@
             });
 
             it('should work for "function(var, var, var)"', function (done) {
-                when(x, y, z).Q(f).Q(function (evt) {
+                sync(x, y, z).Q(f).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();
@@ -736,7 +698,7 @@
             });
 
             it('should work via `apply`', function (done) {
-                when.apply(null, [xa, ya, za]).Q(fa).Q(function (evt) {
+                sync.apply(null, [xa, ya, za]).Q(fa).Q(function (evt) {
                  // This function needs documentation.
                     expect(this.val).to.equal(9);
                     done();

@@ -7,7 +7,8 @@
 //  a standardized output function.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
+//                                                  ~~ last updated 05 Oct 2013
 
-('Hello world!').Q(function () { puts(this.val); });
+QUANAH.avar({val: 'Hello world!'}).Q(function () { puts(this.val); });
 
 //- vim:set syntax=javascript:

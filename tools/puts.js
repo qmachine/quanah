@@ -2,7 +2,7 @@
 
 //- puts.js ~~
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 23 Jan 2013
+//                                                  ~~ last updated 05 Oct 2013
 
 (function (global) {
     'use strict';
@@ -130,8 +130,9 @@
  // in sandboxed contexts, and using identifiers like `global` carelessly ...
 
     /*jslint indent: 4, maxlen: 80 */
-    /*global global: true */
+    /*global global: false */
     /*properties global */
+
     if (this === null) {
 
      // Strict mode has captured us, but we already passed a reference :-)

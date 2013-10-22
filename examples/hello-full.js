@@ -8,22 +8,36 @@
 //  for those who are or aspire to become expert-level JavaScript programmers.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
+//                                                  ~~ last updated 05 Oct 2013
 
 (function () {
     'use strict';
 
  // Pragmas
 
-    /*global puts: false */
+    /*global puts: false, QUANAH: false */
 
     /*jslint indent: 4, maxlen: 80 */
 
+ // Declarations
+
+    var avar, x;
+
+ // Definitions
+
+    avar = QUANAH.avar;
+
+    x = avar({val: 'Hello world!'});
+
  // Demonstration
 
-    ('Hello world!').Q(function (evt) {
+    x.Q(function (evt) {
      // This function needs documentation.
         puts(this.val);
         return evt.exit();
+    }).on('error', function (message) {
+     // This function needs documentation.
+        throw new Error(message);
     });
 
  // That's all, folks!

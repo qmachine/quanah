@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 17 Sep 2013
+//                                                  ~~ last updated 21 Oct 2013
 
 (function () {
     'use strict';
@@ -52,16 +52,19 @@
         it('should have its own `avar` method', function () {
             expect(quanah).to.have.property('avar');
             expect(quanah.avar).to.be.a('function');
+            expect(quanah.avar.length).to.equal(1); // check arity
         });
 
         it('should have its own `def` method', function () {
             expect(quanah).to.have.property('def');
             expect(quanah.def).to.be.a('function');
+            expect(quanah.def.length).to.equal(1);
         });
 
         it('should have its own `sync` method', function () {
             expect(quanah).to.have.property('sync');
             expect(quanah.sync).to.be.a('function');
+            expect(quanah.sync.length).to.equal(0);
         });
 
         it('should be able to replace an avar\'s `val`', function (done) {
@@ -244,6 +247,26 @@
             });
         });
 
+        it('should support avar functions', function (done) {
+            var f, x;
+            f = avar({
+                val: function (evt) {
+                 // This function also happens to be "distributable".
+                    this.val += 2;
+                    return evt.exit();
+                }
+            });
+            x = avar({val: 2});
+            x.Q(f).Q(function (evt) {
+             // This function needs documentation.
+                if (this.val !== 4) {
+                    return evt.fail('Computed result was not 4.');
+                }
+                done();
+                return evt.exit();
+            });
+        });
+
      /*
         it('should not affect assignment to a `Q` property', function () {
             ({}).Q = 5;
@@ -276,22 +299,27 @@
             it('should have an `on` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('on');
                 expect(x.on).to.be.a('function');
+                expect(x.on.length).to.equal(0); // strange, I know, but ...
             });
             it('should have a `Q` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('Q');
                 expect(x.constructor.prototype.Q).to.be.a('function');
+                expect(x.constructor.prototype.Q.length).to.equal(1);
             });
             it('should have a `revive` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('revive');
                 expect(x.revive).to.be.a('function');
+                expect(x.revive.length).to.equal(0);
             });
             it('should have a `toString` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('toString');
                 expect(x.toString).to.be.a('function');
+                expect(x.toString.length).to.equal(0);
             });
             it('should have a `valueOf` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('valueOf');
                 expect(x.valueOf).to.be.a('function');
+                expect(x.valueOf.length).to.equal(0);
             });
             return;
         });
@@ -314,8 +342,6 @@
             });
             return;
         });
-
-     /**/
 
         describe('The `sync` method', function () {
          // This function needs documentation.
@@ -357,7 +383,6 @@
                     return;
                 });
             });
-         */
 
             it('should work for "afunc(avar)"', function (done) {
                 sync(xa).Q(fa).Q(function (evt) {
@@ -710,13 +735,15 @@
                 });
             });
 
+         */
+
         });
 
         return;
 
     });
 
-/*
+ /*
     describe('Quanah AVars', function () {
 
         var avar;
@@ -943,7 +970,7 @@
 
     });
 
-*/
+ */
 
  // That's all, folks!
 

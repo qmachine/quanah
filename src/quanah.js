@@ -14,11 +14,11 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        add_to_queue, apply, avar, call, can_run_remotely, comm, concat,
-        configurable, def, defineProperty, done, epitaph, exit, exports, f,
-        fail, hasOwnProperty, key, length, on, onerror, prototype, push, Q,
-        QUANAH, queue, random, ready, revive, run_remotely, shift, slice, stay,
-        sync, toString, unshift, val, value, valueOf, writable, x
+        add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
+        done, epitaph, exit, exports, f, fail, hasOwnProperty, key, length, on,
+        onerror, prototype, push, Q, QUANAH, queue, random, ready, revive,
+        run_remotely, shift, slice, stay, sync, toString, unshift, val,
+        valueOf, x
     */
 
  // Prerequisites
@@ -77,7 +77,7 @@
                      // This function allows Quanah to postpone execution of
                      // the given task until both `f` and `x` are ready. The
                      // following line is given in the form `f.call(x, evt)`.
-                        (this.val[0].val).call(this.val[1], evt);
+                        (args[0].val).call(that, evt);
                         return;
                     });
                 } else {
@@ -305,59 +305,33 @@
         return;
     };
 
-    user_defs = {'can_run_remotely': null, 'run_remotely': null};
-
-    uuid = function () {
-     // This function generates random hexadecimal strings of length 32. These
-     // strings don't satisfy RFC 4122 or anything, but they're conceptually
-     // the same as UUIDs.
-        var y = Math.random().toString(16).slice(2, 32);
-        if (y === '') {
-         // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
-         // has some weird quirks due to its ActionScript roots.
-            while (y.length < 32) {
-                y += (Math.random() * 1e16).toString(16);
-            }
-            y = y.slice(0, 32);
-        } else {
-         // Every other JS implementation I have tried will use this instead.
-            while (y.length < 32) {
-                y += Math.random().toString(16).slice(2, 34 - y.length);
-            }
-        }
-        return y;
-    };
-
     sync = function () {
      // This function takes any number of arguments, any number of which may
-     // be avars, and outputs a special "compound" avar whose `val` property is
-     // an array of the original input arguments. The compound avar also has a
-     // slightly modified form of `Object.prototype.Q` placed directly onto it
-     // as an instance method; this provides a nice way of distinguishing a
-     // "normal" avar from a compound one. It no longer creates the instance
-     // methods `isready`/`areready` because, even though those were really
-     // pretty and had a nice interpretation in English, the use of setters was
-     // confusing to many of my peers. Any functions that are fed into the `Q`
-     // method will wait for all input arguments' outstanding queues to empty
-     // before executing, and exiting will allow each of the inputs to begin
-     // working through its individual queue again. Also, a compound avar can
-     // still be used as a prerequisite to execution even when the compound
-     // avar depends on one of the other prerequisites, and although the
-     // immediate usefulness of this ability may not be obvious, it will turn
-     // out to be crucially important for expressing certain concurrency
-     // patterns idiomatically :-)
+     // be avars, and it outputs a new avar which acts as a "sync point". The
+     // syntax here is designed to mimic `Array.concat`. The avar returned by
+     // this function will have a slightly modified form of `AVar.prototype.Q`
+     // placed directly onto it as an instance method as means to provide a
+     // nice way of distinguishing a "normal" avar from a "sync point". Any
+     // functions that are fed into the `Q` method will wait for all input
+     // arguments' outstanding queues to empty before executing, and exiting
+     // will allow each of the inputs to begin working through its individual
+     // queue again. Also, a sync point can still be used as a prerequisite to
+     // execution even when the sync point depends on one of the other
+     // prerequisites. (Although the immediate usefulness of this capability
+     // isn't obvious, it turns out to be crucially important for expressing
+     // certain concurrency patterns idiomatically.)
      //
      // NOTE: What happens here if an avar which has already failed is used in
      // a `sync` statement? Does the `sync` fail immediately, as expected?
      //
-     // NOTE: The instance method `Q` that gets added to a compound avar is not
+     // NOTE: The instance method `Q` that gets added to a sync point is not
      // a perfect substitute for the instance `comm` method it already has ...
      //
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
         x = [];
-        y = avar({'val': args});
+        y = avar();
         while (stack.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
@@ -464,6 +438,29 @@
             }});
             return y;
         };
+        return y;
+    };
+
+    user_defs = {'can_run_remotely': null, 'run_remotely': null};
+
+    uuid = function () {
+     // This function generates random hexadecimal strings of length 32. These
+     // strings don't satisfy RFC 4122 or anything, but they're conceptually
+     // the same as UUIDs.
+        var y = Math.random().toString(16).slice(2, 32);
+        if (y === '') {
+         // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
+         // has some weird quirks due to its ActionScript roots.
+            while (y.length < 32) {
+                y += (Math.random() * 1e16).toString(16);
+            }
+            y = y.slice(0, 32);
+        } else {
+         // Every other JS implementation I have tried will use this instead.
+            while (y.length < 32) {
+                y += Math.random().toString(16).slice(2, 34 - y.length);
+            }
+        }
         return y;
     };
 

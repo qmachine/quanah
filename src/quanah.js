@@ -2,7 +2,7 @@
 
 //- quanah.js ~~
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 17 Sep 2013
+//                                                  ~~ last updated 21 Oct 2013
 
 (function (global) {
     'use strict';

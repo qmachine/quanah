@@ -2,7 +2,7 @@
 
 #-  render.rb ~~
 #                                                       ~~ (c) SRW, 18 Aug 2012
-#                                                   ~~ last updated 04 Apr 2013
+#                                                   ~~ last updated 05 Jul 2014
 
 require "date"
 require "redcarpet"
@@ -36,7 +36,7 @@ File::open(filename, "w") do |f|
   </head>
   <body>
     <noscript>This page requires JavaScript.</noscript>
-    <a id="github_ribbon" href="https://github.com/wilkinson/quanah">
+    <a id="github_ribbon" href="https://github.com/qmachine/quanah">
       <span>Fork me on GitHub!</span>
     </a>
     #{markdown.render(IO.read("README.md")).chomp}

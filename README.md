@@ -1,6 +1,6 @@
-# Quanah [![Build Status](https://travis-ci.org/qmachine/quanah.png)](https://travis-ci.org/qmachine/quanah) [![Build Status](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![NPM version](https://badge.fury.io/js/quanah.png)](http://badge.fury.io/js/quanah)
+# Quanah
 
-[Quanah](http://qmachine.github.io/quanah/) is a JavaScript library for
+[Quanah](https://qmachine.github.io/quanah/) is a JavaScript library for
 writing concurrent programs in JavaScript that still run correctly in serial
 execution environments. [QMachine](https://www.qmachine.org/), for example,
 uses Quanah extensively to implement a web service that acts as a supercomputer
@@ -20,3 +20,8 @@ There are several "mirrors" available on
 available on [GitHub](https://github.com/qmachine/quanah/graphs) and
 [Ohloh](https://www.ohloh.net/p/quanah), too.
 
+===
+
+[![Build Status](https://travis-ci.org/qmachine/quanah.png)](https://travis-ci.org/qmachine/quanah) [![Build Status](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![NPM version](https://badge.fury.io/js/quanah.png)](http://badge.fury.io/js/quanah)
+
+<!-- vim:set syntax=markdown: -->

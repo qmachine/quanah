@@ -22,6 +22,6 @@ available on [GitHub](https://github.com/qmachine/quanah/graphs) and
 
 ===
 
-[![Build Status](https://travis-ci.org/qmachine/quanah.png)](https://travis-ci.org/qmachine/quanah) [![Build Status](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![NPM version](https://badge.fury.io/js/quanah.png)](http://badge.fury.io/js/quanah)
+[![Build Status](https://travis-ci.org/qmachine/quanah.svg?branch=master)](https://travis-ci.org/qmachine/quanah) [![Build Status](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![NPM version](https://badge.fury.io/js/quanah.png)](http://badge.fury.io/js/quanah)
 
 <!-- vim:set syntax=markdown: -->

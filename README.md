@@ -6,11 +6,16 @@ execution environments. [QMachine](https://www.qmachine.org/), for example,
 uses Quanah extensively to implement a web service that acts as a supercomputer
 that uses web browsers as computational nodes. I am currently writing several
 papers about Quanah and applications that use it, but I promise I will write
-more documentation soon!
+more documentation soon -- see https://quanah.readthedocs.org :-)
 
-A [Node.js](http://nodejs.org/) module can be installed via
-[NPM](https://www.npmjs.org/package/quanah). Quanah is also available in
-[Bower](http://bower.io/) and
+Because Quanah is written in pure JS, it can be used in both client- and
+server-side applications. Thus, this repository integrates with both
+[Bower](http://bower.io) and [NPM](https://www.npmjs.org):
+
+    $ bower install quanah
+    $ npm install quanah
+
+Quanah is also available through
 [MinervaJS](http://minervajs.org/site/index.html#!/view/quanah).
 
 There are several "mirrors" available on

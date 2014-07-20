@@ -14,6 +14,7 @@
 
 import sys
 import os
+import urllib
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -122,7 +123,22 @@ html_theme = 'default'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+
+srwdir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '_static')
+
+try:
+    os.stat(srwdir)
+except:
+    os.mkdir(srwdir)
+
+try:
+    urllib.urlretrieve('https://qmachine.github.io/quanah/favicon.ico', \
+        os.path.join(srwdir, 'favicon.ico'))
+    html_favicon = 'favicon.ico'
+except:
+    pass
+
+del srwdir
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

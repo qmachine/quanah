@@ -1,5 +1,6 @@
 {
     "dependencies": {},
+    "ignore": [],
     "main": [
         "./src/quanah.js"
     ],

@@ -6,7 +6,7 @@ execution environments. [QMachine](https://www.qmachine.org/), for example,
 uses Quanah extensively to implement a web service that acts as a supercomputer
 that uses web browsers as computational nodes. I am currently writing several
 papers about Quanah and applications that use it, but I promise I will write
-more documentation soon -- see https://quanah.readthedocs.org :-)
+more [documentation](https://quanah.readthedocs.org) soon!
 
 Because Quanah is written in pure JS, it can be used in both client- and
 server-side applications. Thus, this repository integrates with both

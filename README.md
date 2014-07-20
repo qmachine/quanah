@@ -9,8 +9,8 @@ papers about Quanah and applications that use it, but I promise I will write
 more documentation soon!
 
 A [Node.js](http://nodejs.org/) module can be installed via
-[NPM](https://npmjs.org/package/quanah). Quanah is also available in
-[Bower](http://twitter.github.io/bower/) and
+[NPM](https://www.npmjs.org/package/quanah). Quanah is also available in
+[Bower](http://bower.io/) and
 [MinervaJS](http://minervajs.org/site/index.html#!/view/quanah).
 
 There are several "mirrors" available on

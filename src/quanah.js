@@ -2,7 +2,7 @@
 
 //- quanah.js ~~
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 17 Dec 2013
+//                                                  ~~ last updated 26 Jul 2014
 
 (function (global) {
     'use strict';
@@ -20,15 +20,6 @@
         run_remotely, shift, slice, stay, sync, toString, unshift, val,
         valueOf, x
     */
-
- // Prerequisites
-
-    if (global.hasOwnProperty('QUANAH')) {
-     // Exit early if Quanah's "namespace" is already present. Unfortunately,
-     // it may not always exist as a global variable, so we'll probably need to
-     // search through `module.exports` in the future ...
-        return;
-    }
 
  // Declarations
 
@@ -529,14 +520,20 @@
  // Out-of-scope definitions
 
     (function (obj) {
-     // This function runs in Node.js, PhantomJS, and RingoJS, which means it
-     // may work with other CommonJS-ish package loaders, too. I am not certain
-     // whether this function adds much value, however, because the mere act of
-     // loading Quanah loads "Method Q" anyway ...
+     // Quanah attempts to be a good citizen even though the JavaScript
+     // community has never fully agreed on a module specification. Thus, this
+     // function attempts to "export" Quanah in the most idiomatic way possible
+     // for a given platform.
         /*jslint node: true */
         if (typeof module === 'object') {
+         // Assume CommonJS-ish conventions are being used. In Node.js, modules
+         // are cached when loaded, so we can safely assume that this code will
+         // only execute once and therefore will never overwrite "itself".
             module.exports = obj;
-        } else {
+        } else if (global.hasOwnProperty('QUANAH') === false) {
+         // Assume browser-inspired "namespace" convention by assigning a
+         // single object to a new all-caps global property. If the target name
+         // is already present, assume that Quanah has already been loaded.
             global.QUANAH = obj;
         }
         return;

@@ -1,6 +1,9 @@
 //- JavaScript source code
 
 //- quanah.js ~~
+//
+//  See https://quanah.readthedocs.org/en/latest/ for more information.
+//
 //                                                      ~~ (c) SRW, 14 Nov 2012
 //                                                  ~~ last updated 26 Jul 2014
 
@@ -8,6 +11,8 @@
     'use strict';
 
  // Pragmas
+
+    /*global */
 
     /*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
 
@@ -466,12 +471,11 @@
     };
 
     AVar.prototype.Q = function method_Q(f) {
-     // This function is the infamous "Method Q" that acted as a "namespace"
-     // for previous versions of Quanah. Here, it is defined as a prototype
-     // method for avars, but if you assign it to `Object.prototype.Q`, it will
-     // work for any native value except `null` or `undefined`. It expects its
-     // argument to be a function of a single variable or else an avar with
-     // such a function as its `val`.
+     // This function is the infamous "Method Q" that once doubled as the
+     // "namespace" for Quanah. Here, it is defined as a chainable prototype
+     // method for avars that takes a single input argument. The input argument
+     // is expected to be either a monadic (single variable) function or else
+     // an avar a monadic function as its `val`.
         if (AVar.prototype.Q !== method_Q) {
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }

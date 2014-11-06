@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 26 Jul 2014
+//                                                  ~~ last updated 06 Nov 2014
 
 (function (global) {
     'use strict';
@@ -156,7 +156,8 @@
 
     avar = function (obj) {
      // This function enables the user to avoid the `new` keyword, which is
-     // useful because OOP in JS is not typically well-understood by users.
+     // useful because object-oriented programming in JS is not typically
+     // well-understood by users.
         return new AVar(obj);
     };
 

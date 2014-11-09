@@ -5,10 +5,73 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 06 Nov 2014
+//                                                  ~~ last updated 09 Nov 2014
 
-(function (global) {
+(Function.prototype.call.call(function (that, lib) {
     'use strict';
+
+ // This strict anonymous closure is the first of two; this one focuses on
+ // exporting the library for use by other programs, while the second one
+ // contains the code for the library itself. The primary reason to decompose a
+ // single closure into two is to "quarantine" all references to the global
+ // object into one closure (this one) so that the library code can be written
+ // as portably as possible. Unfortunately, detecting which object in the
+ // environment should be treated as _the_ global object is much more difficult
+ // than it should be -- strict mode disables the `call` method's default
+ // behavior of replacing `null` with the global object. Luckily, we can work
+ // around that by passing a reference to the enclosing scope as an argument at
+ // the same time and testing to see if strict mode has done its deed. This
+ // task is not hard in the usual browser context because we know that the
+ // global object is `window`, but CommonJS implementations such as RingoJS
+ // confound the issue by modifying the scope chain, running scripts in
+ // sandboxed contexts, and using identifiers like `global` carelessly ...
+
+    /*global global: false, module: false */
+    /*jshint quotmark: single, strict: true */
+    /*jslint indent: 4, maxlen: 80 */
+    /*properties exports, global, hasOwnProperty, QUANAH */
+
+ // Declare a variable to hold a reference to the global object.
+
+    var g;
+
+ // Store a reference to the global object.
+
+    if (this === null) {
+     // Strict mode has captured us, but we already passed a reference :-)
+        g = (typeof global === 'object') ? global : that;
+    } else {
+     // Strict mode isn't supported in this environment, and we need to make
+     // sure we don't get fooled by Rhino's `global` function.
+        g = (typeof this.global === 'object') ? this.global : this;
+    }
+
+ // Export Quanah as a CommonJS module or as a property of the global object.
+
+    if (typeof module === 'object') {
+     // Assume CommonJS-ish conventions are being used. In Node.js, modules are
+     // cached when loaded, so we can safely assume that this code will only
+     // execute once and therefore will never overwrite "itself".
+        module.exports = lib;
+    } else if (g.hasOwnProperty('QUANAH') === false) {
+     // Assume browser-inspired "namespace" convention by assigning single
+     // object to a new all-caps global property. If the target name is already
+     // present, assume that Quanah has already been loaded.
+        g.QUANAH = lib;
+    }
+
+ // That's all, folks!
+
+    return;
+
+}, null, this, (function () {
+    'use strict';
+
+ // This second strict anonymous closure defines Quanah in a way that is
+ // completely sandboxed from the global object. The entire library is written
+ // in a subset of ECMAScript that is so old and well-supported that Quanah
+ // actually runs correctly as ActionScript 2.0. Currently, the only "problems"
+ // that JSLint finds are a few shadowed variables :-)
 
  // Pragmas
 
@@ -20,10 +83,9 @@
 
     /*properties
         add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
-        done, epitaph, exit, exports, f, fail, hasOwnProperty, key, length, on,
-        onerror, prototype, push, Q, QUANAH, queue, random, ready, revive,
-        run_remotely, shift, slice, stay, sync, toString, unshift, val,
-        valueOf, x
+        done, epitaph, exit, f, fail, hasOwnProperty, key, length, on, onerror,
+        prototype, push, Q, queue, random, ready, revive, run_remotely, shift,
+        slice, stay, sync, toString, unshift, val, valueOf, x
     */
 
  // Declarations
@@ -264,13 +326,13 @@
                  // ECMAScript standard lacks anything resembling a package
                  // manager, the `stay` method also comes in handy for delaying
                  // execution until an external library has loaded. Of course,
-                 // if you delay the execution, when will it run again? The
-                 // short answer is unsatisfying: you can never _know_. For a
-                 // longer answer, you'll have to wait for my upcoming papers
-                 // that explain why leaving execution guarantees to chance is
-                 // perfectly acceptable when the probability approachs 1 :-)
+                 // if execution has been delayed, when will it run again? The
+                 // short answer is unsatisfying: it cannot never be _known_.
+                 // Future publications will detail this idea by explaining why
+                 // leaving execution guarantees to chance is acceptable when
+                 // the probability approaches 1 :-)
                  //
-                 // NOTE: Don't push back onto the queue until _after_ you send
+                 // NOTE: Don't push back onto the queue until _after_ sending
                  // the `stay` message. Invoking `comm` also invokes `revive`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
@@ -522,63 +584,10 @@
         return this.val.valueOf.apply(this.val, arguments);
     };
 
- // Out-of-scope definitions
-
-    (function (obj) {
-     // Quanah attempts to be a good citizen even though the JavaScript
-     // community has never fully agreed on a module specification. Thus, this
-     // function attempts to "export" Quanah in the most idiomatic way possible
-     // for a given platform.
-        /*jslint node: true */
-        if (typeof module === 'object') {
-         // Assume CommonJS-ish conventions are being used. In Node.js, modules
-         // are cached when loaded, so we can safely assume that this code will
-         // only execute once and therefore will never overwrite "itself".
-            module.exports = obj;
-        } else if (global.hasOwnProperty('QUANAH') === false) {
-         // Assume browser-inspired "namespace" convention by assigning a
-         // single object to a new all-caps global property. If the target name
-         // is already present, assume that Quanah has already been loaded.
-            global.QUANAH = obj;
-        }
-        return;
-    }({'avar': avar, 'def': def, 'sync': sync}));
-
  // That's all, folks!
 
-    return;
+    return {'avar': avar, 'def': def, 'sync': sync};
 
-}(Function.prototype.call.call(function (that) {
-    'use strict';
-
- // This strict anonymous closure encapsulates the logic for detecting which
- // object in the environment should be treated as _the_ global object. It's
- // not as easy as you may think -- strict mode disables the `call` method's
- // default behavior of replacing `null` with the global object. Luckily, we
- // can work around that by passing a reference to the enclosing scope as an
- // argument at the same time and testing to see if strict mode has done its
- // deed. This task is not hard in the usual browser context because we know
- // that the global object is `window`, but CommonJS implementations such as
- // RingoJS confound the issue by modifying the scope chain, running scripts
- // in sandboxed contexts, and using identifiers like `global` carelessly ...
-
-    /*jslint indent: 4, maxlen: 80 */
-    /*global global: false */
-    /*properties global */
-
-    if (this === null) {
-
-     // Strict mode has captured us, but we already passed a reference :-)
-
-        return (typeof global === 'object') ? global : that;
-
-    }
-
- // Strict mode isn't supported in this environment, but we need to make sure
- // we don't get fooled by Rhino's `global` function.
-
-    return (typeof this.global === 'object') ? this.global : this;
-
-}, null, this)));
+}())));
 
 //- vim:set syntax=javascript:

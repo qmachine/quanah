@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 21 Oct 2013
+//                                                  ~~ last updated 08 Nov 2014
 
 (function () {
     'use strict';
@@ -17,7 +17,15 @@
 
     /*global beforeEach: false, describe: false, it: false */
 
+    /*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
+
     /*jslint indent: 4, maxlen: 80, node: true */
+
+    /*properties
+        a, an, avar, be, comm, constructor, def, error, equal, exit, fail,
+        have, key, length, log, name, nextTick, on, Q, PI, property, prototype,
+        push, random, revive, sync, to, toString, val, valueOf
+    */
 
  // Declarations
 
@@ -33,7 +41,6 @@
      // This is the actual specification :-)
 
         var avar, quanah;
-
         beforeEach(function () {
          // This function needs documentation.
             avar = require('../src/quanah').avar;

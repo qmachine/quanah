@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 09 Nov 2014
+//                                                  ~~ last updated 10 Nov 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -68,10 +68,12 @@
     'use strict';
 
  // This second strict anonymous closure defines Quanah in a way that is
- // completely sandboxed from the global object. The entire library is written
- // in a subset of ECMAScript that is so old and well-supported that Quanah
- // actually runs correctly as ActionScript 2.0. Currently, the only "problems"
- // that JSLint finds are a few shadowed variables :-)
+ // completely sandboxed from the global object. Unfortunately, a disadvantage
+ // of this approach is that it may eliminate the use of opt-in asm.js, but no
+ // functions are strong candidates for that anyway. The entire library is
+ // written in a subset of ECMAScript that is so old and well-supported that
+ // Quanah actually runs correctly as ActionScript 2.0. Currently, the only
+ // "problems" that JSLint finds are a few shadowed variables :-)
 
  // Pragmas
 

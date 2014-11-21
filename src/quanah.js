@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 10 Nov 2014
+//                                                  ~~ last updated 21 Nov 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -76,8 +76,6 @@
  // "problems" that JSLint finds are a few shadowed variables :-)
 
  // Pragmas
-
-    /*global */
 
     /*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
 

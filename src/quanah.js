@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 21 Nov 2014
+//                                                  ~~ last updated 22 Nov 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -91,7 +91,7 @@
  // Declarations
 
     var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
-        run_locally, run_remotely, sync, user_defs, uuid;
+        run_locally, run_remotely, sync, user_defs; //, uuid;
 
  // Definitions
 
@@ -204,9 +204,11 @@
             }
             return revive();
         };
+     /*
         if (that.hasOwnProperty('key') === false) {
             that.key = uuid();
         }
+     */
         if (that.hasOwnProperty('val') === false) {
             that.val = null;
         }
@@ -502,6 +504,7 @@
 
     user_defs = {'can_run_remotely': null, 'run_remotely': null};
 
+ /*
     uuid = function () {
      // This function generates random hexadecimal strings of length 32. These
      // strings don't satisfy RFC 4122 or anything, but they're conceptually
@@ -522,6 +525,7 @@
         }
         return y;
     };
+ */
 
  // Prototype definitions
 

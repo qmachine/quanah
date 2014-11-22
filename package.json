@@ -31,5 +31,5 @@
     "scripts": {
         "test": "./node_modules/mocha/bin/mocha"
     },
-    "version": "0.2.2"
+    "version": "0.3.0-pre"
 }

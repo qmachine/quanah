@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 08 Nov 2014
+//                                                  ~~ last updated 22 Nov 2014
 
 (function () {
     'use strict';
@@ -295,10 +295,12 @@
                 expect(x).to.have.property('comm');
                 expect(x.comm).to.be.a('function');
             });
+         /*
             it('should have a `key` instance property', function () {
                 expect(x).to.have.property('key');
                 expect(x.key).to.be.a('string');
             });
+         */
             it('should have a `val` instance property', function () {
                 expect(x).to.have.property('val');
                 expect(x.val).to.equal(null);

@@ -82,16 +82,16 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
-        done, epitaph, exit, f, fail, hasOwnProperty, key, length, on, onerror,
-        prototype, push, Q, queue, random, ready, revive, run_remotely, shift,
-        slice, stay, sync, toString, unshift, val, valueOf, x
+        add_to_queue, apply, avar, can_run_remotely, comm, concat, def, done,
+        epitaph, exit, f, fail, length, on, onerror, push, Q, queue, ready,
+        revive, run_remotely, shift, slice, stay, sync, toString, unshift, val,
+        valueOf, x
     */
 
  // Declarations
 
     var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
-        run_locally, run_remotely, sync, user_defs; //, uuid;
+        run_locally, run_remotely, sync, user_defs;
 
  // Definitions
 
@@ -204,11 +204,6 @@
             }
             return revive();
         };
-     /*
-        if (that.hasOwnProperty('key') === false) {
-            that.key = uuid();
-        }
-     */
         if (that.hasOwnProperty('val') === false) {
             that.val = null;
         }
@@ -503,29 +498,6 @@
     };
 
     user_defs = {'can_run_remotely': null, 'run_remotely': null};
-
- /*
-    uuid = function () {
-     // This function generates random hexadecimal strings of length 32. These
-     // strings don't satisfy RFC 4122 or anything, but they're conceptually
-     // the same as UUIDs.
-        var y = Math.random().toString(16).slice(2, 32);
-        if (y === '') {
-         // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
-         // has some weird quirks due to its ActionScript roots.
-            while (y.length < 32) {
-                y += (Math.random() * 1e16).toString(16);
-            }
-            y = y.slice(0, 32);
-        } else {
-         // Every other JS implementation I have tried will use this instead.
-            while (y.length < 32) {
-                y += Math.random().toString(16).slice(2, 34 - y.length);
-            }
-        }
-        return y;
-    };
- */
 
  // Prototype definitions
 

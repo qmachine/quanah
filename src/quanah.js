@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 21 Nov 2014
+//                                                  ~~ last updated 22 Nov 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -85,7 +85,7 @@
         add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
         done, epitaph, exit, f, fail, hasOwnProperty, key, length, on, onerror,
         prototype, push, Q, queue, random, ready, revive, run_remotely, shift,
-        slice, stay, sync, toString, unshift, val, valueOf, x
+        slice, stay, sync, test, toString, unshift, val, valueOf, x
     */
 
  // Declarations
@@ -505,7 +505,12 @@
     uuid = function () {
      // This function generates random hexadecimal strings of length 32. These
      // strings don't satisfy RFC 4122 or anything, but they're conceptually
-     // the same as UUIDs.
+     // the same as UUIDs. An open issue in PhantomJS (http://goo.gl/8r4C40)
+     // regarding incorrect conversion of numbers to strings motivated the
+     // addition of output validation to this function. Although it appears
+     // that sampling uniform random numbers from [0.001, 1] rather than [0, 1]
+     // will avoid the bug, such a strategy will only be adopted after thorough
+     // investigation and benchmarking.
         var y = Math.random().toString(16).slice(2, 32);
         if (y === '') {
          // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
@@ -520,7 +525,7 @@
                 y += Math.random().toString(16).slice(2, 34 - y.length);
             }
         }
-        return y;
+        return ((/^[0-9a-f]{32}$/).test(y)) ? y : uuid();
     };
 
  // Prototype definitions

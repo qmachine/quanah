@@ -95,17 +95,12 @@
 
  // Definitions
 
-    AVar = function AVar(obj) {
+    AVar = function AVar(val) {
      // This function constructs "avars", which are generic containers for
      // "asynchronous variables".
-        var key, state, that;
+        var state, that;
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
-        for (key in obj) {
-            if ((obj.hasOwnProperty(key)) && (key !== 'comm')) {
-                that[key] = obj[key];
-            }
-        }
         that.comm = function comm(obj) {
          // This function provides a mechanism for manipulating the internal
          // state of an avar without providing direct access to that state. It
@@ -203,20 +198,15 @@
             }
             return revive();
         };
-        if (that.hasOwnProperty('val') === false) {
-            that.val = null;
-        }
-     // At this point, we will never use `key` or `obj` again, and the `comm`
-     // instance method shadows those names, but I'm not sure if we need to
-     // destroy the references ourselves explicitly for garbage collection ...
+        that.val = val;
         return that;
     };
 
-    avar = function (obj) {
+    avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
      // useful because object-oriented programming in JS is not typically
      // well-understood by users.
-        return new AVar(obj);
+        return new AVar(val);
     };
 
     can_run_remotely = function (task) {
@@ -517,7 +507,7 @@
         if (AVar.prototype.Q !== method_Q) {
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
-        var x = (this instanceof AVar) ? this : avar({'val': this});
+        var x = (this instanceof AVar) ? this : avar(this);
         x.comm({'add_to_queue': f});
         return x;
     };

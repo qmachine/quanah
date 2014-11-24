@@ -110,11 +110,10 @@
          // This function provides a mechanism for manipulating the internal
          // state of an avar without providing direct access to that state. It
          // was inspired by the message-passing style used in Objective-C.
-            var args, key, message;
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    args = [].concat(obj[key]);
-                    message = key;
+            var args, message;
+            for (message in obj) {
+                if (obj.hasOwnProperty(message)) {
+                    args = [].concat(obj[message]);
                 }
             }
             switch (message) {

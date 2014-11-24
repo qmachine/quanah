@@ -8,7 +8,7 @@
 //  for those who are or aspire to become expert-level JavaScript programmers.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 05 Oct 2013
+//                                                  ~~ last updated 24 Nov 2014
 
 (function () {
     'use strict';
@@ -27,7 +27,7 @@
 
     avar = QUANAH.avar;
 
-    x = avar({val: 'Hello world!'});
+    x = avar('Hello world!');
 
  // Demonstration
 

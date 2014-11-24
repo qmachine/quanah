@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 22 Nov 2014
+//                                                  ~~ last updated 24 Nov 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';

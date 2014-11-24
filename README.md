@@ -22,7 +22,8 @@ There are several "mirrors" available on
 [Bitbucket](https://bitbucket.org/wilkinson/quanah),
 [GitHub](https://github.com/qmachine/quanah), and
 [Google Code](https://quanah.googlecode.com). Various project statistics are
-available on [GitHub](https://github.com/qmachine/quanah/graphs) and
+available on [Codacy](https://www.codacy.com/public/qmachine/quanah/dashboard),
+[GitHub](https://github.com/qmachine/quanah/graphs) and
 [Open Hub](https://www.openhub.net/p/quanah), too.
 
 ===

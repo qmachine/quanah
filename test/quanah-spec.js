@@ -8,7 +8,7 @@
 //  part of an NPM-based workflow.
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 08 Nov 2014
+//                                                  ~~ last updated 22 Nov 2014
 
 (function () {
     'use strict';
@@ -103,7 +103,7 @@
         });
 
         it('should survive deliberate failures', function (done) {
-            var x = avar({val: 'This test fails deliberately :-)'});
+            var x = avar('This test fails deliberately :-)');
             x.Q(function (evt) {
              // This function needs documentation.
                 return evt.fail(x.val);
@@ -119,7 +119,7 @@
         });
 
         it('should allow `.on` and `.Q` commutatively', function (done) {
-            var x = avar({val: 'This test fails deliberately :-)'});
+            var x = avar('This test fails deliberately :-)');
             x.Q(function (evt) {
              // This function needs documentation.
                 return evt.fail(x.val);
@@ -203,7 +203,7 @@
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
-                var temp = avar({val: 'This fails deliberately.'});
+                var temp = avar('This fails deliberately.');
                 temp.Q(function (temp_evt) {
                  // This function needs documentation.
                     return temp_evt.fail(temp.val);
@@ -228,6 +228,7 @@
             });
         });
 
+     /*
         it('should always present the same `key`', function (done) {
             var f, results;
             f = function (evt) {
@@ -253,17 +254,16 @@
                 return;
             });
         });
+     */
 
         it('should support avar functions', function (done) {
             var f, x;
-            f = avar({
-                val: function (evt) {
-                 // This function also happens to be "distributable".
-                    this.val += 2;
-                    return evt.exit();
-                }
+            f = avar(function (evt) {
+             // This function also happens to be "distributable".
+                this.val += 2;
+                return evt.exit();
             });
-            x = avar({val: 2});
+            x = avar(2);
             x.Q(f).Q(function (evt) {
              // This function needs documentation.
                 if (this.val !== 4) {
@@ -295,13 +295,15 @@
                 expect(x).to.have.property('comm');
                 expect(x.comm).to.be.a('function');
             });
+         /*
             it('should have a `key` instance property', function () {
                 expect(x).to.have.property('key');
                 expect(x.key).to.be.a('string');
             });
+         */
             it('should have a `val` instance property', function () {
                 expect(x).to.have.property('val');
-                expect(x.val).to.equal(null);
+                expect(x.val).to.equal(undefined);
             });
             it('should have an `on` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('on');
@@ -366,14 +368,14 @@
                     this.val = y;
                     return evt.exit();
                 };
-                fa = avar({val: f});
+                fa = avar(f);
                 sync = quanah.sync;
                 x = 2;
-                xa = avar({val: x});
+                xa = avar(x);
                 y = 3;
-                ya = avar({val: y});
+                ya = avar(y);
                 z = 4;
-                za = avar({val: z});
+                za = avar(z);
                 return;
             });
 

@@ -82,31 +82,25 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        add_to_queue, apply, avar, call, can_run_remotely, comm, concat, def,
-        done, epitaph, exit, f, fail, floor, hasOwnProperty, key, length, on,
-        onerror, prototype, push, Q, queue, random, ready, revive,
-        run_remotely, shift, slice, stay, sync, test, toString, unshift, val,
+        add_to_queue, apply, avar, can_run_remotely, comm, concat, def, done,
+        epitaph, exit, f, fail, length, on, onerror, push, Q, queue, ready,
+        revive, run_remotely, shift, slice, stay, sync, toString, unshift, val,
         valueOf, x
     */
 
  // Declarations
 
     var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
-        run_locally, run_remotely, sync, user_defs, uuid;
+        run_locally, run_remotely, sync, user_defs;
 
  // Definitions
 
-    AVar = function AVar(obj) {
+    AVar = function AVar(val) {
      // This function constructs "avars", which are generic containers for
      // "asynchronous variables".
-        var key, state, that;
+        var state, that;
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
-        for (key in obj) {
-            if ((obj.hasOwnProperty(key)) && (key !== 'comm')) {
-                that[key] = obj[key];
-            }
-        }
         that.comm = function comm(obj) {
          // This function provides a mechanism for manipulating the internal
          // state of an avar without providing direct access to that state. It
@@ -204,23 +198,15 @@
             }
             return revive();
         };
-        if (that.hasOwnProperty('key') === false) {
-            that.key = uuid();
-        }
-        if (that.hasOwnProperty('val') === false) {
-            that.val = null;
-        }
-     // At this point, we will never use `key` or `obj` again, and the `comm`
-     // instance method shadows those names, but I'm not sure if we need to
-     // destroy the references ourselves explicitly for garbage collection ...
+        that.val = val;
         return that;
     };
 
-    avar = function (obj) {
+    avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
      // useful because object-oriented programming in JS is not typically
      // well-understood by users.
-        return new AVar(obj);
+        return new AVar(val);
     };
 
     can_run_remotely = function (task) {
@@ -502,33 +488,6 @@
 
     user_defs = {'can_run_remotely': null, 'run_remotely': null};
 
-    uuid = function () {
-     // This function generates random hexadecimal strings of length 32. These
-     // strings don't satisfy RFC 4122 or anything, but they're conceptually
-     // the same as UUIDs. This version of the function generates characters by
-     // sampling uniformly from [0, 16] and flooring, which generates an index
-     // that maps to a character. This definition works in old browsers as well
-     // as Adobe/Mozilla Tamarin and PhantomJS, the last of which has an open
-     // issue regarding number-to-string conversion (http://goo.gl/8r4C40) that
-     // caused the previous definition to generate invalid characters. As a
-     // bonus, this version also generates a more uniform range of hexadecimal
-     // strings than the previous one, in which zeroes were underrepresented.
-     // An even faster version is shown in the comments, but it infuriates
-     // JSLint because it uses the `|` operator instead of `Math.floor` :-P
-        var c, i, y;
-        c = [
-            '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-        ];
-        //y = c[(Math.random() * 16) | 0];
-        y = c[Math.floor(Math.random() * 16)];
-        for (i = 0; i < 31; i += 1) {
-            //y += c[(Math.random() * 16) | 0];
-            y += c[Math.floor(Math.random() * 16)];
-        }
-        return y;
-    };
-
  // Prototype definitions
 
     AVar.prototype.on = function () {
@@ -548,7 +507,7 @@
         if (AVar.prototype.Q !== method_Q) {
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
-        var x = (this instanceof AVar) ? this : avar({'val': this});
+        var x = (this instanceof AVar) ? this : avar(this);
         x.comm({'add_to_queue': f});
         return x;
     };

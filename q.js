@@ -2,67 +2,113 @@
 
 //- quanah.js ~~
 //
-//  This file is also available from git.io/q.js and bit.ly/quanahjs :-P
+//  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 27 Mar 2013
+//                                                  ~~ last updated 24 Nov 2014
 
-(function () {
+(Function.prototype.call.call(function (that, lib) {
     'use strict';
+
+ // This strict anonymous closure is the first of two; this one focuses on
+ // exporting the library for use by other programs, while the second one
+ // contains the code for the library itself. The primary reason to decompose a
+ // single closure into two is to "quarantine" all references to the global
+ // object into one closure (this one) so that the library code can be written
+ // as portably as possible. Unfortunately, detecting which object in the
+ // environment should be treated as _the_ global object is much more difficult
+ // than it should be -- strict mode disables the `call` method's default
+ // behavior of replacing `null` with the global object. Luckily, we can work
+ // around that by passing a reference to the enclosing scope as an argument at
+ // the same time and testing to see if strict mode has done its deed. This
+ // task is not hard in the usual browser context because we know that the
+ // global object is `window`, but CommonJS implementations such as RingoJS
+ // confound the issue by modifying the scope chain, running scripts in
+ // sandboxed contexts, and using identifiers like `global` carelessly ...
+
+    /*global global: false, module: false */
+    /*jshint quotmark: single, strict: true */
+    /*jslint indent: 4, maxlen: 80 */
+    /*properties exports, global, hasOwnProperty, QUANAH */
+
+ // Declare a variable to hold a reference to the global object.
+
+    var g;
+
+ // Store a reference to the global object.
+
+    if (this === null) {
+     // Strict mode has captured us, but we already passed a reference :-)
+        g = (typeof global === 'object') ? global : that;
+    } else {
+     // Strict mode isn't supported in this environment, and we need to make
+     // sure we don't get fooled by Rhino's `global` function.
+        g = (typeof this.global === 'object') ? this.global : this;
+    }
+
+ // Export Quanah as a CommonJS module or as a property of the global object.
+
+    if (typeof module === 'object') {
+     // Assume CommonJS-ish conventions are being used. In Node.js, modules are
+     // cached when loaded, so we can safely assume that this code will only
+     // execute once and therefore will never overwrite "itself".
+        module.exports = lib;
+    } else if (g.hasOwnProperty('QUANAH') === false) {
+     // Assume browser-inspired "namespace" convention by assigning single
+     // object to a new all-caps global property. If the target name is already
+     // present, assume that Quanah has already been loaded.
+        g.QUANAH = lib;
+    }
+
+ // That's all, folks!
+
+    return;
+
+}, null, this, (function () {
+    'use strict';
+
+ // This second strict anonymous closure defines Quanah in a way that is
+ // completely sandboxed from the global object. Unfortunately, a disadvantage
+ // of this approach is that it may eliminate the use of opt-in asm.js, but no
+ // functions are strong candidates for that anyway. The entire library is
+ // written in a subset of ECMAScript that is so old and well-supported that
+ // Quanah actually runs correctly as ActionScript 2.0. Currently, the only
+ // "problems" that JSLint finds are a few shadowed variables :-)
 
  // Pragmas
 
-    /*jshint maxparams: 1, quotmark: single, strict: true */
+    /*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
 
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        Q, add_to_queue, apply, avar, call, can_run_remotely, comm, concat,
-        configurable, def, defineProperty, done, epitaph, exit, exports, f,
-        fail, hasOwnProperty, key, length, on, onerror, prototype, push, queue,
-        random, ready, revive, run_remotely, shift, slice, stay, toString,
-        unshift, val, value, valueOf, when, writable, x
+        add_to_queue, apply, avar, can_run_remotely, comm, concat, def, done,
+        epitaph, exit, f, fail, length, on, onerror, push, Q, queue, ready,
+        revive, run_remotely, shift, slice, stay, sync, toString, unshift, val,
+        valueOf, x
     */
-
- // Prerequisites
-
-    if (Object.prototype.hasOwnProperty('Q')) {
-     // Exit early if Quanah's "Method Q" is already present.
-        return;
-    }
 
  // Declarations
 
     var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
-        run_locally, run_remotely, user_defs, uuid, when;
+        run_locally, run_remotely, sync, user_defs;
 
  // Definitions
 
-    AVar = function AVar(obj) {
+    AVar = function AVar(val) {
      // This function constructs "avars", which are generic containers for
      // "asynchronous variables".
-        var key, state, that;
-        state = {
-            epitaph:    null,
-            onerror:    null,
-            queue:      [],
-            ready:      true
-        };
+        var state, that;
+        state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
-        for (key in obj) {
-            if ((obj.hasOwnProperty(key)) && (key !== 'comm')) {
-                that[key] = obj[key];
-            }
-        }
-        that.comm = function (obj) {
+        that.comm = function comm(obj) {
          // This function provides a mechanism for manipulating the internal
          // state of an avar without providing direct access to that state. It
          // was inspired by the message-passing style used in Objective-C.
-            var args, key, message;
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    args = [].concat(obj[key]);
-                    message = key;
+            var args, message;
+            for (message in obj) {
+                if (obj.hasOwnProperty(message)) {
+                    args = [].concat(obj[message]);
                 }
             }
             switch (message) {
@@ -76,30 +122,29 @@
                     state.queue.push(args[0]);
                     if (state.ready === true) {
                         state.ready = false;
-                        queue.unshift({f: state.queue.shift(), x: that});
+                        queue.unshift({'f': state.queue.shift(), 'x': that});
                     }
                 } else if (args[0] instanceof AVar) {
-                    when(args[0], that).Q(function (evt) {
+                    sync(args[0], that).Q(function (evt) {
                      // This function allows Quanah to postpone execution of
-                     // the given task until both `f` and `x` are ready.
-                        var f, x;
-                        f = this.val[0].val;
-                        x = this.val[1];
-                        f.call(x, evt);
+                     // the given task until both `f` and `x` are ready. The
+                     // following line is given in the form `f.call(x, evt)`.
+                        (args[0].val).call(that, evt);
                         return;
                     });
                 } else {
-                    that.comm({'fail': 'Transformation must be a function.'});
+                    comm({'fail': 'Transformation must be a function.'});
                 }
                 break;
             case 'done':
              // A computation involving this avar has succeeded, and we will
              // now prepare to run the next computation that depends on it by
-             // transferring it into the `revive` queue.
+             // transferring it from the avar's individual queue into the
+             // global `queue` used by the `revive` function.
                 state.ready = true;
                 if (state.queue.length > 0) {
                     state.ready = false;
-                    queue.unshift({f: state.queue.shift(), x: that});
+                    queue.unshift({'f': state.queue.shift(), 'x': that});
                 }
                 break;
             case 'fail':
@@ -130,7 +175,7 @@
                  // immediately.
                     state.onerror = args[1];
                     if (state.epitaph !== null) {
-                        that.comm({'fail': state.epitaph});
+                        comm({'fail': state.epitaph});
                     }
                 }
                 break;
@@ -148,24 +193,20 @@
              // else a user is re-programming Quanah's guts; in either case, it
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `revive` using an obsolete idiom
-             // that involved calling `that.comm` without any arguments.
-                that.comm({'fail': 'Invalid `comm` message "' + message + '"'});
+             // that involved calling `comm` without any arguments.
+                comm({'fail': 'Invalid `comm` message "' + message + '"'});
             }
             return revive();
         };
-        if (that.hasOwnProperty('key') === false) {
-            that.key = uuid();
-        }
-        if (that.hasOwnProperty('val') === false) {
-            that.val = null;
-        }
+        that.val = val;
         return that;
     };
 
-    avar = function (obj) {
+    avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
-     // useful because OOP in JS is not typically well-understood by users.
-        return new AVar(obj);
+     // useful because object-oriented programming in JS is not typically
+     // well-understood by users.
+        return new AVar(val);
     };
 
     can_run_remotely = function (task) {
@@ -205,19 +246,19 @@
     revive = function () {
      // This function contains the execution center for Quanah. It's pretty
      // simple, really -- it just runs the first available task in its queue
-     // (`queue`), and it selects an execution context conditionally. That's
-     // all it does. It makes no attempt to run every task in the queue every
-     // time it is called, because instead Quanah uses a strategy in which it
-     // tries to call `revive` as many times as necessary to process an entire
-     // program correctly. For example, every time an avar receives a `comm`
-     // message, `revive` will run. Because `revive` only runs a single task
-     // from the queue for each invocation, its queue can be shared safely
-     // across multiple execution "contexts" simultaneously, and it makes no
-     // difference if the separate contexts are due to recursion or to special
-     // objects such as Web Workers. The `revive` function selects a context
-     // for execution using conditional tests that determine whether a given
-     // computation can be distributed to external resources for execution, and
-     // if they cannot be distributed, execution occurs on the local machine.
+     // (`queue`) in an execution context appropriate for that particular task.
+     // That's all it does. It makes no attempt to run every task in the queue
+     // every time it is called, because instead it assumes it will be called
+     // repeatedly until the entire program has executed. For example, every
+     // time an avar receives a `comm` message, `revive` will run. Because
+     // `revive` only runs a single task from its queue for each invocation,
+     // that queue can be shared safely across multiple execution contexts
+     // simultaneously, and it makes no difference if the separate contexts are
+     // due to recursion or to special objects such as Web Workers. The
+     // `revive` function selects an execution context using conditional tests
+     // that determine whether a given task can be distributed faithfully to
+     // external resources for execution or not; if a task cannot be
+     // distributed faithfully, then it will be executed by the local machine.
         var task = queue.shift();
         if (task !== undefined) {
             if (can_run_remotely(task)) {
@@ -271,13 +312,13 @@
                  // ECMAScript standard lacks anything resembling a package
                  // manager, the `stay` method also comes in handy for delaying
                  // execution until an external library has loaded. Of course,
-                 // if you delay the execution, when will it run again? The
-                 // short answer is unsatisfying: you can never _know_. For a
-                 // longer answer, you'll have to wait for my upcoming papers
-                 // that explain why leaving execution guarantees to chance is
-                 // perfectly acceptable when the probability approachs 1 :-)
+                 // if execution has been delayed, when will it run again? The
+                 // short answer is unsatisfying: it cannot never be _known_.
+                 // Future publications will detail this idea by explaining why
+                 // leaving execution guarantees to chance is acceptable when
+                 // the probability approaches 1 :-)
                  //
-                 // NOTE: Don't push back onto the queue until _after_ you send
+                 // NOTE: Don't push back onto the queue until _after_ sending
                  // the `stay` message. Invoking `comm` also invokes `revive`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
@@ -309,60 +350,33 @@
         return;
     };
 
-    user_defs = {
-        can_run_remotely:   null,
-        run_remotely:       null
-    };
-
-    uuid = function () {
-     // This function generates random hexadecimal UUIDs of length 32.
-        var y = Math.random().toString(16).slice(2, 32);
-        if (y === '') {
-         // This shouldn't ever happen in JavaScript, but Adobe/Mozilla Tamarin
-         // has some weird quirks due to its ActionScript roots.
-            while (y.length < 32) {
-                y += (Math.random() * 1e16).toString(16);
-            }
-            y = y.slice(0, 32);
-        } else {
-         // Every other JS implementation I have tried will use this instead.
-            while (y.length < 32) {
-                y += Math.random().toString(16).slice(2, 34 - y.length);
-            }
-        }
-        return y;
-    };
-
-    when = function () {
+    sync = function () {
      // This function takes any number of arguments, any number of which may
-     // be avars, and outputs a special "compound" avar whose `val` property is
-     // an array of the original input arguments. The compound avar also has a
-     // slightly modified form of `Object.prototype.Q` placed directly onto it
-     // as an instance method; this provides a nice way of distinguishing a
-     // "normal" avar from a compound one. It no longer creates the instance
-     // methods `isready`/`areready` because, even though those were really
-     // pretty and had a nice interpretation in English, the use of setters was
-     // confusing to many of my peers. Any functions that are fed into the `Q`
-     // method will wait for all input arguments' outstanding queues to empty
-     // before executing, and exiting will allow each of the inputs to begin
-     // working through its individual queue again. Also, a compound avar can
-     // still be used as a prerequisite to execution even when the compound
-     // avar depends on one of the other prerequisites, and although the
-     // immediate usefulness of this ability may not be obvious, it will turn
-     // out to be crucially important for expressing certain concurrency
-     // patterns idiomatically :-)
+     // be avars, and it outputs a new avar which acts as a "sync point". The
+     // syntax here is designed to mimic `Array.concat`. The avar returned by
+     // this function will have a slightly modified form of `AVar.prototype.Q`
+     // placed directly onto it as an instance method as means to provide a
+     // nice way of distinguishing a "normal" avar from a "sync point". Any
+     // functions that are fed into the `Q` method will wait for all input
+     // arguments' outstanding queues to empty before executing, and exiting
+     // will allow each of the inputs to begin working through its individual
+     // queue again. Also, a sync point can still be used as a prerequisite to
+     // execution even when the sync point depends on one of the other
+     // prerequisites. (Although the immediate usefulness of this capability
+     // isn't obvious, it turns out to be crucially important for expressing
+     // certain concurrency patterns idiomatically.)
      //
      // NOTE: What happens here if an avar which has already failed is used in
-     // a `when` statement? Does the `when` fail immediately, as expected?
+     // a `sync` statement? Does the `sync` fail immediately, as expected?
      //
-     // NOTE: The instance method `Q` that gets added to a compound avar is not
+     // NOTE: The instance method `Q` that gets added to a sync point is not
      // a perfect substitute for the instance `comm` method it already has ...
      //
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         stack = args.slice();
         x = [];
-        y = avar({val: args});
+        y = avar();
         while (stack.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
@@ -373,7 +387,7 @@
          // complicated code that would actually overflow that limit. Anyway,
          // the prerequisites of compound avars will be added, but the compound
          // avars themselves will not be added. Performing this operation is
-         // what allows Quanah to "un-nest" `when` statements in a single pass
+         // what allows Quanah to "un-nest" `sync` statements in a single pass
          // without constructing a directed acyclic graph or preprocessing the
          // source code :-)
             temp = stack.shift();
@@ -439,8 +453,8 @@
                  // These methods close over the `evt` argument as well as
                  // the `egress` array so that invocations of the control
                  // statements `exit`, `fail`, and `stay` are forwarded to
-                 // all of the original arguments given to `when`.
-                    exit: function (message) {
+                 // all of the original arguments given to `sync`.
+                    'exit': function (message) {
                      // This function signals successful completion :-)
                         var i, n;
                         for (i = 0, n = egress.length; i < n; i += 1) {
@@ -448,7 +462,7 @@
                         }
                         return evt.exit(message);
                     },
-                    fail: function (message) {
+                    'fail': function (message) {
                      // This function signals a failed execution :-(
                         var i, n;
                         for (i = 0, n = egress.length; i < n; i += 1) {
@@ -456,7 +470,7 @@
                         }
                         return evt.fail(message);
                     },
-                    stay: function (message) {
+                    'stay': function (message) {
                      // This function postpones execution temporarily.
                         var i, n;
                         for (i = 0, n = egress.length; i < n; i += 1) {
@@ -472,6 +486,8 @@
         return y;
     };
 
+    user_defs = {'can_run_remotely': null, 'run_remotely': null};
+
  // Prototype definitions
 
     AVar.prototype.on = function () {
@@ -482,13 +498,25 @@
         return this;
     };
 
+    AVar.prototype.Q = function method_Q(f) {
+     // This function is the infamous "Method Q" that once doubled as the
+     // "namespace" for Quanah. Here, it is defined as a chainable prototype
+     // method for avars that takes a single input argument. The input argument
+     // is expected to be either a monadic (single variable) function or else
+     // an avar a monadic function as its `val`.
+        if (AVar.prototype.Q !== method_Q) {
+            throw new Error('`AVar.prototype.Q` may have been compromised.');
+        }
+        var x = (this instanceof AVar) ? this : avar(this);
+        x.comm({'add_to_queue': f});
+        return x;
+    };
+
     AVar.prototype.revive = function () {
-     // This function is an efficient syntactic sugar for triggering `revive`
-     // from code external to this giant anonymous closure. Note that it does
-     // not use `this`, which means that it may be a vestigial definition from
-     // when I worried too much about limiting users' direct access to internal
-     // functions.
-        return revive();
+     // This function is a chainable syntactic sugar for triggering `revive`
+     // from code external to this giant anonymous closure.
+        revive();
+        return this;
     };
 
     AVar.prototype.toString = function () {
@@ -521,61 +549,10 @@
         return this.val.valueOf.apply(this.val, arguments);
     };
 
- // Out-of-scope definitions
-
-    (function (method_Q) {
-     // This function uses ES5.1 property descriptors if they are available in
-     // order to hide "Method Q" from `for .. in` loops. I did this originally
-     // as an attempt to reduce conflicts with jQuery et al., but it also has
-     // security implications that I will need to revisit in the near future.
-        if (Object.hasOwnProperty('defineProperty')) {
-            Object.defineProperty(Object.prototype, 'Q', {
-             // NOTE: ES5.1 property descriptors' values default to `false`.
-                configurable: true,
-                //enumerable: false,
-                writable: true,
-                value: method_Q
-            });
-        } else {
-            Object.prototype.Q = method_Q;
-        }
-        return;
-    }(function method_Q(f) {
-     // This function acts as a "namespace" for Quanah as well as its most
-     // important syntactic sugar -- "Method Q". This function can be used as
-     // a method of any native value except `null` or `undefined`. It expects
-     // its argument to be a function of a single variable or else an avar with
-     // such a function as its `val`.
-        if (Object.prototype.Q !== method_Q) {
-            throw new Error('"Method Q" is not available.');
-        }
-        var x = (this instanceof AVar) ? this : avar({val: this});
-        x.comm({'add_to_queue': f});
-        return x;
-    }));
-
-    Object.prototype.Q.avar = avar;
-
-    Object.prototype.Q.def = def;
-
-    Object.prototype.Q.when = when;
-
-    (function () {
-     // This function runs in Node.js, PhantomJS, and RingoJS, which means it
-     // may work with other CommonJS-ish package loaders, too. I am not certain
-     // whether this function adds much value, however, because the mere act of
-     // loading Quanah loads "Method Q" anyway ...
-        /*jslint node: true */
-        if (typeof module === 'object') {
-            module.exports = Object.prototype.Q;
-        }
-        return;
-    }());
-
  // That's all, folks!
 
-    return;
+    return {'avar': avar, 'def': def, 'sync': sync};
 
-}());
+}())));
 
 //- vim:set syntax=javascript:

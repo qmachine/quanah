@@ -22,6 +22,8 @@ RM      :=  $(call contingent, grm rm) -rf
 all: run
 
 clean: reset
+	@   (cd docs/ && make $@)                                       ;   \
+            $(RM) docs/_static/favicon.ico
 
 clobber: clean
 

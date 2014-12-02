@@ -16,7 +16,7 @@
 #       served to show the default, and I removed most of them.
 #
 #                                                       ~~ (c) SRW, 09 Jul 2014
-#                                                   ~~ last updated 24 Nov 2014
+#                                                   ~~ last updated 02 Dec 2014
 
 import os, urllib
 
@@ -84,8 +84,9 @@ except:
   os.mkdir('_static')
 
 try:
-  urllib.urlretrieve('https://qmachine.github.io/quanah/favicon.ico', \
-    os.path.join('_static', 'favicon.ico'))
+  if (os.path.isfile(os.path.join('_static', 'favicon.ico')) is False):
+    urllib.urlretrieve('https://qmachine.github.io/quanah/favicon.ico', \
+      os.path.join('_static', 'favicon.ico'))
   html_favicon = 'favicon.ico'
 except:
   pass

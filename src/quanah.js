@@ -207,6 +207,8 @@
              // that involved calling `comm` without any arguments.
                 comm({'fail': 'Invalid `comm` message "' + message + '"'});
             }
+         // NOTE: I cannot remember why, but elsewhere in the code, the
+         // `revive()` and the `return` are separated; why not here, too?
             return revive();
         };
         that.val = val;
@@ -248,7 +250,7 @@
      // This function returns `true` only if and only if the input argument
      // `f` is a function. The second condition is necessary to avoid a false
      // positive when `f` is a regular expression. Please note that an avar
-     // whose `val` property is a function will still return `false`.
+     // with a function as its `val` will still return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
     };
 
@@ -341,7 +343,7 @@
          // After all the setup, the actual invocation is anticlimactic ;-)
             obj.f.call(obj.x, evt);
         } catch (err) {
-         // In early versions of Quanah, `stay` threw a special Error type as
+         // In early versions of Quanah, `stay` threw a special `Error` type as
          // a crude form of message passing, but because it no longer throws
          // errors, we can assume that all caught errors are failures. Because
          // the user may have chosen to replace the `evt.fail` method with a
@@ -504,7 +506,7 @@
     AVar.prototype.on = function () {
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
-     // am hoping to leave myself plenty of room to grow later :-)
+     // am hoping to leave Quanah plenty of room to grow later :-)
         this.comm({'on': Array.prototype.slice.call(arguments)});
         return this;
     };
@@ -514,7 +516,7 @@
      // "namespace" for Quanah. Here, it is defined as a chainable prototype
      // method for avars that takes a single input argument. The input argument
      // is expected to be either a monadic (single variable) function or else
-     // an avar a monadic function as its `val`.
+     // an avar with a monadic function as its `val`.
         if (AVar.prototype.Q !== method_Q) {
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
@@ -535,7 +537,7 @@
      // code here differs from the code for `AVar.prototype.valueOf` because it
      // assumes that the returned value should have a particular type (string).
      // My reasoning here is that, if the returned value were not a string, the
-     // JS engine will coerce it to a string; for the `null` and `undefined`
+     // JS engine would coerce it to a string; for the `null` and `undefined`
      // cases, we can circumvent that coercion and thereby improve performance.
         if (this.val === null) {
             return 'null';

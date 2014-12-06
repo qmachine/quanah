@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 24 Nov 2014
+//                                                  ~~ last updated 05 Dec 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -166,7 +166,11 @@
                 }
                 break;
             case 'on':
-             // This one is an experiment ...
+             // This arm was originally added as an experiment into supporting
+             // an event-driven idiom inspired by Node.js, but "error" is still
+             // the only event available. New "fail" and "stay" events are
+             // under consideration, but they will be added only if they enable
+             // behavior that was previously impossible.
                 if ((args[0] === 'error') && (is_Function(args[1]))) {
                  // A computation has defined an `onerror` handler for this
                  // avar, but we need to make sure that it hasn't already
@@ -182,11 +186,18 @@
             case 'stay':
              // A computation that depends on this avar has been postponed,
              // but that computation will be put back into the queue directly
-             // by `local_call`. Thus, nothing actually needs to happen here;
-             // we just need to wait. For consistency with `exit` and `fail`,
-             // I allow `stay` to take a message argument, but right now it
-             // doesn't actually do anything. In the future, however, I may
-             // enable a verbose mode for debugging that outputs the message.
+             // by `local_call`. In many JS environments, it will be sufficient
+             // for us simply to wait for `revive` to be called again, but I
+             // am now realizing that some environments *should* run a function
+             // here. (My guess is that, if `stay` is called in an environment
+             // such as Spidermonkey that lacks an event loop, then it may not
+             // be possible to guarantee that `revive` will ever run. In such
+             // an environment, I can think of very few cases for which using
+             // `stay` is a good idea; to fix this edge case may involve the
+             // addition of a user-defined integration with the native event
+             // loop.) For consistency with `exit` and `fail`, I allow `stay`
+             // to take a message argument, but right now that argument won't
+             // actually be used for anything.
                 break;
             default:
              // When this arm is chosen, either an error exists in Quanah or

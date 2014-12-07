@@ -463,24 +463,24 @@
                  // all of the original arguments given to `sync`.
                     'exit': function (message) {
                      // This function signals successful completion :-)
-                        var i, n;
-                        for (i = 0, n = egress.length; i < n; i += 1) {
+                        var i;
+                        for (i = 0; i < egress.length; i += 1) {
                             egress[i].exit(message);
                         }
                         return evt.exit(message);
                     },
                     'fail': function (message) {
                      // This function signals a failed execution :-(
-                        var i, n;
-                        for (i = 0, n = egress.length; i < n; i += 1) {
+                        var i;
+                        for (i = 0; i < egress.length; i += 1) {
                             egress[i].fail(message);
                         }
                         return evt.fail(message);
                     },
                     'stay': function (message) {
                      // This function postpones execution temporarily.
-                        var i, n;
-                        for (i = 0, n = egress.length; i < n; i += 1) {
+                        var i;
+                        for (i = 0; i < egress.length; i += 1) {
                             egress[i].stay(message);
                         }
                         return evt.stay(message);

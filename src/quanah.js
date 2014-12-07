@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 05 Dec 2014
+//                                                  ~~ last updated 06 Dec 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -207,8 +207,6 @@
              // that involved calling `comm` without any arguments.
                 comm({'fail': 'Invalid `comm` message "' + message + '"'});
             }
-         // NOTE: I cannot remember why, but elsewhere in the code, the
-         // `revive()` and the `return` are separated; why not here, too?
             return revive();
         };
         that.val = val;

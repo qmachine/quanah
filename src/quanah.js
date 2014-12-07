@@ -435,7 +435,7 @@
             egress = [];
             m = 0;
             n = x.length;
-            ready = false;
+            ready = (m === n);
             for (j = 0; j < n; j += 1) {
                 if (x[j] instanceof AVar) {
                     x[j].Q(blocker);

@@ -417,7 +417,7 @@
                 y.comm({'add_to_queue': f});
                 return y;
             }
-            var blocker, count, egress, i, m, n, ready;
+            var blocker, count, egress, j, m, n, ready;
             blocker = function (evt) {
              // This function stores the `evt` argument into an array that will
              // be used later by the input argument to `f`.
@@ -429,18 +429,16 @@
              // some private state variables in order to delay the execution of
              // `f` until certain conditions are satisfied.
                 m += 1;
-                if (m === n) {
-                    ready = true;
-                }
+                ready = (m === n);
                 return revive();
             };
             egress = [];
             m = 0;
             n = x.length;
             ready = false;
-            for (i = 0; i < n; i += 1) {
-                if (x[i] instanceof AVar) {
-                    x[i].Q(blocker);
+            for (j = 0; j < n; j += 1) {
+                if (x[j] instanceof AVar) {
+                    x[j].Q(blocker);
                 } else {
                     count();
                 }
@@ -461,25 +459,25 @@
                  // all of the original arguments given to `sync`.
                     'exit': function (message) {
                      // This function signals successful completion :-)
-                        var i;
-                        for (i = 0; i < egress.length; i += 1) {
-                            egress[i].exit(message);
+                        var index;
+                        for (index = 0; index < egress.length; index += 1) {
+                            egress[index].exit(message);
                         }
                         return evt.exit(message);
                     },
                     'fail': function (message) {
                      // This function signals a failed execution :-(
-                        var i;
-                        for (i = 0; i < egress.length; i += 1) {
-                            egress[i].fail(message);
+                        var index;
+                        for (index = 0; index < egress.length; index += 1) {
+                            egress[index].fail(message);
                         }
                         return evt.fail(message);
                     },
                     'stay': function (message) {
                      // This function postpones execution temporarily.
-                        var i;
-                        for (i = 0; i < egress.length; i += 1) {
-                            egress[i].stay(message);
+                        var index;
+                        for (index = 0; index < egress.length; index += 1) {
+                            egress[index].stay(message);
                         }
                         return evt.stay(message);
                     }

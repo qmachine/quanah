@@ -195,9 +195,8 @@
              // an environment, I can think of very few cases for which using
              // `stay` is a good idea; to fix this edge case may involve the
              // addition of a user-defined integration with the native event
-             // loop.) For consistency with `exit` and `fail`, I allow `stay`
-             // to take a message argument, but right now that argument won't
-             // actually be used for anything.
+             // loop.) For consistency with `exit` and `fail`, `stay` accepts
+             // a message argument, but right now that argument won't be used.
                 break;
             default:
              // When this arm is chosen, either an error exists in Quanah or
@@ -387,7 +386,7 @@
         while (stack.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
-         // dependencies from the input arguments `args`. Instead, I am using
+         // dependencies from the input arguments `args`. Instead, Quanah uses
          // an array-based stack here with a `while` loop as a means to avoid
          // the treacherous function recursion stack and its unpredictably
          // limited depth, since a user could potentially write fiendishly
@@ -420,9 +419,8 @@
             }
             var blocker, count, egress, i, m, n, ready;
             blocker = function (evt) {
-             // This function stores the `evt` argument into an array so we can
-             // prevent further execution involving `val` until after we call
-             // the input argument `f`.
+             // This function stores the `evt` argument into an array that will
+             // be used later by the input argument to `f`.
                 egress.push(evt);
                 return count();
             };
@@ -530,9 +528,9 @@
      // This function delegates to the avar's `val` property if possible. The
      // code here differs from the code for `AVar.prototype.valueOf` because it
      // assumes that the returned value should have a particular type (string).
-     // My reasoning here is that, if the returned value were not a string, the
-     // JS engine would coerce it to a string; for the `null` and `undefined`
-     // cases, we can circumvent that coercion and thereby improve performance.
+     // The reasoning here is that, if the returned value were not a string,
+     // the JS engine would *probably* coerce it to a string, but why worry?
+     // Specifying the behavior explicitly is cheap and easy to understand :-)
         if (this.val === null) {
             return 'null';
         }

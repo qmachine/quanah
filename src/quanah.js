@@ -102,9 +102,9 @@
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
         that.comm = function comm(obj) {
-         // This function provides a mechanism for manipulating the internal
-         // state of an avar without providing direct access to that state. It
-         // was inspired by the message-passing style used in Objective-C.
+         // This function is an instance method for manipulating the internal
+         // state of an avar. Its design was inspired by the message-passing
+         // style used in Objective-C.
             var args, message;
             for (message in obj) {
                 if (obj.hasOwnProperty(message)) {
@@ -289,13 +289,14 @@
      // allows the user to indicate the program's logic explicitly even when
      // the program's control is difficult or impossible to predict, as is
      // commonly the case in JavaScript when working with callback functions.
-        var evt;
         try {
-            evt = {
-             // This is the `evt` object, an object literal with methods that
-             // send messages to `obj.x` for execution control. Methods can
-             // be replaced by the user from within the calling function `f`
-             // without affecting the execution of computations :-)
+            obj.f.call(obj.x, {
+             // This is the object that defines the input argument given to the
+             // transformation `f`; it is most often called `evt`. It is an
+             // object literal that provides `exit`, `fail`, and `stay` methods
+             // that send messages to `obj.x` for flow control. Quanah used to
+             // store a reference to this object so that users could override
+             // the `fail` method, but no one ever found a reason to do it.
                 'exit': function (message) {
                  // This function indicates successful completion.
                     return obj.x.comm({'done': message});
@@ -337,17 +338,12 @@
                     queue.push(obj);
                     return;
                 }
-            };
-         // After all the setup, the actual invocation is anticlimactic ;-)
-            obj.f.call(obj.x, evt);
+            });
         } catch (err) {
          // In early versions of Quanah, `stay` threw a special `Error` type as
-         // a crude form of message passing, but because it no longer throws
-         // errors, we can assume that all caught errors are failures. Because
-         // the user may have chosen to replace the `evt.fail` method with a
-         // personal routine, I have deliberately reused that reference here,
-         // to honor the user's wishes.
-            evt.fail(err);
+         // a crude form of message passing, but because Quanah no longer
+         // throws errors, it can assume that all caught errors are failures.
+            obj.x.comm({'fail': err});
         }
         return;
     };

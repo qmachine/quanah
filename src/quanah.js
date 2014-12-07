@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 06 Dec 2014
+//                                                  ~~ last updated 07 Dec 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -223,10 +223,12 @@
      // This function exists to keep the abstraction in `revive` as clean and
      // close to English as possible. It tests for the existence of particular
      // user-defined functions so that `revive` can decide whether to use local
-     // or remote execution for a given task.
+     // or remote execution for a given task. Note also that the `=== true` is
+     // meaningful here because it requires the user-defined function to return
+     // a boolean `true` rather than a truthy value like `[]`.
         return ((is_Function(user_defs.can_run_remotely))   &&
                 (is_Function(user_defs.run_remotely))       &&
-                (user_defs.can_run_remotely(task)));
+                (user_defs.can_run_remotely(task) === true));
     };
 
     def = function (obj) {
@@ -351,7 +353,11 @@
      // This function exists only to forward input arguments to a user-defined
      // function which may or may not ever be provided. JS doesn't crash in a
      // situation like this because `can_run_remotely` tests for the existence
-     // of the user-defined method before delegating to `run_remotely`.
+     // of the user-defined method before delegating to `run_remotely`. Note
+     // that the lines below should not be simplified into a single line; then
+     // current form ensures that `run_remotely` always returns `undefined`,
+     // because user-provided definitions may not adhere to the prescribed
+     // signature ;-)
         user_defs.run_remotely(task);
         return;
     };

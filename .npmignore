@@ -15,5 +15,6 @@ Makefile
 npm-debug.log
 share/
 test/
+tools/macros.make
 
 #-  vim:set syntax=gitconfig:

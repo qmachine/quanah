@@ -2,13 +2,12 @@
 
 //- quanah-spec.js ~~
 //
-//  These tests were originally contributed by David Robbins on 06 April 2012
-//  for use with Jasmine (http://pivotal.github.io/jasmine/). The current form
-//  is designed for use with Mocha (https://github.com/visionmedia/mocha) as
-//  part of an NPM-based workflow.
+//  Many of these tests were originally contributed by David Robbins for use
+//  with Jasmine. I have rewritten almost all of it for use with Mocha, but I
+//  am grateful to him for demonstrating how useful unit tests are :-)
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 22 Nov 2014
+//                                                  ~~ last updated 07 Dec 2014
 
 (function () {
     'use strict';
@@ -40,11 +39,13 @@
     describe('Quanah', function () {
      // This is the actual specification :-)
 
-        var avar, quanah;
+        var avar, quanah, sync;
         beforeEach(function () {
          // This function needs documentation.
             avar = require('../src/quanah').avar;
+            //def = require('../src/quanah').def;
             quanah = require('../src/quanah');
+            sync = require('../src/quanah').sync;
             return;
         });
 
@@ -137,7 +138,7 @@
         it('should survive unexpected failures', function (done) {
             var x = avar();
             x.Q(function (evt) {
-             // This fails because `x.val` is not a function to simulate a
+             // This fails because `x.val` is not a function, which simulates a
              // programming error (as opposed to an uncaught `throw`).
                 x.val('Hi mom!');
                 return evt.exit();
@@ -354,22 +355,21 @@
 
         describe('The `sync` method', function () {
          // This function needs documentation.
-            var f, fa, sync, x, xa, y, ya, z, za;
+            var f, fa, x, xa, y, ya, z, za;
             beforeEach(function () {
              // This function needs documentation.
                 f = function (evt) {
                  // This function needs documentation.
-                    var i, n, y;
+                    var i, n, temp;
                     n = this.val.length;
-                    y = 0;
+                    temp = 0;
                     for (i = 0; i < n; i += 1) {
-                        y += this.val[i];
+                        temp += this.val[i];
                     }
-                    this.val = y;
+                    this.val = temp;
                     return evt.exit();
                 };
                 fa = avar(f);
-                sync = quanah.sync;
                 x = 2;
                 xa = avar(x);
                 y = 3;
@@ -379,11 +379,12 @@
                 return;
             });
 
-         /*
             it('should work when no vars are given', function (done) {
                 sync().Q(function (evt) {
-                 // This function needs documentation.
-                    expect(this.val).to.equal(null);
+                 // This function records the current behavior, but this
+                 // behavior may change really soon, because I don't find this
+                 // nearly as intuitive now as I did when I first wrote `sync`.
+                    expect(this.val).to.equal(undefined);
                     done();
                     return evt.exit();
                 }).on('error', function (message) {
@@ -393,6 +394,7 @@
                 });
             });
 
+         /*
             it('should work for "afunc(avar)"', function (done) {
                 sync(xa).Q(fa).Q(function (evt) {
                  // This function needs documentation.

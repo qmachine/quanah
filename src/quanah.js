@@ -515,13 +515,13 @@
         return this;
     };
 
-    AVar.prototype.Q = function method_Q(f) {
+    AVar.prototype.Q = function methodQ(f) {
      // This function is the infamous "Method Q" that once doubled as the
      // "namespace" for Quanah. Here, it is defined as a chainable prototype
      // method for avars that takes a single input argument. The input argument
      // is expected to be either a monadic (single variable) function or else
      // an avar with a monadic function as its `val`.
-        if (AVar.prototype.Q !== method_Q) {
+        if (AVar.prototype.Q !== methodQ) {
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
         var x = (this instanceof AVar) ? this : avar(this);

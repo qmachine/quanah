@@ -480,11 +480,19 @@
                         return evt.fail(message);
                     },
                     'stay': function (message) {
-                     // This function postpones execution temporarily.
+                     // This function postpones execution temporarily. Although
+                     // it seems reasonable that `stay` should match the forms
+                     // of `exit` and `fail`, such behavior doesn't really make
+                     // sense. Telling all the blocked avars to stay is silly
+                     // because they're already blocked. Moreover, it would
+                     // cause them all to run the non-idempotent `blocker`
+                     // function again -- not a good move!
+                     /*
                         var index;
                         for (index = 0; index < egress.length; index += 1) {
                             egress[index].stay(message);
                         }
+                     */
                         return evt.stay(message);
                     }
                 });

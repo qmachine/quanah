@@ -1,4 +1,6 @@
-# Quanah
+Quanah
+======
+
 
 [Quanah](https://qmachine.github.io/quanah/) is a JavaScript (JS) library for
 writing concurrent programs that still run correctly in serial execution
@@ -30,4 +32,4 @@ available on [Codacy](https://www.codacy.com/public/qmachine/quanah/dashboard),
 
 [![Build Status](https://travis-ci.org/qmachine/quanah.svg?branch=master)](https://travis-ci.org/qmachine/quanah) [![Build Status](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![NPM version](https://badge.fury.io/js/quanah.svg)](http://badge.fury.io/js/quanah)
 
-<!-- vim:set syntax=markdown: -->
+

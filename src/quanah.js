@@ -235,7 +235,8 @@
      // This function enables the user to redefine "internal" functions from
      // outside the giant anonymous closure. In particular, this allows users
      // to "port" Quanah as a concurrency model for use with almost any storage
-     // or messaging system.
+     // or messaging system. For a real-world example, check out the browser
+     // client for QMachine (https://github.com/qmachine/qm-browser-client).
         var key;
         for (key in obj) {
             if ((obj.hasOwnProperty(key)) && (user_defs[key] === null)) {

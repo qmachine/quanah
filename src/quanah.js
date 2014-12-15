@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 07 Dec 2014
+//                                                  ~~ last updated 14 Dec 2014
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -249,8 +249,10 @@
     is_Function = function (f) {
      // This function returns `true` only if and only if the input argument
      // `f` is a function. The second condition is necessary to avoid a false
-     // positive when `f` is a regular expression. Please note that an avar
-     // with a function as its `val` will still return `false`.
+     // positive when `f` is a regular expression. Quanah's priority is always
+     // to behave according to the ECMAScript standard, and thus it doesn't try
+     // to handle bugs like http://git.io/WcNQEQ or http://git.io/bZIaQw. Also,
+     // note that an avar with a function as its `val` will return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
     };
 

@@ -17,9 +17,6 @@ server-side applications. Thus, this repository integrates with both
     $ bower install quanah
     $ npm install quanah
 
-Quanah is also available through
-[MinervaJS](http://minervajs.org/site/index.html#!/view/quanah).
-
 There are several "mirrors" available on
 [Bitbucket](https://bitbucket.org/wilkinson/quanah),
 [GitHub](https://github.com/qmachine/quanah), and

@@ -5,11 +5,11 @@
 #   This contains live instructions for development on the Quanah library.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
-#                                                   ~~ last updated 20 Jan 2013
+#                                                   ~~ last updated 23 Dec 2014
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
-include $(PROJECT_ROOT)/tools/macros.make
+include $(PROJECT_ROOT)/share/macros.make
 
 NPM     :=  $(call contingent, npm)
 RM      :=  $(call contingent, grm rm) -rf

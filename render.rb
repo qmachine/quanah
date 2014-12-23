@@ -2,23 +2,20 @@
 
 #-  render.rb ~~
 #                                                       ~~ (c) SRW, 18 Aug 2012
-#                                                   ~~ last updated 05 Jul 2014
+#                                                   ~~ last updated 23 Dec 2014
 
-require "date"
-require "redcarpet"
+require 'date'
+require 'github/markdown'
 
-filename = "index.html"
+filename = 'index.html'
 
-markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML,
-    :autolink => true, :space_after_headers => true)
-
-today = "%02d %s %4d" % [
+today = '%02d %s %4d' % [
     Time.now.day,
     Date::ABBR_MONTHNAMES[Time.now.month],
     Time.now.year
 ]
 
-File::open(filename, "w") do |f|
+File::open(filename, 'w') do |f|
     content = <<-EOF
 <!DOCTYPE html>
 <!--
@@ -39,7 +36,7 @@ File::open(filename, "w") do |f|
     <a id="github_ribbon" href="https://github.com/qmachine/quanah">
       <span>Fork me on GitHub!</span>
     </a>
-    #{markdown.render(IO.read("README.md")).chomp}
+    #{GitHub::Markdown.render_gfm(IO.read('README.md')).gsub!('<br>', '')}
     <p>
       Note that this page has already loaded Quanah, which means that you can
       open your browser's developer console and experiment without even leaving

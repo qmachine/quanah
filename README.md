@@ -31,7 +31,7 @@ available on [Codacy](https://www.codacy.com/public/qmachine/quanah/dashboard),
 ===
 
 | Purpose | Status |
-| ------- | ------ |
+|:-------:|:------:|
 | Documentation | [![Documentation Status](https://readthedocs.org/projects/quanah/badge/?version=latest)](https://readthedocs.org/projects/quanah/?badge=latest) |
 | Unit tests | [![drone.io](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![Travis CI](https://travis-ci.org/qmachine/quanah.svg?branch=master)](https://travis-ci.org/qmachine/quanah) |
 | Version badges | [![Bower version](https://badge.fury.io/bo/quanah.svg)](http://badge.fury.io/bo/quanah) [![NPM version](https://badge.fury.io/js/quanah.svg)](http://badge.fury.io/js/quanah) |

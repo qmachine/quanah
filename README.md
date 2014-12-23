@@ -30,5 +30,12 @@ available on [Codacy](https://www.codacy.com/public/qmachine/quanah/dashboard),
 
 ===
 
-[![Build Status](https://travis-ci.org/qmachine/quanah.svg?branch=master)](https://travis-ci.org/qmachine/quanah) [![Build Status](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) [![Bower version](https://badge.fury.io/bo/quanah.svg)](http://badge.fury.io/bo/quanah) [![NPM version](https://badge.fury.io/js/quanah.svg)](http://badge.fury.io/js/quanah)
+| Purpose | Status |
+|:-------:|:------:|
+| Documentation | [![Documentation Status](https://readthedocs.org/projects/quanah/badge/?version=latest)](https://readthedocs.org/projects/quanah/?badge=latest) |
+| Unit tests | [![Special targets](https://drone.io/github.com/qmachine/quanah/status.png)](https://drone.io/github.com/qmachine/quanah/latest) |
+| Unit tests | [![Unit tests](https://travis-ci.org/qmachine/quanah.svg?branch=master)](https://travis-ci.org/qmachine/quanah) |
+
+[![Bower version](https://badge.fury.io/bo/quanah.svg)](http://badge.fury.io/bo/quanah) [![NPM version](https://badge.fury.io/js/quanah.svg)](http://badge.fury.io/js/quanah)
+
 

@@ -2,13 +2,15 @@
 
 #-  .travis.yml ~~
 #                                                       ~~ (c) SRW, 15 Jul 2013
-#                                                   ~~ last updated 15 Jul 2013
+#                                                   ~~ last updated 23 Dec 2014
 
 language: node_js
 
 node_js:
-    -   "0.10"
-    -   "0.8"
-    -   "0.6"
+    -   '0.10'
+    -   '0.8'
+    -   '0.6'
+
+sudo: false
 
 #-  vim:set syntax=yaml:

@@ -2,7 +2,7 @@
 
 #-  .npmignore ~~
 #                                                       ~~ (c) SRW, 18 Aug 2012
-#                                                   ~~ last updated 07 Dec 2014
+#                                                   ~~ last updated 24 Dec 2014
 
 .bowerrc
 .gitignore
@@ -15,6 +15,5 @@ Makefile
 npm-debug.log
 share/
 test/
-tools/macros.make
 
 #-  vim:set syntax=gitconfig:

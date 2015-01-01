@@ -16,7 +16,7 @@
 #       served to show the default, and I removed most of them.
 #
 #                                                       ~~ (c) SRW, 09 Jul 2014
-#                                                   ~~ last updated 02 Dec 2014
+#                                                   ~~ last updated 01 Jan 2015
 
 import os, urllib
 
@@ -42,7 +42,7 @@ master_doc = 'index'
 # General information about the project.
 
 project = u'Quanah'
-copyright = u'2014, Sean Wilkinson'
+copyright = u'2014-2015, Sean Wilkinson'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

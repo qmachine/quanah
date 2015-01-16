@@ -5,12 +5,13 @@
 #   This contains live instructions for development on the Quanah library.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
-#                                                   ~~ last updated 23 Dec 2014
+#                                                   ~~ last updated 16 Jan 2015
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(PROJECT_ROOT)/share/macros.make
 
+NODE    :=  $(call contingent, nodejs node)
 NPM     :=  $(call contingent, npm)
 RM      :=  $(call contingent, grm rm) -rf
 
@@ -37,16 +38,17 @@ help:
 reset:
 	@   $(call contingent, clear)
 
-run: test
+run: check
 
 ###
 
 .PHONY: check test
 
-check: test
-
-test: $(PROJECT_ROOT)/node_modules/
+check: $(PROJECT_ROOT)/node_modules/
 	@   $(NPM) test
+	@   $(NODE) $(PROJECT_ROOT)/examples/until.js
+
+test: check
 
 ###
 

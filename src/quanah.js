@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 14 Dec 2014
+//                                                  ~~ last updated 15 Jan 2015
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -84,8 +84,8 @@
     /*properties
         add_to_queue, apply, avar, can_run_remotely, comm, concat, def, done,
         epitaph, exit, f, fail, length, on, onerror, push, Q, queue, ready,
-        revive, run_remotely, shift, slice, stay, sync, toString, unshift, val,
-        valueOf, x
+        revive, run_remotely, shift, slice, snooze, stay, sync, toString,
+        unshift, val, valueOf, x
     */
 
  // Declarations
@@ -340,6 +340,9 @@
                  // immediately if there's only one task to be run.
                     obj.x.comm({'stay': message});
                     queue.push(obj);
+                    if (is_Function(user_defs.snooze)) {
+                        user_defs.snooze();
+                    }
                     return;
                 }
             });
@@ -506,7 +509,11 @@
         return y;
     };
 
-    user_defs = {'can_run_remotely': null, 'run_remotely': null};
+    user_defs = {
+        'can_run_remotely': null,
+        'run_remotely': null,
+        'snooze': null
+    };
 
  // Prototype definitions
 

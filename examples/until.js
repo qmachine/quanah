@@ -7,7 +7,7 @@
 //  but the demonstration here is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 01 Dec 2014
+//                                                  ~~ last updated 15 Jan 2015
 
 (function () {
     'use strict';
@@ -19,21 +19,19 @@
     /*jslint indent: 4, maxlen: 80, node: true */
 
     /*properties
-        avar, call, constructor, error, exit, log, on, prototype, Q, random,
-        revive, stay, until, val
+        avar, call, constructor, def, error, exit, log, on, nextTick,
+        prototype, Q, random, revive, snooze, stay, until, val
     */
 
  // Declarations
 
-    var AVar, avar, trigger;
+    var AVar, avar;
 
  // Definitions
 
-    AVar = require('quanah').avar().constructor;
+    AVar = require('../').avar().constructor;
 
-    avar = require('quanah').avar;
-
-    trigger = setInterval(avar().revive, 0);
+    avar = require('../').avar;
 
  // Prototype definitions
 
@@ -50,7 +48,20 @@
         return this;
     };
 
- // Demonstrations
+ // User definitions for Quanah
+
+    require('../').def({
+        'snooze': function () {
+         // This function is analogous to a human who hits the "snooze" button
+         // on an alarm clock because it tells Quanah to come back later. In
+         // this regard, it is different from `revive` because `revive` starts
+         // work on the queue immediately.
+            process.nextTick(AVar.prototype.revive);
+            return;
+        }
+    });
+
+ // Demonstration
 
     avar(2).until(function () {
      // This function needs documentation.
@@ -59,7 +70,6 @@
     }).Q(function (evt) {
      // This function prints the results to screen.
         console.log(this.val);
-        clearInterval(trigger);
         return evt.exit();
     }).on('error', function (message) {
         console.error('Error:', message);

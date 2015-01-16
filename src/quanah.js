@@ -289,10 +289,11 @@
      // This function applies the transformation `f` to `x` for method `f` and
      // property `x` of the input object `obj` by calling `f` with `evt` as an
      // input argument and `x` as the `this` value. The advantage of performing
-     // transformations this way versus computing `f(x)` directly is that it
+     // transformations this way (versus computing `f(x)` directly) is that it
      // allows the user to indicate the program's logic explicitly even when
      // the program's control is difficult or impossible to predict, as is
      // commonly the case in JavaScript when working with callback functions.
+     // Note also that this function acts almost entirely by side effects.
         try {
             obj.f.call(obj.x, {
              // This is the object that defines the input argument given to the

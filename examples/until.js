@@ -19,7 +19,7 @@
     /*jslint indent: 4, maxlen: 80, node: true */
 
     /*properties
-        avar, call, constructor, def, error, exit, log, on, nextTick,
+        avar, call, constructor, def, error, exit, log, on, nextTick, print,
         prototype, Q, random, revive, snooze, stay, until, val
     */
 
@@ -34,6 +34,20 @@
     avar = require('../').avar;
 
  // Prototype definitions
+
+    AVar.prototype.print = function () {
+     // This function is just shorthand that mimics QMachine's browser client.
+        this.Q(function (evt) {
+         // This function prints the current `val` to stdout.
+            console.log(this.val);
+            return evt.exit();
+        }).on('error', function (message) {
+         // This function prints errors to stderr if anything goes wrong.
+            console.error('Error:', message);
+            return;
+        });
+        return this;
+    };
 
     AVar.prototype.until = function (f) {
      // This function provides a chainable, non-blocking `until` loop by using
@@ -64,17 +78,11 @@
  // Demonstration
 
     avar(2).until(function () {
-     // This function needs documentation.
+     // This function will be treated like the block of a `while` loop, but
+     // the loop will run asynchronously :-)
         this.val += Math.random();
         return (this.val > 5);
-    }).Q(function (evt) {
-     // This function prints the results to screen.
-        console.log(this.val);
-        return evt.exit();
-    }).on('error', function (message) {
-        console.error('Error:', message);
-        return;
-    });
+    }).print();
 
  // That's all, folks!
 

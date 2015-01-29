@@ -7,7 +7,9 @@
 //  but the demonstration here is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 15 Jan 2015
+//                                                  ~~ last updated 29 Jan 2015
+
+/* @flow */
 
 (function () {
     'use strict';

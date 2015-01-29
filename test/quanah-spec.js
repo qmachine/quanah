@@ -9,6 +9,8 @@
 //                                                      ~~ (c) SRW, 17 Nov 2012
 //                                                  ~~ last updated 07 Dec 2014
 
+/* @flow */
+
 (function () {
     'use strict';
 

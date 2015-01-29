@@ -7,6 +7,8 @@
 //                                                      ~~ (c) SRW, 14 Nov 2012
 //                                                  ~~ last updated 15 Jan 2015
 
+/* @flow */
+
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
 

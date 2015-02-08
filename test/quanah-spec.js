@@ -323,6 +323,7 @@
                 expect(x.revive).to.be.a('function');
                 expect(x.revive.length).to.equal(0);
             });
+         /*
             it('should have a `toString` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('toString');
                 expect(x.toString).to.be.a('function');
@@ -333,9 +334,11 @@
                 expect(x.valueOf).to.be.a('function');
                 expect(x.valueOf.length).to.equal(0);
             });
+         */
             return;
         });
 
+     /*
         describe('The `AVar.prototype.toString` method', function () {
          // This function needs documentation.
             var x;
@@ -354,6 +357,7 @@
             });
             return;
         });
+     */
 
         describe('The `sync` method', function () {
          // This function needs documentation.

@@ -86,8 +86,7 @@
     /*properties
         add_to_queue, apply, avar, can_run_remotely, concat, def, epitaph,
         exit, f, fail, length, on, onerror, push, Q, queue, ready, revive,
-        run_remotely, send, shift, slice, snooze, stay, sync, toString,
-        unshift, val, valueOf, x
+        run_remotely, send, shift, slice, snooze, stay, sync, unshift, val, x
     */
 
  // Declarations
@@ -547,36 +546,6 @@
      // from code external to this giant anonymous closure.
         revive();
         return this;
-    };
-
-    AVar.prototype.toString = function () {
-     // This function delegates to the avar's `val` property if possible. The
-     // code here differs from the code for `AVar.prototype.valueOf` because it
-     // assumes that the returned value should have a particular type (string).
-     // The reasoning here is that, if the returned value were not a string,
-     // the JS engine would *probably* coerce it to a string, but why worry?
-     // Specifying the behavior explicitly is cheap and easy to understand :-)
-        if (this.val === null) {
-            return 'null';
-        }
-        if (this.val === undefined) {
-            return 'undefined';
-        }
-        return this.val.toString.apply(this.val, arguments);
-    };
-
-    AVar.prototype.valueOf = function () {
-     // This function delegates to the avar's `val` property. It would be easy
-     // simply to return the value of the avar's `val` and let the JS engine
-     // decide what to do with it, but that approach assumes that no value's
-     // `valueOf` method ever uses input arguments. That assumption could be
-     // supported by a careful reading of the ES5.1 standard (June 2011), but
-     // the priority here is correctness -- not performance -- and therefore
-     // this method has been designed for generic use.
-        if ((this.val === null) || (this.val === undefined)) {
-            return this.val;
-        }
-        return this.val.valueOf.apply(this.val, arguments);
     };
 
  // That's all, folks!

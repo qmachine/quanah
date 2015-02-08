@@ -108,30 +108,6 @@
          // message-passing style used in Objective-C. Its name and functional
          // signature were later changed to mimic Ruby's `Object.send`.
             switch (name) {
-            case 'add_to_queue':
-             // The next transformation to be applied to this avar will be put
-             // into an instance-specific queue before it ends up in the main
-             // task queue (`queue`). Because retriggering execution by sending
-             // `exit` messages recursively requires a lot of extra overhead,
-             // we'll just go ahead and retrigger execution directly.
-                if (is_Function(args[0])) {
-                    state.queue.push(args[0]);
-                    if (state.ready === true) {
-                        state.ready = false;
-                        queue.unshift({'f': state.queue.shift(), 'x': that});
-                    }
-                } else if (args[0] instanceof AVar) {
-                    sync(args[0], that).Q(function (evt) {
-                     // This function allows Quanah to postpone execution of
-                     // the given task until both `f` and `x` are ready. The
-                     // following line is given in the form `f.call(x, evt)`.
-                        (args[0].val).call(that, evt);
-                        return;
-                    });
-                } else {
-                    that.send('fail', ['Transformation must be a function.']);
-                }
-                break;
             case 'exit':
              // A computation involving this avar has succeeded, and we will
              // now prepare to run the next computation that depends on it by
@@ -177,6 +153,30 @@
                     if (state.epitaph !== null) {
                         that.send('fail', [state.epitaph]);
                     }
+                }
+                break;
+            case 'queue':
+             // The next transformation to be applied to this avar will be put
+             // into an instance-specific queue before it ends up in the main
+             // task queue (`queue`). Because retriggering execution by sending
+             // `exit` messages recursively requires a lot of extra overhead,
+             // we'll just go ahead and retrigger execution directly.
+                if (is_Function(args[0])) {
+                    state.queue.push(args[0]);
+                    if (state.ready === true) {
+                        state.ready = false;
+                        queue.unshift({'f': state.queue.shift(), 'x': that});
+                    }
+                } else if (args[0] instanceof AVar) {
+                    sync(args[0], that).Q(function (evt) {
+                     // This function allows Quanah to postpone execution of
+                     // the given task until both `f` and `x` are ready. The
+                     // following line is given in the form `f.call(x, evt)`.
+                        (args[0].val).call(that, evt);
+                        return;
+                    });
+                } else {
+                    that.send('fail', ['Transformation must be a function.']);
                 }
                 break;
             case 'stay':
@@ -431,7 +431,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
-                y.send('add_to_queue', [f]);
+                y.send('queue', [f]);
                 return y;
             }
             var blocker, count, egress, j, m, n, ready;
@@ -460,7 +460,7 @@
                     count();
                 }
             }
-            y.send('add_to_queue', [function (evt) {
+            y.send('queue', [function (evt) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
@@ -537,7 +537,7 @@
      // is expected to be either a monadic (single variable) function or else
      // an avar with a monadic function as its `val`.
         var x = (this instanceof AVar) ? this : avar(this);
-        x.send('add_to_queue', [f]);
+        x.send('queue', [f]);
         return x;
     };
 

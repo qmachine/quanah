@@ -85,13 +85,13 @@
 
     /*properties
         add_to_queue, apply, avar, can_run_remotely, concat, def, epitaph,
-        exit, f, fail, length, on, onerror, push, Q, queue, ready, revive,
+        exit, f, fail, length, on, onerror, push, Q, queue, ready,
         run_remotely, send, shift, slice, snooze, stay, sync, unshift, val, x
     */
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, def, is_Function, queue, revive,
+    var AVar, avar, can_run_remotely, def, is_Function, loop, queue,
         run_locally, run_remotely, sync, user_defs;
 
  // Definitions
@@ -136,7 +136,7 @@
              // A computation involving this avar has succeeded, and we will
              // now prepare to run the next computation that depends on it by
              // transferring it from the avar's individual queue into the
-             // global `queue` used by the `revive` function.
+             // global `queue` used by the `loop` function.
                 state.ready = true;
                 if (state.queue.length > 0) {
                     state.ready = false;
@@ -183,12 +183,12 @@
              // A computation that depends on this avar has been postponed,
              // but that computation will be put back into the queue directly
              // by `local_call`. In many JS environments, it will be sufficient
-             // for us simply to wait for `revive` to be called again, but I
+             // for us simply to wait for `loop` to be called again, but I
              // am now realizing that some environments *should* run a function
              // here. (My guess is that, if `stay` is called in an environment
              // such as Spidermonkey that lacks an event loop, then it may not
-             // be possible to guarantee that `revive` will ever run. In such
-             // an environment, I can think of very few cases for which using
+             // be possible to guarantee that `loop` will ever run. In such an
+             // environment, I can think of very few cases for which using
              // `stay` is a good idea; to fix this edge case may involve the
              // addition of a user-defined integration with the native event
              // loop.) For consistency with `exit` and `fail`, `stay` accepts
@@ -198,11 +198,11 @@
              // When this arm is chosen, either an error exists in Quanah or
              // else a user is re-programming Quanah's guts; in either case, it
              // may be useful to capture the error. Another possibility is that
-             // a user is trying to trigger `revive` using an obsolete idiom
-             // that involved calling `send` without any arguments.
+             // a user is trying to trigger `loop` using an obsolete idiom that
+             // involved calling `send` without any arguments.
                 that.send('fail', ['Invalid `send` message "' + name + '"']);
             }
-            return revive();
+            return loop();
         };
         that.val = val;
         return that;
@@ -216,9 +216,9 @@
     };
 
     can_run_remotely = function (task) {
-     // This function exists to keep the abstraction in `revive` as clean and
+     // This function exists to keep the abstraction in `loop` as clean and
      // close to English as possible. It tests for the existence of particular
-     // user-defined functions so that `revive` can decide whether to use local
+     // user-defined functions so that `loop` can decide whether to use local
      // or remote execution for a given task. Note also that the `=== true` is
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
@@ -260,22 +260,20 @@
         return ((typeof f === 'function') && (f instanceof Function));
     };
 
-    queue = [];
-
-    revive = function () {
+    loop = function () {
      // This function contains the execution center for Quanah. It's pretty
      // simple, really -- it just runs the first available task in its queue
      // (`queue`) in an execution context appropriate for that particular task.
      // That's all it does. It makes no attempt to run every task in the queue
      // every time it is called, because instead it assumes it will be called
      // repeatedly until the entire program has executed. For example, every
-     // time an avar receives a `send` message, `revive` will run. Because
-     // `revive` only runs a single task from its queue for each invocation,
-     // that queue can be shared safely across multiple execution contexts
-     // simultaneously, and it makes no difference if the separate contexts are
-     // due to recursion or to special objects such as Web Workers. The
-     // `revive` function selects an execution context using conditional tests
-     // that determine whether a given task can be distributed faithfully to
+     // time an avar receives a `send` message, `loop` will run. Because `loop`
+     // only runs a single task from its queue for each invocation, that queue
+     // can be shared safely across multiple execution contexts simultaneously,
+     // and it makes no difference if the separate contexts are due to
+     // recursion or to special objects such as Web Workers. The `loop`
+     // function selects an execution context using conditional tests that
+     // determine whether a given task can be distributed faithfully to
      // external resources for execution or not; if a task cannot be
      // distributed faithfully, then it will be executed by the local machine.
         var task = queue.shift();
@@ -288,6 +286,8 @@
         }
         return;
     };
+
+    queue = [];
 
     run_locally = function (obj) {
      // This function applies the transformation `f` to `x` for method `f` and
@@ -340,13 +340,13 @@
                  // the probability approaches 1 :-)
                  //
                  // NOTE: Don't push back onto the queue until _after_ sending
-                 // the `stay` message. Invoking `send` also invokes `revive`,
+                 // the `stay` message. Invoking `send` also invokes `loop`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
                     obj.x.send('stay', [message]);
                     queue.push(obj);
                     if (is_Function(user_defs.snooze)) {
-                        user_defs.snooze(revive);
+                        user_defs.snooze(loop);
                     }
                     return;
                 }
@@ -447,7 +447,7 @@
              // `f` until certain conditions are satisfied.
                 m += 1;
                 ready = (m === n);
-                return revive();
+                return loop();
             };
             egress = [];
             m = 0;

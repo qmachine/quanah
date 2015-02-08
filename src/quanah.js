@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 29 Jan 2015
+//                                                  ~~ last updated 08 Feb 2015
 
 /* @flow */
 
@@ -84,9 +84,9 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        add_to_queue, apply, avar, can_run_remotely, comm, concat, def, done,
+        add_to_queue, apply, avar, can_run_remotely, concat, def, done,
         epitaph, exit, f, fail, length, on, onerror, push, Q, queue, ready,
-        revive, run_remotely, shift, slice, snooze, stay, sync, toString,
+        revive, run_remotely, send, shift, slice, snooze, stay, sync, toString,
         unshift, val, valueOf, x
     */
 
@@ -103,7 +103,7 @@
         var state, that;
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
-        that.comm = function comm(obj) {
+        that.send = function send(obj) {
          // This function is an instance method for manipulating the internal
          // state of an avar. Its design was inspired by the message-passing
          // style used in Objective-C.
@@ -135,7 +135,7 @@
                         return;
                     });
                 } else {
-                    comm({'fail': 'Transformation must be a function.'});
+                    send({'fail': 'Transformation must be a function.'});
                 }
                 break;
             case 'done':
@@ -181,7 +181,7 @@
                  // immediately.
                     state.onerror = args[1];
                     if (state.epitaph !== null) {
-                        comm({'fail': state.epitaph});
+                        send({'fail': state.epitaph});
                     }
                 }
                 break;
@@ -205,8 +205,8 @@
              // else a user is re-programming Quanah's guts; in either case, it
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `revive` using an obsolete idiom
-             // that involved calling `comm` without any arguments.
-                comm({'fail': 'Invalid `comm` message "' + message + '"'});
+             // that involved calling `send` without any arguments.
+                send({'fail': 'Invalid `send` message "' + message + '"'});
             }
             return revive();
         };
@@ -267,7 +267,7 @@
      // That's all it does. It makes no attempt to run every task in the queue
      // every time it is called, because instead it assumes it will be called
      // repeatedly until the entire program has executed. For example, every
-     // time an avar receives a `comm` message, `revive` will run. Because
+     // time an avar receives a `send` message, `revive` will run. Because
      // `revive` only runs a single task from its queue for each invocation,
      // that queue can be shared safely across multiple execution contexts
      // simultaneously, and it makes no difference if the separate contexts are
@@ -306,7 +306,7 @@
              // the `fail` method, but no one ever found a reason to do it.
                 'exit': function (message) {
                  // This function indicates successful completion.
-                    return obj.x.comm({'done': message});
+                    return obj.x.send({'done': message});
                 },
                 'fail': function (message) {
                  // This function indicates a failure, and it is intended to
@@ -321,7 +321,7 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace `throw` with `fail` in
                  // their programs to solve the remote error capture problem.
-                    return obj.x.comm({'fail': message});
+                    return obj.x.send({'fail': message});
                 },
                 'stay': function (message) {
                  // This function allows a user to postpone execution, and it
@@ -338,10 +338,10 @@
                  // the probability approaches 1 :-)
                  //
                  // NOTE: Don't push back onto the queue until _after_ sending
-                 // the `stay` message. Invoking `comm` also invokes `revive`,
+                 // the `stay` message. Invoking `send` also invokes `revive`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
-                    obj.x.comm({'stay': message});
+                    obj.x.send({'stay': message});
                     queue.push(obj);
                     if (is_Function(user_defs.snooze)) {
                         user_defs.snooze();
@@ -353,7 +353,7 @@
          // In early versions of Quanah, `stay` threw a special `Error` type as
          // a crude form of message passing, but because Quanah no longer
          // throws errors, it can assume that all caught errors are failures.
-            obj.x.comm({'fail': err});
+            obj.x.send({'fail': err});
         }
         return;
     };
@@ -391,7 +391,7 @@
      // a `sync` statement? Does the `sync` fail immediately, as expected?
      //
      // NOTE: The instance method `Q` that gets added to a sync point is not
-     // a perfect substitute for the instance `comm` method it already has ...
+     // a perfect substitute for the instance `send` method it already has ...
      //
         var args, flag, i, stack, temp, x, y;
         args = Array.prototype.slice.call(arguments);
@@ -429,7 +429,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
-                y.comm({'add_to_queue': f});
+                y.send({'add_to_queue': f});
                 return y;
             }
             var blocker, count, egress, j, m, n, ready;
@@ -458,7 +458,7 @@
                     count();
                 }
             }
-            y.comm({'add_to_queue': function (evt) {
+            y.send({'add_to_queue': function (evt) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
@@ -524,7 +524,7 @@
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        this.comm({'on': Array.prototype.slice.call(arguments)});
+        this.send({'on': Array.prototype.slice.call(arguments)});
         return this;
     };
 
@@ -538,7 +538,7 @@
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
         var x = (this instanceof AVar) ? this : avar(this);
-        x.comm({'add_to_queue': f});
+        x.send({'add_to_queue': f});
         return x;
     };
 

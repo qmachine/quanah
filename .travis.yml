@@ -2,11 +2,12 @@
 
 #-  .travis.yml ~~
 #                                                       ~~ (c) SRW, 15 Jul 2013
-#                                                   ~~ last updated 23 Dec 2014
+#                                                   ~~ last updated 08 Feb 2015
 
 language: node_js
 
 node_js:
+    -   '0.12'
     -   '0.10'
     -   '0.8'
     -   '0.6'

@@ -7,7 +7,7 @@
 //  am grateful to him for demonstrating how useful unit tests are :-)
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 07 Dec 2014
+//                                                  ~~ last updated 08 Feb 2015
 
 /* @flow */
 
@@ -23,9 +23,9 @@
     /*jslint indent: 4, maxlen: 80, node: true */
 
     /*properties
-        a, an, avar, be, comm, constructor, def, error, equal, exit, fail,
-        have, key, length, log, name, nextTick, on, Q, PI, property, prototype,
-        push, random, revive, sync, to, toString, val, valueOf
+        a, an, avar, be, constructor, def, error, equal, exit, fail, have, key,
+        length, log, name, nextTick, on, Q, PI, property, prototype, push,
+        random, revive, send, sync, to, toString, val, valueOf
     */
 
  // Declarations
@@ -294,9 +294,9 @@
             it('should have a constructor called "AVar"', function () {
                 expect(x.constructor.name).to.equal('AVar');
             });
-            it('should have a `comm` instance method', function () {
-                expect(x).to.have.property('comm');
-                expect(x.comm).to.be.a('function');
+            it('should have a `send` instance method', function () {
+                expect(x).to.have.property('send');
+                expect(x.send).to.be.a('function');
             });
          /*
             it('should have a `key` instance property', function () {

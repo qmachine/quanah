@@ -84,9 +84,9 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        add_to_queue, apply, avar, can_run_remotely, concat, def, epitaph,
-        exit, f, fail, length, on, onerror, push, Q, queue, ready,
-        run_remotely, send, shift, slice, snooze, stay, sync, unshift, val, x
+        apply, avar, can_run_remotely, def, epitaph, exit, f, fail, length, on,
+        onerror, push, Q, queue, ready, run_remotely, send, shift, slice,
+        snooze, stay, sync, unshift, val, x
     */
 
  // Declarations

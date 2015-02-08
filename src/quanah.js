@@ -514,11 +514,11 @@
 
  // Prototype definitions
 
-    AVar.prototype.on = function () {
+    AVar.prototype.on = function (event_name, listener) {
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        this.send('on', Array.prototype.slice.call(arguments));
+        this.send('on', [event_name, listener]);
         return this;
     };
 

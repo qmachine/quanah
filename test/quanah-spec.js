@@ -311,7 +311,7 @@
             it('should have an `on` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('on');
                 expect(x.on).to.be.a('function');
-                expect(x.on.length).to.equal(0); // strange, I know, but ...
+                expect(x.on.length).to.equal(2);
             });
             it('should have a `Q` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('Q');

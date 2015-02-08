@@ -79,7 +79,7 @@
 
  // Pragmas
 
-    /*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
+    /*jshint es3: true, maxparams: 2, quotmark: single, strict: true */
 
     /*jslint indent: 4, maxlen: 80 */
 
@@ -102,17 +102,12 @@
         var state, that;
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
-        that.send = function send(obj) {
+        that.send = function (name, args) {
          // This function is an instance method for manipulating the internal
-         // state of an avar. Its design was inspired by the message-passing
-         // style used in Objective-C.
-            var args, message;
-            for (message in obj) {
-                if (obj.hasOwnProperty(message)) {
-                    args = [].concat(obj[message]);
-                }
-            }
-            switch (message) {
+         // state of an avar. Its design was originally inspired by the
+         // message-passing style used in Objective-C. Its name and functional
+         // signature were later changed to mimic Ruby's `Object.send`.
+            switch (name) {
             case 'add_to_queue':
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
@@ -134,7 +129,7 @@
                         return;
                     });
                 } else {
-                    send({'fail': 'Transformation must be a function.'});
+                    that.send('fail', ['Transformation must be a function.']);
                 }
                 break;
             case 'exit':
@@ -180,7 +175,7 @@
                  // immediately.
                     state.onerror = args[1];
                     if (state.epitaph !== null) {
-                        send({'fail': state.epitaph});
+                        that.send('fail', [state.epitaph]);
                     }
                 }
                 break;
@@ -205,7 +200,7 @@
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `revive` using an obsolete idiom
              // that involved calling `send` without any arguments.
-                send({'fail': 'Invalid `send` message "' + message + '"'});
+                that.send('fail', ['Invalid `send` message "' + name + '"']);
             }
             return revive();
         };
@@ -305,7 +300,7 @@
              // the `fail` method, but no one ever found a reason to do it.
                 'exit': function (message) {
                  // This function indicates successful completion.
-                    return obj.x.send({'exit': message});
+                    return obj.x.send('exit', [message]);
                 },
                 'fail': function (message) {
                  // This function indicates a failure, and it is intended to
@@ -320,7 +315,7 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace `throw` with `fail` in
                  // their programs to solve the remote error capture problem.
-                    return obj.x.send({'fail': message});
+                    return obj.x.send('fail', [message]);
                 },
                 'stay': function (message) {
                  // This function allows a user to postpone execution, and it
@@ -340,7 +335,7 @@
                  // the `stay` message. Invoking `send` also invokes `revive`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
-                    obj.x.send({'stay': message});
+                    obj.x.send('stay', [message]);
                     queue.push(obj);
                     if (is_Function(user_defs.snooze)) {
                         user_defs.snooze();
@@ -352,7 +347,7 @@
          // In early versions of Quanah, `stay` threw a special `Error` type as
          // a crude form of message passing, but because Quanah no longer
          // throws errors, it can assume that all caught errors are failures.
-            obj.x.send({'fail': err});
+            obj.x.send('fail', [err]);
         }
         return;
     };
@@ -428,7 +423,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
-                y.send({'add_to_queue': f});
+                y.send('add_to_queue', [f]);
                 return y;
             }
             var blocker, count, egress, j, m, n, ready;
@@ -457,7 +452,7 @@
                     count();
                 }
             }
-            y.send({'add_to_queue': function (evt) {
+            y.send('add_to_queue', [function (evt) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
@@ -505,7 +500,7 @@
                     }
                 });
                 return;
-            }});
+            }]);
             return y;
         };
         return y;
@@ -523,7 +518,7 @@
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        this.send({'on': Array.prototype.slice.call(arguments)});
+        this.send('on', Array.prototype.slice.call(arguments));
         return this;
     };
 
@@ -537,7 +532,7 @@
             throw new Error('`AVar.prototype.Q` may have been compromised.');
         }
         var x = (this instanceof AVar) ? this : avar(this);
-        x.send({'add_to_queue': f});
+        x.send('add_to_queue', [f]);
         return x;
     };
 

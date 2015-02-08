@@ -84,9 +84,9 @@
     /*jslint indent: 4, maxlen: 80 */
 
     /*properties
-        add_to_queue, apply, avar, can_run_remotely, concat, def, done,
-        epitaph, exit, f, fail, length, on, onerror, push, Q, queue, ready,
-        revive, run_remotely, send, shift, slice, snooze, stay, sync, toString,
+        add_to_queue, apply, avar, can_run_remotely, concat, def, epitaph,
+        exit, f, fail, length, on, onerror, push, Q, queue, ready, revive,
+        run_remotely, send, shift, slice, snooze, stay, sync, toString,
         unshift, val, valueOf, x
     */
 
@@ -118,7 +118,7 @@
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
              // task queue (`queue`). Because retriggering execution by sending
-             // `done` messages recursively requires a lot of extra overhead,
+             // `exit` messages recursively requires a lot of extra overhead,
              // we'll just go ahead and retrigger execution directly.
                 if (is_Function(args[0])) {
                     state.queue.push(args[0]);
@@ -138,7 +138,7 @@
                     send({'fail': 'Transformation must be a function.'});
                 }
                 break;
-            case 'done':
+            case 'exit':
              // A computation involving this avar has succeeded, and we will
              // now prepare to run the next computation that depends on it by
              // transferring it from the avar's individual queue into the
@@ -306,7 +306,7 @@
              // the `fail` method, but no one ever found a reason to do it.
                 'exit': function (message) {
                  // This function indicates successful completion.
-                    return obj.x.send({'done': message});
+                    return obj.x.send({'exit': message});
                 },
                 'fail': function (message) {
                  // This function indicates a failure, and it is intended to

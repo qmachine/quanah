@@ -202,7 +202,8 @@
              // involved calling `send` without any arguments.
                 that.send('fail', ['Invalid `send` message "' + name + '"']);
             }
-            return loop();
+            loop();
+            return that;
         };
         that.val = val;
         return that;
@@ -348,7 +349,8 @@
                     if (is_Function(user_defs.snooze)) {
                         user_defs.snooze(loop);
                     }
-                    return;
+                 // Return `obj.x` for type consistency with `exit` and `fail`.
+                    return obj.x;
                 }
             });
         } catch (err) {
@@ -431,8 +433,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
-                y.send('queue', [f]);
-                return y;
+                return y.send('queue', [f]);
             }
             var blocker, count, egress, j, m, n, ready;
             blocker = function (evt) {
@@ -526,8 +527,7 @@
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        this.send('on', [event_name, listener]);
-        return this;
+        return this.send('on', [event_name, listener]);
     };
 
     AVar.prototype.Q = function (f) {
@@ -536,9 +536,7 @@
      // method for avars that takes a single input argument. The input argument
      // is expected to be either a monadic (single variable) function or else
      // an avar with a monadic function as its `val`.
-        var x = (this instanceof AVar) ? this : avar(this);
-        x.send('queue', [f]);
-        return x;
+        return ((this instanceof AVar) ? this : avar(this)).send('queue', [f]);
     };
 
  // That's all, folks!

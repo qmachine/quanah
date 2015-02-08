@@ -346,7 +346,7 @@
                     obj.x.send('stay', [message]);
                     queue.push(obj);
                     if (is_Function(user_defs.snooze)) {
-                        user_defs.snooze();
+                        user_defs.snooze(revive);
                     }
                     return;
                 }
@@ -539,13 +539,6 @@
         var x = (this instanceof AVar) ? this : avar(this);
         x.send('add_to_queue', [f]);
         return x;
-    };
-
-    AVar.prototype.revive = function () {
-     // This function is a chainable syntactic sugar for triggering `revive`
-     // from code external to this giant anonymous closure.
-        revive();
-        return this;
     };
 
  // That's all, folks!

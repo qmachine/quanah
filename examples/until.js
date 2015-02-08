@@ -7,7 +7,7 @@
 //  but the demonstration here is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 29 Jan 2015
+//                                                  ~~ last updated 08 Feb 2015
 
 /* @flow */
 
@@ -22,7 +22,7 @@
 
     /*properties
         avar, call, constructor, def, error, exit, log, on, nextTick, print,
-        prototype, Q, random, revive, snooze, stay, until, val
+        prototype, Q, random, snooze, stay, until, val
     */
 
  // Declarations
@@ -67,12 +67,12 @@
  // User definitions for Quanah
 
     require('../').def({
-        'snooze': function () {
+        'snooze': function (loop) {
          // This function is analogous to a human who hits the "snooze" button
          // on an alarm clock because it tells Quanah to come back later. In
          // this regard, it is different from `revive` because `revive` starts
          // work on the queue immediately.
-            process.nextTick(AVar.prototype.revive);
+            process.nextTick(loop);
             return;
         }
     });

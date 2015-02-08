@@ -25,7 +25,7 @@
     /*properties
         a, an, avar, be, constructor, def, error, equal, exit, fail, have, key,
         length, log, name, nextTick, on, Q, PI, property, prototype, push,
-        random, revive, send, sync, to, toString, val, valueOf
+        random, send, sync, to, toString, val, valueOf
     */
 
  // Declarations
@@ -318,12 +318,12 @@
                 expect(x.constructor.prototype.Q).to.be.a('function');
                 expect(x.constructor.prototype.Q.length).to.equal(1);
             });
+         /*
             it('should have a `revive` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('revive');
                 expect(x.revive).to.be.a('function');
                 expect(x.revive.length).to.equal(0);
             });
-         /*
             it('should have a `toString` prototype method', function () {
                 expect(x.constructor.prototype).to.have.property('toString');
                 expect(x.toString).to.be.a('function');

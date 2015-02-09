@@ -15,7 +15,7 @@
 
 /*properties
     apply, avar, call, can_run_remotely, def, epitaph, exit, exports, f, fail,
-    global, hasOwnProperty, length, on, onerror, prototype, push, Q, QUANAH,
+    global, hasOwnProperty, length, on, onfail, prototype, push, Q, QUANAH,
     queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
 */
 
@@ -94,7 +94,7 @@
      // This function constructs "asynchronous variables" ("avars"). An avar is
      // a generic container for any other JavaScript type.
         var state, that;
-        state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
+        state = {'epitaph': null, 'onfail': null, 'queue': [], 'ready': true};
         that = this;
         that.send = function (name, arg) {
          // This function is an instance method for manipulating the internal
@@ -117,7 +117,7 @@
              // overwriting the queue with a fresh one. This is also important
              // because JavaScript's garbage collector can't free the memory
              // unless we release these references. We will also try to call an
-             // `onerror` listener if one has been provided.
+             // `onfail` listener if one has been provided.
                 if (state.epitaph === null) {
                  // We don't want to overwrite the original error by accident,
                  // since that would be an utter nightmare for debugging.
@@ -125,52 +125,51 @@
                 }
                 state.queue = [];
                 state.ready = false;
-                if (is_Function(state.onerror)) {
-                    state.onerror.call(that, state.epitaph);
+                if (is_Function(state.onfail)) {
+                    state.onfail.call(that, state.epitaph);
                 }
                 break;
-            case 'onerror':
+            case 'onfail':
              // This arm was originally added as an experiment into supporting
-             // an event-driven idiom inspired by Node.js, but "error" is still
-             // the only event available. New "fail" and "stay" events are
+             // an event-driven idiom inspired by Node.js, but "fail" is still
+             // the only event available. Matching "exit" and "stay" events are
              // under consideration, but they will be added only if they enable
              // behavior that was previously impossible.
                 if (is_Function(arg)) {
-                 // An `onerror` listener has been provided for this avar, but
-                 // we need to make sure that it hasn't already failed in some
-                 // previous computation. If the avar has already failed, we
+                 // An `onfail` listener has been provided for this avar, but
+                 // we need to make sure that the avar hasn't already failed in
+                 // a previous computation. If the avar has already failed, we
                  // will store the listener and also call it immediately.
-                    state.onerror = arg;
+                    state.onfail = arg;
                     if (state.epitaph !== null) {
-                        that.send('fail', state.epitaph);
+                        state.onfail.call(that, state.epitaph);
                     }
                 }
                 break;
             case 'queue':
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
-             // task queue (`queue`).
-                if (is_Function(arg)) {
-                    state.queue.push(arg);
-                } else if (arg instanceof AVar) {
+             // task queue (`queue`). Although `arg` is expected to a function
+             // or an avar that will have a function as its `val` eventually,
+             // typechecking is not enforced at this time. Instead, the idea
+             // here is to allow type errors to be caught by `run_locally` or
+             // `run_remotely`.
+                if (arg instanceof AVar) {
                     sync(arg, that).Q(function (evt) {
                      // This function allows Quanah to postpone execution of
                      // the given task until both `f` and `x` are ready. The
                      // following line is given in the form `f.call(x, evt)`.
-                     // Instead of checking that `arg.val` is a function, the
-                     // strategy here is to allow type errors to be caught by
-                     // `run_locally` or `run_remotely`.
                         (arg.val).call(that, evt);
                         return;
                     });
                 } else {
-                    that.send('fail', 'Transformation must be a function.');
+                    state.queue.push(arg);
                 }
                 break;
             case 'stay':
-             // A computation that depends on this avar has been postponed,
-             // but that computation will be put back into the queue directly
-             // by `local_call`. In many JS environments, it will be sufficient
+             // A computation that depends on this avar has been postponed, but
+             // that computation will be put back into the queue directly by
+             // `run_locally`. In many JS environments, it will be sufficient
              // for us simply to wait for `loop` to be called again, but I
              // am now realizing that some environments *should* run a function
              // here. (My guess is that, if `stay` is called in an environment
@@ -321,14 +320,18 @@
                  // replace the `throw new Error(...)` idiom, primarily because
                  // capturing errors that are thrown during remote execution
                  // are very difficult to capture and return to the invoking
-                 // contexts otherwise. Although `local_call` is named "local"
-                 // to indicate that the invocation and execution occur on the
-                 // same machine, the `volunteer` function actually imports
-                 // tasks from other machines before invoking and executing
-                 // them; therefore, the "original invocation" may have come
-                 // from a "remote" machine, with respect to execution. Thus,
-                 // Quanah encourages users to replace `throw` with `fail` in
-                 // their programs to solve the remote error capture problem.
+                 // contexts otherwise. Although the name `run_locally` was
+                 // chosen to indicate that the invocation and execution occur
+                 // in the same JS context, it does not always imply that the
+                 // local context was the "original context". For example, a
+                 // QMachine volunteer might actually import tasks from other
+                 // machines into its own task queue; in such a case, the
+                 // "original invocation" may have come from a "remote"
+                 // machine, with respect to execution. The `fail` method is
+                 // provided as a means to `throw` exceptions across arbitrary
+                 // contexts. It also provides a clean alternative to error
+                 // catching for asynchronous callback functions, because a
+                 // `try/catch` block like this one cannot catch those errors.
                     task.x.send('fail', message);
                     return;
                 },

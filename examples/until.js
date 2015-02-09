@@ -43,7 +43,7 @@
          // This function prints the current `val` to stdout.
             console.log(this.val);
             return evt.exit();
-        }).on('error', function (message) {
+        }).on('fail', function (message) {
          // This function prints errors to stderr if anything goes wrong.
             console.error('Error:', message);
             return;

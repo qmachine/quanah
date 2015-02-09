@@ -110,7 +110,7 @@
             x.Q(function (evt) {
              // This function needs documentation.
                 return evt.fail(x.val);
-            }).on('error', function (message) {
+            }).on('fail', function (message) {
              // This function needs documentation.
                 expect(message).to.equal(x.val);
                 return done();
@@ -130,7 +130,7 @@
              // This function needs documentation.
                 console.log('This should _NOT_ appear in the output!');
                 return evt.exit();
-            }).on('error', function (message) {
+            }).on('fail', function (message) {
              // This function needs documentation.
                 expect(message).to.equal(x.val);
                 return done();
@@ -148,7 +148,7 @@
              // This function needs documentation.
                 console.log('This should _NOT_ appear in the output!');
                 return evt.exit();
-            }).on('error', function () {
+            }).on('fail', function () {
              // This function needs documentation.
                 return done();
             });
@@ -215,7 +215,7 @@
                     console.log('This should _NOT_ appear in the output!');
                     temp_evt.exit();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     return evt.fail(message);
                 });
@@ -224,7 +224,7 @@
              // This function needs documentation.
                 console.log('This should _NOT_ appear in the output!');
                 return evt.exit();
-            }).on('error', function (message) {
+            }).on('fail', function (message) {
              // This function needs documentation.
                 expect(message).to.equal('This fails deliberately.');
                 return done();
@@ -251,7 +251,7 @@
                 }
                 done();
                 return evt.exit();
-            }).on('error', function (message) {
+            }).on('fail', function (message) {
              // This function needs documentation.
                 console.error('Error:', message);
                 return;
@@ -393,7 +393,7 @@
                     expect(this.val).to.equal(undefined);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -407,7 +407,7 @@
                     expect(this.val).to.equal(2);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -420,7 +420,7 @@
                     expect(this.val).to.equal(2);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -433,7 +433,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -446,7 +446,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -459,7 +459,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -472,7 +472,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -485,7 +485,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -498,7 +498,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -511,7 +511,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -524,7 +524,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -537,7 +537,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -550,7 +550,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -563,7 +563,7 @@
                     expect(this.val).to.equal(2);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -576,7 +576,7 @@
                     expect(this.val).to.equal(2);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -589,7 +589,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -602,7 +602,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -615,7 +615,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -628,7 +628,7 @@
                     expect(this.val).to.equal(5);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -641,7 +641,7 @@
                     expect(this.val).to.equal(9);
                     bye();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -654,7 +654,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -667,7 +667,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -680,7 +680,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -693,7 +693,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -706,7 +706,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -719,7 +719,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -732,7 +732,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;
@@ -745,7 +745,7 @@
                     expect(this.val).to.equal(9);
                     done();
                     return evt.exit();
-                }).on('error', function (message) {
+                }).on('fail', function (message) {
                  // This function needs documentation.
                     console.error('Error:', message);
                     return;

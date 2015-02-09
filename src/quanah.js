@@ -9,7 +9,15 @@
 
 /* @flow */
 
-/*properties call, prototype */
+/*jshint es3: true, maxparams: 2, quotmark: single, strict: true */
+
+/*jslint indent: 4, maxlen: 80 */
+
+/*properties
+    apply, avar, call, can_run_remotely, def, epitaph, exit, exports, f, fail,
+    global, hasOwnProperty, length, on, onerror, prototype, push, Q, QUANAH,
+    queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
+*/
 
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
@@ -31,9 +39,6 @@
  // sandboxed contexts, and using identifiers like `global` carelessly ...
 
     /*global global: false, module: false */
-    /*jshint quotmark: single, strict: true */
-    /*jslint indent: 4, maxlen: 80 */
-    /*properties exports, global, hasOwnProperty, QUANAH */
 
  // Declare a variable to hold a reference to the global object.
 
@@ -78,18 +83,6 @@
  // written in a subset of ECMAScript that is so old and well-supported that
  // Quanah actually runs correctly as ActionScript 2.0.
 
- // Pragmas
-
-    /*jshint es3: true, maxparams: 2, quotmark: single, strict: true */
-
-    /*jslint indent: 4, maxlen: 80 */
-
-    /*properties
-        apply, avar, can_run_remotely, def, epitaph, exit, f, fail, length, on,
-        onerror, push, Q, queue, ready, run_remotely, send, shift, slice,
-        snooze, stay, sync, val, x
-    */
-
  // Declarations
 
     var AVar, avar, can_run_remotely, def, is_Function, loop, queue,
@@ -98,8 +91,8 @@
  // Definitions
 
     AVar = function AVar(val) {
-     // This function constructs "avars", which are generic containers for
-     // "asynchronous variables".
+     // This function constructs "asynchronous variables" ("avars"). An avar is
+     // a generic container for any other JavaScript type.
         var state, that;
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;

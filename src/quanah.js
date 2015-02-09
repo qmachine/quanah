@@ -236,18 +236,19 @@
      // outside the giant anonymous closure. In particular, this allows users
      // to "port" Quanah as a concurrency model for use with almost any storage
      // or messaging system. For a real-world example, check out the browser
-     // client for QMachine (https://github.com/qmachine/qm-browser-client).
-     // Note that only the first definition provided for a given method will be
-     // used. The reason for this is historical, because Quanah's development
-     // was largely driven by the needs of QMachine, and concerns about a
-     // malicious user's ability to "hijack" a worker by redefining "low-level"
-     // functions seemed important. In the future, the namespace object itself
-     // will likely serve as storage for external definitions, and individuals
-     // with security concerns will just use `Object.defineProperty` to prevent
-     // their code from being overwritten.
+     // client for QMachine (https://github.com/qmachine/qm-browser-client). In
+     // the past, only the first definition provided for a given method would
+     // be used, because Quanah's development was largely driven by the needs
+     // of QMachine, and concerns about a malicious user's ability to "hijack"
+     // a worker by redefining "low-level" functions seemed important. It is
+     // now very clear, however, that security concerns of that nature are not
+     // Quanah's responsibility. In the future, it is most likely that the
+     // "namespace module" itself will be used to store external definitions,
+     // because that would allow individuals with security concerns to use
+     // `Object.defineProperty` to prevent their code from being overwritten.
         var key;
         for (key in obj) {
-            if ((obj.hasOwnProperty(key)) && (user_defs[key] === null)) {
+            if (obj.hasOwnProperty(key)) {
                 user_defs[key] = obj[key];
             }
         }
@@ -519,11 +520,7 @@
         return y;
     };
 
-    user_defs = {
-        'can_run_remotely': null,
-        'run_remotely': null,
-        'snooze': null
-    };
+    user_defs = {};
 
  // Prototype definitions
 

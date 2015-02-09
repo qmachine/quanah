@@ -87,7 +87,7 @@
     /*properties
         apply, avar, can_run_remotely, def, epitaph, exit, f, fail, length, on,
         onerror, push, Q, queue, ready, run_remotely, send, shift, slice,
-        snooze, stay, sync, unshift, val, x
+        snooze, stay, sync, val, x
     */
 
  // Declarations
@@ -111,22 +111,20 @@
             switch (name) {
             case 'exit':
              // A computation involving this avar has succeeded, and we will
-             // now prepare to run the next computation that depends on it by
-             // transferring it from the avar's individual queue into the
-             // global `queue` used by the `loop` function.
-                state.ready = true;
-                if (state.queue.length > 0) {
-                    state.ready = false;
-                    queue.unshift({'f': state.queue.shift(), 'x': that});
-                }
+             // now prepare to enable the application of the next transform in
+             // the queue, unless this avar has already failed. The extra check
+             // may not actually be necessary, but there's no harm in playing
+             // it safe right now until I can formally prove that there are no
+             // race conditions.
+                state.ready = (state.epitaph === null);
                 break;
             case 'fail':
              // A computation involving this avar has failed, and we will now
              // suspend all computations that depend on it indefinitely by
              // overwriting the queue with a fresh one. This is also important
-             // because the garbage collector can't free the memory unless we
-             // release these references. We will also try to call `onerror`
-             // if one has been defined.
+             // because JavaScript's garbage collector can't free the memory
+             // unless we release these references. We will also try to call
+             // `onerror` if one has been defined.
                 if (state.epitaph === null) {
                  // We don't want to overwrite the original error by accident,
                  // since that would be an utter nightmare for debugging.
@@ -158,20 +156,17 @@
             case 'queue':
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
-             // task queue (`queue`). Because retriggering execution by sending
-             // `exit` messages recursively requires a lot of extra overhead,
-             // we'll just go ahead and retrigger execution directly.
+             // task queue (`queue`).
                 if (is_Function(arg)) {
                     state.queue.push(arg);
-                    if (state.ready === true) {
-                        state.ready = false;
-                        queue.unshift({'f': state.queue.shift(), 'x': that});
-                    }
                 } else if (arg instanceof AVar) {
                     sync(arg, that).Q(function (evt) {
                      // This function allows Quanah to postpone execution of
                      // the given task until both `f` and `x` are ready. The
                      // following line is given in the form `f.call(x, evt)`.
+                     // Instead of checking that `arg.val` is a function, the
+                     // strategy here is to allow type errors to be caught by
+                     // `run_locally` or `run_remotely`.
                         (arg.val).call(that, evt);
                         return;
                     });
@@ -202,6 +197,21 @@
              // involved calling `send` without any arguments.
                 that.send('fail', 'Invalid `send` message "' + name + '"');
             }
+         // Now, if the avar is ready for its next transform, "lock" the avar
+         // and add a new task to the main task queue (`queue`).
+            if ((state.ready === true) && (state.queue.length > 0)) {
+                state.ready = false;
+             // The use of `push` here is for consistency with a FIFO ordering,
+             // but for a long time `unshift` was used here instead. The reason
+             // for using `unshift` was because of a questionable assumption
+             // that, because the new task would *definitely* never have been
+             // `stay`ed, trying it first before working through the rest of
+             // the queue again would require less cycles through the queue in
+             // the long term. Performance isn't a primary concern right now,
+             // though, so ... `push` it is.
+                queue.push({'f': state.queue.shift(), 'x': that});
+            }
+         // Finally, run `loop` to trigger execution for the main queue.
             loop();
             return that;
         };

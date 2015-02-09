@@ -67,14 +67,9 @@
  // User definitions for Quanah
 
     require('../').def({
-        'snooze': function (loop) {
-         // This function is analogous to a human who hits the "snooze" button
-         // on an alarm clock because it tells Quanah to come back later. In
-         // this regard, it is different from `revive` because `revive` starts
-         // work on the queue immediately.
-            process.nextTick(loop);
-            return;
-        }
+     // This function is analogous to a human who hits the "snooze" button on
+     // an alarm clock because it tells Quanah to come back later.
+        'snooze': process.nextTick // see also: http://goo.gl/8HMpVX
     });
 
  // Demonstration

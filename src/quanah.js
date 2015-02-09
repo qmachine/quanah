@@ -9,6 +9,8 @@
 
 /* @flow */
 
+/*properties call, prototype */
+
 (Function.prototype.call.call(function (that, lib) {
     'use strict';
 

@@ -359,9 +359,8 @@
                 }
             });
         } catch (err) {
-         // In early versions of Quanah, `stay` threw a special `Error` type as
-         // a crude form of message passing, but because Quanah no longer
-         // throws errors, it can assume that all caught errors are failures.
+         // Because Quanah never throws exceptions of its own, `err` is assumed
+         // to be a task-level failure.
             task.x.send('fail', err);
         }
         return;

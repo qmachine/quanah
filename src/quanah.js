@@ -391,7 +391,7 @@
      // be avars, and it outputs a new avar which acts as a "sync point". The
      // syntax here is designed to mimic `Array.concat`. The avar returned by
      // this function will have a slightly modified form of `AVar.prototype.Q`
-     // placed directly onto it as an instance method as means to provide a
+     // placed directly onto it as an instance method as a means to provide a
      // nice way of distinguishing a "normal" avar from a "sync point". Any
      // functions that are fed into the `Q` method will wait for all input
      // arguments' outstanding queues to empty before executing, and exiting

@@ -116,8 +116,8 @@
              // suspend all computations that depend on it indefinitely by
              // overwriting the queue with a fresh one. This is also important
              // because JavaScript's garbage collector can't free the memory
-             // unless we release these references. We will also try to call
-             // `onerror` if one has been defined.
+             // unless we release these references. We will also try to call an
+             // `onerror` listener if one has been provided.
                 if (state.epitaph === null) {
                  // We don't want to overwrite the original error by accident,
                  // since that would be an utter nightmare for debugging.

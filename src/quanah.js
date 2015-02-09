@@ -76,8 +76,7 @@
  // of this approach is that it may eliminate the use of opt-in asm.js, but no
  // functions are strong candidates for that anyway. The entire library is
  // written in a subset of ECMAScript that is so old and well-supported that
- // Quanah actually runs correctly as ActionScript 2.0. Currently, the only
- // "problems" that JSLint finds are a few shadowed variables :-)
+ // Quanah actually runs correctly as ActionScript 2.0.
 
  // Pragmas
 

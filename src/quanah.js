@@ -385,18 +385,17 @@
     sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "sync point". The
-     // syntax here is designed to mimic `Array.concat`. The avar returned by
-     // this function will have a slightly modified form of `AVar.prototype.Q`
-     // placed directly onto it as an instance method as a means to provide a
-     // nice way of distinguishing a "normal" avar from a "sync point". Any
-     // functions that are fed into the `Q` method will wait for all input
-     // arguments' outstanding queues to empty before executing, and exiting
-     // will allow each of the inputs to begin working through its individual
-     // queue again. Also, a sync point can still be used as a prerequisite to
-     // execution even when the sync point depends on one of the other
-     // prerequisites. (Although the immediate usefulness of this capability
-     // isn't obvious, it turns out to be crucially important for expressing
-     // certain concurrency patterns idiomatically.)
+     // avar returned by this function will have a slightly modified form of
+     // `AVar.prototype.Q` placed directly onto it as an instance method as a
+     // means to provide a nice way of distinguishing a "normal" avar from a
+     // "sync point". Any functions that are fed into the `Q` method will wait
+     // for all input arguments' outstanding queues to empty before executing,
+     // and exiting will allow each of the inputs to begin working through its
+     // individual queue again. Also, a sync point can still be used as a
+     // prerequisite to execution even when the sync point depends on one of
+     // the other prerequisites. (Although the immediate usefulness of this
+     // capability isn't obvious, it turns out to be crucially important for
+     // expressing certain concurrency patterns idiomatically.)
      //
      // NOTE: What happens here if an avar which has already failed is used in
      // a `sync` statement? Does the `sync` fail immediately, as expected?

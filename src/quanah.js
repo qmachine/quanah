@@ -137,19 +137,18 @@
                     state.onerror.apply(that, state.epitaph);
                 }
                 break;
-            case 'on':
+            case 'onerror':
              // This arm was originally added as an experiment into supporting
              // an event-driven idiom inspired by Node.js, but "error" is still
              // the only event available. New "fail" and "stay" events are
              // under consideration, but they will be added only if they enable
              // behavior that was previously impossible.
-                if ((args[0] === 'error') && (is_Function(args[1]))) {
-                 // A computation has defined an `onerror` handler for this
-                 // avar, but we need to make sure that it hasn't already
-                 // failed in some previous computation. If the avar has
-                 // already failed, we will store the handler and also fire it
-                 // immediately.
-                    state.onerror = args[1];
+                if (is_Function(args[0])) {
+                 // An `onerror` listener has been provided for this avar, but
+                 // we need to make sure that it hasn't already failed in some
+                 // previous computation. If the avar has already failed, we
+                 // will store the listener and also call it immediately.
+                    state.onerror = args[0];
                     if (state.epitaph !== null) {
                         that.send('fail', [state.epitaph]);
                     }
@@ -527,7 +526,7 @@
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        return this.send('on', [event_name, listener]);
+        return this.send('on' + event_name, [listener]);
     };
 
     AVar.prototype.Q = function (f) {

@@ -94,7 +94,7 @@
      // This function constructs "asynchronous variables" ("avars"). An avar is
      // a generic container for any other JavaScript type.
         var state, that;
-        state = {'epitaph': null, 'onfail': null, 'queue': [], 'ready': true};
+        state = {'epitaph': null, 'onfail': [], 'queue': [], 'ready': true};
         that = this;
         that.send = function (name, arg) {
          // This function is an instance method for manipulating the internal
@@ -125,9 +125,15 @@
                 }
                 state.queue = [];
                 state.ready = false;
-                if (is_Function(state.onfail)) {
-                    state.onfail.call(that, state.epitaph);
-                }
+                (function () {
+                 // This anonymous closure creates a temporary scope in which
+                 // to iterate over known `onfail` listeners.
+                    var i;
+                    for (i = 0; i < state.onfail.length; i += 1) {
+                        state.onfail[i].call(that, state.epitaph);
+                    }
+                    return;
+                }());
                 break;
             case 'onfail':
              // This arm was originally added as an experiment into supporting
@@ -140,9 +146,9 @@
                  // we need to make sure that the avar hasn't already failed in
                  // a previous computation. If the avar has already failed, we
                  // will store the listener and also call it immediately.
-                    state.onfail = arg;
+                    state.onfail.push(arg);
                     if (state.epitaph !== null) {
-                        state.onfail.call(that, state.epitaph);
+                        arg.call(that, state.epitaph);
                     }
                 }
                 break;

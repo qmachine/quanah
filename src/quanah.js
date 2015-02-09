@@ -308,7 +308,8 @@
              // the `fail` method, but no one ever found a reason to do it.
                 'exit': function (message) {
                  // This function indicates successful completion.
-                    return obj.x.send('exit', message);
+                    obj.x.send('exit', message);
+                    return;
                 },
                 'fail': function (message) {
                  // This function indicates a failure, and it is intended to
@@ -323,7 +324,8 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace `throw` with `fail` in
                  // their programs to solve the remote error capture problem.
-                    return obj.x.send('fail', message);
+                    obj.x.send('fail', message);
+                    return;
                 },
                 'stay': function (message) {
                  // This function allows a user to postpone execution, and it
@@ -348,8 +350,7 @@
                     if (is_Function(user_defs.snooze)) {
                         user_defs.snooze(loop);
                     }
-                 // Return `obj.x` for type consistency with `exit` and `fail`.
-                    return obj.x;
+                    return;
                 }
             });
         } catch (err) {

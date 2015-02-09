@@ -188,7 +188,7 @@
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `loop` using an obsolete idiom that
              // involved calling `send` without any arguments.
-                that.send('fail', 'Invalid `send` message "' + name + '"');
+                that.send('fail', 'Invalid `send` to "' + name + '"');
             }
          // Now, if the avar is ready for its next transform, "lock" the avar
          // and add a new task to the main task queue (`queue`).
@@ -294,9 +294,9 @@
 
     queue = [];
 
-    run_locally = function (obj) {
+    run_locally = function (task) {
      // This function applies the transformation `f` to `x` for method `f` and
-     // property `x` of the input object `obj` by calling `f` with `evt` as an
+     // property `x` of the input object `task` by calling `f` with `evt` as an
      // input argument and `x` as the `this` value. The advantage of performing
      // transformations this way (versus computing `f(x)` directly) is that it
      // allows the user to indicate the program's logic explicitly even when
@@ -304,16 +304,16 @@
      // commonly the case in JavaScript when working with callback functions.
      // Note also that this function acts almost entirely by side effects.
         try {
-            obj.f.call(obj.x, {
+            task.f.call(task.x, {
              // This is the object that defines the input argument given to the
              // transformation `f`; it is most often called `evt`. It is an
              // object literal that provides `exit`, `fail`, and `stay` methods
-             // that send messages to `obj.x` for flow control. Quanah used to
+             // that send messages to `task.x` for flow control. Quanah used to
              // store a reference to this object so that users could override
-             // the `fail` method, but no one ever found a reason to do it.
+             // the `fail` method, but no one ever found a reason to do that.
                 'exit': function (message) {
                  // This function indicates successful completion.
-                    obj.x.send('exit', message);
+                    task.x.send('exit', message);
                     return;
                 },
                 'fail': function (message) {
@@ -329,7 +329,7 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace `throw` with `fail` in
                  // their programs to solve the remote error capture problem.
-                    obj.x.send('fail', message);
+                    task.x.send('fail', message);
                     return;
                 },
                 'stay': function (message) {
@@ -350,8 +350,8 @@
                  // the `stay` message. Invoking `send` also invokes `loop`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
-                    obj.x.send('stay', message);
-                    queue.push(obj);
+                    task.x.send('stay', message);
+                    queue.push(task);
                     if (is_Function(user_defs.snooze)) {
                         user_defs.snooze(loop);
                     }
@@ -362,7 +362,7 @@
          // In early versions of Quanah, `stay` threw a special `Error` type as
          // a crude form of message passing, but because Quanah no longer
          // throws errors, it can assume that all caught errors are failures.
-            obj.x.send('fail', err);
+            task.x.send('fail', err);
         }
         return;
     };

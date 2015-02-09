@@ -102,7 +102,7 @@
         var state, that;
         state = {'epitaph': null, 'onerror': null, 'queue': [], 'ready': true};
         that = this;
-        that.send = function (name, args) {
+        that.send = function (name, arg) {
          // This function is an instance method for manipulating the internal
          // state of an avar. Its design was originally inspired by the
          // message-passing style used in Objective-C. Its name and functional
@@ -129,12 +129,12 @@
                 if (state.epitaph === null) {
                  // We don't want to overwrite the original error by accident,
                  // since that would be an utter nightmare for debugging.
-                    state.epitaph = args;
+                    state.epitaph = arg;
                 }
                 state.queue = [];
                 state.ready = false;
                 if (is_Function(state.onerror)) {
-                    state.onerror.apply(that, state.epitaph);
+                    state.onerror.call(that, state.epitaph);
                 }
                 break;
             case 'onerror':
@@ -143,14 +143,14 @@
              // the only event available. New "fail" and "stay" events are
              // under consideration, but they will be added only if they enable
              // behavior that was previously impossible.
-                if (is_Function(args[0])) {
+                if (is_Function(arg)) {
                  // An `onerror` listener has been provided for this avar, but
                  // we need to make sure that it hasn't already failed in some
                  // previous computation. If the avar has already failed, we
                  // will store the listener and also call it immediately.
-                    state.onerror = args[0];
+                    state.onerror = arg;
                     if (state.epitaph !== null) {
-                        that.send('fail', [state.epitaph]);
+                        that.send('fail', state.epitaph);
                     }
                 }
                 break;
@@ -160,22 +160,22 @@
              // task queue (`queue`). Because retriggering execution by sending
              // `exit` messages recursively requires a lot of extra overhead,
              // we'll just go ahead and retrigger execution directly.
-                if (is_Function(args[0])) {
-                    state.queue.push(args[0]);
+                if (is_Function(arg)) {
+                    state.queue.push(arg);
                     if (state.ready === true) {
                         state.ready = false;
                         queue.unshift({'f': state.queue.shift(), 'x': that});
                     }
-                } else if (args[0] instanceof AVar) {
-                    sync(args[0], that).Q(function (evt) {
+                } else if (arg instanceof AVar) {
+                    sync(arg, that).Q(function (evt) {
                      // This function allows Quanah to postpone execution of
                      // the given task until both `f` and `x` are ready. The
                      // following line is given in the form `f.call(x, evt)`.
-                        (args[0].val).call(that, evt);
+                        (arg.val).call(that, evt);
                         return;
                     });
                 } else {
-                    that.send('fail', ['Transformation must be a function.']);
+                    that.send('fail', 'Transformation must be a function.');
                 }
                 break;
             case 'stay':
@@ -199,7 +199,7 @@
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `loop` using an obsolete idiom that
              // involved calling `send` without any arguments.
-                that.send('fail', ['Invalid `send` message "' + name + '"']);
+                that.send('fail', 'Invalid `send` message "' + name + '"');
             }
             loop();
             return that;
@@ -308,7 +308,7 @@
              // the `fail` method, but no one ever found a reason to do it.
                 'exit': function (message) {
                  // This function indicates successful completion.
-                    return obj.x.send('exit', [message]);
+                    return obj.x.send('exit', message);
                 },
                 'fail': function (message) {
                  // This function indicates a failure, and it is intended to
@@ -323,7 +323,7 @@
                  // from a "remote" machine, with respect to execution. Thus,
                  // Quanah encourages users to replace `throw` with `fail` in
                  // their programs to solve the remote error capture problem.
-                    return obj.x.send('fail', [message]);
+                    return obj.x.send('fail', message);
                 },
                 'stay': function (message) {
                  // This function allows a user to postpone execution, and it
@@ -343,7 +343,7 @@
                  // the `stay` message. Invoking `send` also invokes `loop`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
-                    obj.x.send('stay', [message]);
+                    obj.x.send('stay', message);
                     queue.push(obj);
                     if (is_Function(user_defs.snooze)) {
                         user_defs.snooze(loop);
@@ -356,7 +356,7 @@
          // In early versions of Quanah, `stay` threw a special `Error` type as
          // a crude form of message passing, but because Quanah no longer
          // throws errors, it can assume that all caught errors are failures.
-            obj.x.send('fail', [err]);
+            obj.x.send('fail', err);
         }
         return;
     };
@@ -432,7 +432,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q".
             if (f instanceof AVar) {
-                return y.send('queue', [f]);
+                return y.send('queue', f);
             }
             var blocker, count, egress, j, m, n, ready;
             blocker = function (evt) {
@@ -460,7 +460,7 @@
                     count();
                 }
             }
-            y.send('queue', [function (evt) {
+            y.send('queue', function (evt) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `evt` argument it will receive. This
@@ -508,7 +508,7 @@
                     }
                 });
                 return;
-            }]);
+            });
             return y;
         };
         return y;
@@ -526,7 +526,7 @@
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        return this.send('on' + event_name, [listener]);
+        return this.send('on' + event_name, listener);
     };
 
     AVar.prototype.Q = function (f) {
@@ -535,7 +535,7 @@
      // method for avars that takes a single input argument. The input argument
      // is expected to be either a monadic (single variable) function or else
      // an avar with a monadic function as its `val`.
-        return ((this instanceof AVar) ? this : avar(this)).send('queue', [f]);
+        return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 
  // That's all, folks!

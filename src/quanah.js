@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 08 Feb 2015
+//                                                  ~~ last updated 09 Feb 2015
 
 /* @flow */
 
@@ -149,8 +149,8 @@
             case 'queue':
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
-             // task queue (`queue`). Although `arg` is expected to a function
-             // or an avar that will have a function as its `val` eventually,
+             // task queue (`queue`). Although `arg` is expected to be either a
+             // function or an avar that will have a function as its `val`,
              // typechecking is not enforced at this time. Instead, the idea
              // here is to allow type errors to be caught by `run_locally` or
              // `run_remotely`.

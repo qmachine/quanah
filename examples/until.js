@@ -47,10 +47,10 @@
 
     AVar.prototype.print = function () {
      // This function is just shorthand that mimics QMachine's browser client.
-        this.Q(function (evt) {
+        this.Q(function (signal) {
          // This function prints the current `val` to stdout.
             console.log(this.val);
-            return evt.exit();
+            return signal.exit();
         }).on('fail', function (message) {
          // This function prints errors to stderr if anything goes wrong.
             console.error('Error:', message);
@@ -62,12 +62,12 @@
     AVar.prototype.until = function (f) {
      // This function provides a chainable, non-blocking `until` loop by using
      // a function `f` to represent the body of the loop.
-        this.Q(function (evt) {
+        this.Q(function (signal) {
          // This function evaluates `f` and repeats if the output is `false`.
             if (f.call(this) === false) {
-                return evt.stay();
+                return signal.stay();
             }
-            return evt.exit();
+            return signal.exit();
         });
         return this;
     };

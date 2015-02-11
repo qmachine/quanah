@@ -160,11 +160,11 @@
              // here is to allow type errors to be caught by `run_locally` or
              // `run_remotely`.
                 if (arg instanceof AVar) {
-                    sync(arg, that).Q(function (evt) {
+                    sync(arg, that).Q(function (signal) {
                      // This function allows Quanah to postpone execution of
                      // the given task until both `f` and `x` are ready. The
-                     // following line is given in the form `f.call(x, evt)`.
-                        (arg.val).call(that, evt);
+                     // following line takes the form `f.call(x, signal)`.
+                        (arg.val).call(that, signal);
                         return;
                     });
                 } else {
@@ -290,21 +290,23 @@
 
     run_locally = function (task) {
      // This function applies the transformation `f` to `x` for method `f` and
-     // property `x` of the input object `task` by calling `f` with `evt` as an
-     // input argument and `x` as the `this` value. The advantage of performing
-     // transformations this way (versus computing `f(x)` directly) is that it
-     // allows the user to indicate the program's logic explicitly even when
-     // the program's control is difficult or impossible to predict, as is
-     // commonly the case in JavaScript when working with callback functions.
-     // Note also that this function acts almost entirely by side effects.
+     // property `x` of the input object `task`. It calls `f` with `x` as the
+     // `this` value, along with an object with methods to control execution as
+     // an input argument. The advantage of performing transformations this way
+     // (versus computing `f(x)` directly) is that it allows/forces the user to
+     // indicate the program's logic explicitly even when the program's control
+     // is difficult or impossible to predict, as is commonly the case in
+     // JavaScript when working with callback functions. Note also that this
+     // function acts almost entirely by side effects.
         try {
             task.f.call(task.x, {
              // This is the object that defines the input argument given to the
-             // transformation `f`; it is most often called `evt`. It is an
-             // object literal that provides `exit`, `fail`, and `stay` methods
-             // that send messages to `task.x` for flow control. Quanah used to
-             // store a reference to this object so that users could override
-             // the `fail` method, but no one ever found a reason to do that.
+             // transformation `f`; it is often called `evt` or `signal`. It is
+             // an object literal that provides `exit`, `fail`, and `stay`
+             // methods that send messages to the task's input data, `task.x`,
+             // for flow control. Quanah used to store a reference to this
+             // object so that users could override the `fail` method, but no
+             // one ever found a reason to do that.
                 'exit': function (message) {
                  // This function indicates successful completion.
                     task.x.send('exit', message);
@@ -477,39 +479,37 @@
                     count();
                 }
             }
-            y.send('queue', function (evt) {
+            y.send('queue', function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
-             // modified version of the `evt` argument it will receive. This
+             // modified version of the `signal` argument it will receive. This
              // function will be put into `y`'s queue, but it will not run
-             // until `ready` is `true`.
+             // until all prerequisites are ready to proceed.
                 if (status === 'failed') {
-                    return evt.fail('Prerequisite(s) for syncpoint failed.');
+                    return signal.fail('Failed prerequisite(s) for syncpoint');
                 }
                 if (status === 'waiting') {
-                    return evt.stay('Acquiring "lock" ...');
+                    return signal.stay('Acquiring "lock" ...');
                 }
                 f.call(this, {
-                 // These methods close over the `evt` argument as well as
-                 // the `egress` array so that invocations of the control
-                 // statements `exit`, `fail`, and `stay` are forwarded to
-                 // all of the original arguments given to `sync`.
+                 // These methods close over the `signal` object in order to
+                 // extend its behavior.
                     'exit': function (message) {
                      // This function signals successful completion :-)
                         status = 'done';
-                        return evt.exit(message);
+                        return signal.exit(message);
                     },
                     'fail': function (message) {
                      // This function signals a failed execution :-(
                         handle_error();
-                        return evt.fail(message);
+                        return signal.fail(message);
                     },
                     'stay': function (message) {
                      // This function postpones execution temporarily. Although
                      // it seems reasonable that `stay` should match the forms
                      // of `exit` and `fail`, such behavior doesn't really make
                      // sense ...
-                        return evt.stay(message);
+                        return signal.stay(message);
                     }
                 });
                 return;

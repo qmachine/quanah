@@ -408,28 +408,25 @@
      // NOTE: The instance method `Q` that gets added to a sync point is not
      // a perfect substitute for the instance `send` method it already has ...
      //
-        var args, flag, i, stack, temp, x, y;
+        var args, flag, i, temp, x, y;
         args = Array.prototype.slice.call(arguments);
-        stack = args.slice();
         x = [];
         y = avar();
-        while (stack.length > 0) {
+        while (args.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
          // dependencies from the input arguments `args`. Instead, Quanah uses
-         // an array-based stack here with a `while` loop as a means to avoid
-         // the treacherous function recursion stack and its unpredictably
-         // limited depth, since a user could potentially write fiendishly
-         // complicated code that would actually overflow that limit. Anyway,
-         // the prerequisites of compound avars will be added, but the compound
+         // an array along with a `while` loop as a means to avoid recursion,
+         // because the recursion depth limit is unpredictable in JavaScript.
+         // The prerequisites of compound avars will be added, but the compound
          // avars themselves will not be added. Performing this operation is
          // what allows Quanah to "un-nest" `sync` statements in a single pass
          // without constructing a directed acyclic graph or preprocessing the
          // source code :-)
-            temp = stack.shift();
+            temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty('Q'))) {
              // This arm "flattens" dependencies for array-based recursion.
-                Array.prototype.push.apply(stack, temp.val);
+                Array.prototype.push.apply(args, temp.val);
             } else {
              // This arm ensures that elements are unique.
                 flag = false;

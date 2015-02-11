@@ -505,10 +505,8 @@
                         return signal.fail(message);
                     },
                     'stay': function (message) {
-                     // This function postpones execution temporarily. Although
-                     // it seems reasonable that `stay` should match the forms
-                     // of `exit` and `fail`, such behavior doesn't really make
-                     // sense ...
+                     // This function postpones execution temporarily. In such
+                     // a case, nothing needs to be forwarded to other avars.
                         return signal.stay(message);
                     }
                 });

@@ -444,8 +444,8 @@
             if (f instanceof AVar) {
                 return y.send('queue', f);
             }
-            var block_queue, count, handle_error, j, m, n, status;
-            block_queue = function (outer_signal) {
+            var block_execution, count, handle_error, j, m, n, status;
+            block_execution = function (outer_signal) {
              // This function needs documentation.
                 count();
                 avar().Q(function (inner_signal) {
@@ -478,7 +478,7 @@
             status = (m === n) ? 'running' : 'waiting';
             for (j = 0; j < n; j += 1) {
                 if (x[j] instanceof AVar) {
-                    x[j].Q(block_queue).on('fail', handle_error);
+                    x[j].Q(block_execution).on('fail', handle_error);
                 } else {
                     count();
                 }
@@ -507,7 +507,7 @@
                     },
                     'fail': function (message) {
                      // This function signals a failed execution :-(
-                        status = 'failed';
+                        handle_error();
                         return evt.fail(message);
                     },
                     'stay': function (message) {

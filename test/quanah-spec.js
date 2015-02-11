@@ -23,7 +23,7 @@
     /*jslint indent: 4, maxlen: 80, node: true */
 
     /*properties
-        a, an, avar, be, constructor, def, error, equal, exit, fail, have, key,
+        a, an, avar, be, constructor, error, equal, exit, fail, have, key,
         length, log, name, nextTick, on, Q, PI, property, prototype, push,
         random, send, sync, to, toString, val, valueOf
     */
@@ -45,7 +45,6 @@
         beforeEach(function () {
          // This function needs documentation.
             avar = require('../src/quanah').avar;
-            //def = require('../src/quanah').def;
             quanah = require('../src/quanah');
             sync = require('../src/quanah').sync;
             return;
@@ -63,12 +62,6 @@
             expect(quanah).to.have.property('avar');
             expect(quanah.avar).to.be.a('function');
             expect(quanah.avar.length).to.equal(1); // check arity
-        });
-
-        it('should have its own `def` method', function () {
-            expect(quanah).to.have.property('def');
-            expect(quanah.def).to.be.a('function');
-            expect(quanah.def.length).to.equal(1);
         });
 
         it('should have its own `sync` method', function () {

@@ -7,7 +7,7 @@
 //  but the demonstration here is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 08 Feb 2015
+//                                                  ~~ last updated 11 Feb 2015
 
 /* @flow */
 
@@ -21,9 +21,17 @@
     /*jslint indent: 4, maxlen: 80, node: true */
 
     /*properties
-        avar, call, constructor, def, error, exit, log, on, nextTick, print,
+        avar, call, constructor, error, exit, log, on, nextTick, print,
         prototype, Q, random, snooze, stay, until, val
     */
+
+ // Prerequisites
+
+ // Extend definitions for Quanah by providing a `snooze` function, which is
+ // analogous to a human who hits the "snooze" button on an alarm clock because
+ // it tells Quanah to come back later :-P
+
+    require('../').snooze = process.nextTick; // see also: http://goo.gl/8HMpVX
 
  // Declarations
 
@@ -63,14 +71,6 @@
         });
         return this;
     };
-
- // User definitions for Quanah
-
-    require('../').def({
-     // This function is analogous to a human who hits the "snooze" button on
-     // an alarm clock because it tells Quanah to come back later.
-        'snooze': process.nextTick // see also: http://goo.gl/8HMpVX
-    });
 
  // Demonstration
 

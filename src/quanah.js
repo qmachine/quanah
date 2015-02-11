@@ -14,7 +14,7 @@
 /*jslint indent: 4, maxlen: 80 */
 
 /*properties
-    apply, avar, call, can_run_remotely, def, epitaph, exit, exports, f, fail,
+    apply, avar, call, can_run_remotely, epitaph, exit, exports, f, fail,
     global, hasOwnProperty, length, on, onfail, prototype, push, Q, QUANAH,
     queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
 */
@@ -85,8 +85,8 @@
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, def, is_Function, loop, queue,
-        run_locally, run_remotely, sync, user_defs;
+    var AVar, avar, can_run_remotely, is_Function, lib, loop, queue,
+        run_locally, run_remotely, sync;
 
  // Definitions
 
@@ -230,33 +230,9 @@
      // or remote execution for a given task. Note also that the `=== true` is
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
-        return ((is_Function(user_defs.can_run_remotely))   &&
-                (is_Function(user_defs.run_remotely))       &&
-                (user_defs.can_run_remotely(task) === true));
-    };
-
-    def = function (obj) {
-     // This function enables the user to redefine "internal" functions from
-     // outside the giant anonymous closure. In particular, this allows users
-     // to "port" Quanah as a concurrency model for use with almost any storage
-     // or messaging system. For a real-world example, check out the browser
-     // client for QMachine (https://github.com/qmachine/qm-browser-client). In
-     // the past, only the first definition provided for a given method would
-     // be used, because Quanah's development was largely driven by the needs
-     // of QMachine, and concerns about a malicious user's ability to "hijack"
-     // a worker by redefining "low-level" functions seemed important. It is
-     // now very clear, however, that security concerns of that nature are not
-     // Quanah's responsibility. In the future, it is most likely that the
-     // "namespace module" itself will be used to store external definitions,
-     // because that would allow individuals with security concerns to use
-     // `Object.defineProperty` to prevent their code from being overwritten.
-        var key;
-        for (key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                user_defs[key] = obj[key];
-            }
-        }
-        return;
+        return ((is_Function(lib.can_run_remotely)) &&
+                (is_Function(lib.run_remotely))     &&
+                (lib.can_run_remotely(task) === true));
     };
 
     is_Function = function (f) {
@@ -267,6 +243,20 @@
      // to handle bugs like http://git.io/WcNQEQ or http://git.io/bZIaQw. Also,
      // note that an avar with a function as its `val` will return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
+    };
+
+    lib = {
+     // This object will be used as a "namespace", but it works more like a
+     // Ruby module -- a "bag of functions". Anything added to this object will
+     // be available both inside and outside this anonymous closure. Because
+     // Quanah can delegate to functions that are defined externally to this
+     // closure if they are available, users can adapt the behavior of Quanah's
+     // "internal" functions for use with any environment. Additionally, this
+     // allows the application developer to control the governance of the
+     // definitions. Developers with concerns about a malicious user's ability
+     // to "hijack" a remote context by redefining "low-level" functions can
+     // use `Object.defineProperty` in modern JS environments to prevent their
+     // code from being overwritten, for example.
     };
 
     loop = function () {
@@ -360,8 +350,8 @@
                  // immediately if there's only one task to be run.
                     task.x.send('stay', message);
                     queue.push(task);
-                    if (is_Function(user_defs.snooze)) {
-                        user_defs.snooze(loop);
+                    if (is_Function(lib.snooze)) {
+                        lib.snooze(loop);
                     }
                     return;
                 }
@@ -383,7 +373,7 @@
      // current form ensures that `run_remotely` always returns `undefined`,
      // because user-provided definitions may not adhere to the prescribed
      // signature ;-)
-        user_defs.run_remotely(task);
+        lib.run_remotely(task);
         return;
     };
 
@@ -446,10 +436,13 @@
             }
             var block_execution, count, handle_error, j, m, n, status;
             block_execution = function (outer_signal) {
-             // This function needs documentation.
+             // This function blocks further progress through an individual
+             // avar's queue until a nested avar exits.
                 count();
                 avar().Q(function (inner_signal) {
-                 // This function needs documentation.
+                 // This function checks to see if the syncpoint has finished
+                 // executing yet. If so, it releases its "parent" avar, which
+                 // was locked because it was being used by the syncpoint.
                     if (status === 'running') {
                         return inner_signal.stay();
                     }
@@ -469,7 +462,8 @@
                 return;
             };
             handle_error = function () {
-             // This function needs documentation.
+             // This function ensures that any failures by upstream avars are
+             // communicated to the downstream syncpoint.
                 status = 'failed';
                 return;
             };
@@ -525,8 +519,6 @@
         return y;
     };
 
-    user_defs = {};
-
  // Prototype definitions
 
     AVar.prototype.on = function (event_name, listener) {
@@ -545,9 +537,14 @@
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 
+ // Final preparations
+
+    lib.avar = avar;
+    lib.sync = sync;
+
  // That's all, folks!
 
-    return {'avar': avar, 'def': def, 'sync': sync};
+    return lib;
 
 }())));
 

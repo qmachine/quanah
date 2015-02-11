@@ -411,7 +411,7 @@
         var args, flag, i, temp, x, y;
         args = Array.prototype.slice.call(arguments);
         x = [];
-        y = avar();
+        y = avar(args.slice());
         while (args.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique

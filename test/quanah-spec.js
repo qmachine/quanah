@@ -7,7 +7,7 @@
 //  am grateful to him for demonstrating how useful unit tests are :-)
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 08 Feb 2015
+//                                                  ~~ last updated 11 Feb 2015
 
 /* @flow */
 
@@ -390,7 +390,8 @@
                  // This function records the current behavior, but this
                  // behavior may change really soon, because I don't find this
                  // nearly as intuitive now as I did when I first wrote `sync`.
-                    expect(this.val).to.equal(undefined);
+                    expect(this.val).to.be.an(Array);
+                    expect(this.val.length).to.equal(0);
                     done();
                     return evt.exit();
                 }).on('fail', function (message) {

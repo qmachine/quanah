@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 09 Feb 2015
+//                                                  ~~ last updated 11 Feb 2015
 
 /* @flow */
 
@@ -105,10 +105,9 @@
             case 'exit':
              // A computation involving this avar has succeeded, and we will
              // now prepare to enable the application of the next transform in
-             // the queue, unless this avar has already failed. The extra check
-             // may not actually be necessary, but there's no harm in playing
-             // it safe right now until I can formally prove that there are no
-             // race conditions.
+             // the queue, unless this avar has already failed. That unusual
+             // (but easily handled) edge case can occur, for example, when an
+             // avar fails upstream of a syncpoint.
                 state.ready = (state.epitaph === null);
                 break;
             case 'fail':
@@ -443,32 +442,46 @@
             }
         }
         y.Q = function (f) {
-         // This function is an instance-specific "Method Q".
+         // This function is an instance-specific "Method Q". If that bothers
+         // you, don't use it ;-)
             if (f instanceof AVar) {
                 return y.send('queue', f);
             }
-            var blocker, count, egress, j, m, n, ready;
-            blocker = function (evt) {
-             // This function stores the `evt` argument into an array that will
-             // be used later by the input argument to `f`.
-                egress.push(evt);
-                return count();
+            var block_queue, count, handle_error, j, m, n, status;
+            block_queue = function (outer_signal) {
+             // This function needs documentation.
+                count();
+                avar().Q(function (inner_signal) {
+                 // This function needs documentation.
+                    if (status === 'running') {
+                        return inner_signal.stay();
+                    }
+                    inner_signal.exit();
+                    return outer_signal.exit();
+                });
+                return;
             };
             count = function () {
              // This function is a simple counting semaphore that closes over
              // some private state variables in order to delay the execution of
              // `f` until certain conditions are satisfied.
                 m += 1;
-                ready = (m === n);
-                return loop();
+                if ((m === n) && (status === 'waiting')) {
+                    status = 'running';
+                }
+                return;
             };
-            egress = [];
+            handle_error = function () {
+             // This function needs documentation.
+                status = 'failed';
+                return;
+            };
             m = 0;
             n = x.length;
-            ready = (m === n);
+            status = (m === n) ? 'running' : 'waiting';
             for (j = 0; j < n; j += 1) {
                 if (x[j] instanceof AVar) {
-                    x[j].Q(blocker);
+                    x[j].Q(block_queue).on('fail', handle_error);
                 } else {
                     count();
                 }
@@ -479,7 +492,10 @@
              // modified version of the `evt` argument it will receive. This
              // function will be put into `y`'s queue, but it will not run
              // until `ready` is `true`.
-                if (ready === false) {
+                if (status === 'failed') {
+                    return evt.fail('Prerequisite(s) for syncpoint failed.');
+                }
+                if (status === 'waiting') {
                     return evt.stay('Acquiring "lock" ...');
                 }
                 f.call(this, {
@@ -489,34 +505,19 @@
                  // all of the original arguments given to `sync`.
                     'exit': function (message) {
                      // This function signals successful completion :-)
-                        var index;
-                        for (index = 0; index < egress.length; index += 1) {
-                            egress[index].exit(message);
-                        }
+                        status = 'done';
                         return evt.exit(message);
                     },
                     'fail': function (message) {
                      // This function signals a failed execution :-(
-                        var index;
-                        for (index = 0; index < egress.length; index += 1) {
-                            egress[index].fail(message);
-                        }
+                        status = 'failed';
                         return evt.fail(message);
                     },
                     'stay': function (message) {
                      // This function postpones execution temporarily. Although
                      // it seems reasonable that `stay` should match the forms
                      // of `exit` and `fail`, such behavior doesn't really make
-                     // sense. Telling all the blocked avars to stay is silly
-                     // because they're already blocked. Moreover, it would
-                     // cause them all to run the non-idempotent `blocker`
-                     // function again -- not a good move!
-                     /*
-                        var index;
-                        for (index = 0; index < egress.length; index += 1) {
-                            egress[index].stay(message);
-                        }
-                     */
+                     // sense ...
                         return evt.stay(message);
                     }
                 });

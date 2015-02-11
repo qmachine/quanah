@@ -11,7 +11,7 @@
 #   control -- always execute your commits manually!
 #
 #                                                       ~~ (c) SRW, 08 Sep 2012
-#                                                   ~~ last updated 02 Dec 2014
+#                                                   ~~ last updated 11 Feb 2015
 
 #-  CouchApp configuration files -- these may contain passwords!
 .couchapprc
@@ -38,8 +38,9 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
-#-  Sphinx build directory
+#-  Sphinx documentation directories
 docs/_build/
+docs/_static/
 
 #-  Twitter Bower stuff
 bower_components/

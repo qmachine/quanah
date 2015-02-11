@@ -5,7 +5,7 @@
 #   This contains live instructions for development on the Quanah library.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
-#                                                   ~~ last updated 16 Jan 2015
+#                                                   ~~ last updated 11 Feb 2015
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -23,14 +23,19 @@ RM      :=  $(call contingent, grm rm) -rf
 all: run
 
 clean: reset
-	@   (cd docs/ && make $@)                                       ;   \
-            $(RM) docs/_static/favicon.ico
+	@   cd $(PROJECT_ROOT)/docs/ && $(MAKE) $@
 
 clobber: clean
 
 distclean: clobber
 	@   $(RM) $(addprefix $(PROJECT_ROOT)/, \
-                .d8_history .v8_history ./node_modules/ npm-debug.log *.tgz)
+                .d8_history \
+                .v8_history \
+                docs/_static/ \
+                node_modules/ \
+                npm-debug.log \
+                *.tgz \
+            )
 
 help:
 	@   $(call show-usage-info)

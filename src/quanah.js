@@ -137,18 +137,18 @@
             case 'onfail':
              // This arm was originally added as an experiment into supporting
              // an event-driven idiom inspired by Node.js, but "fail" is still
-             // the only event available. Matching "exit" and "stay" events are
-             // under consideration, but they will be added only if they enable
-             // behavior that was previously impossible.
-                if (is_Function(arg)) {
-                 // An `onfail` listener has been provided for this avar, but
-                 // we need to make sure that the avar hasn't already failed in
-                 // a previous computation. If the avar has already failed, we
-                 // will store the listener and also call it immediately.
-                    state.onfail.push(arg);
-                    if (state.epitaph !== null) {
-                        arg.call(that, state.epitaph);
-                    }
+             // the only event available. (Matching "exit" and "stay" events
+             // are under consideration, but they will be added only if they
+             // enable behavior that was previously impossible.) Note that no
+             // typechecking is performed here, because failing silently here
+             // for the case when `arg` isn't a function would make debugging
+             // *really* painful. Assuming, then, that a function has been
+             // provided, Quanah needs to make sure that the avar hasn't
+             // already failed in a previous computation. If it has, then the
+             // listener is assigned and also immediately invoked.
+                state.onfail.push(arg);
+                if (state.epitaph !== null) {
+                    arg.call(that, state.epitaph);
                 }
                 break;
             case 'queue':

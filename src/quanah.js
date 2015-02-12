@@ -85,8 +85,8 @@
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, is_Function, lib, loop, queue,
-        run_locally, run_remotely, sync;
+    var AVar, avar, can_run_remotely, is_Function, lib, queue, run_locally,
+        run_remotely, sync, tick;
 
  // Definitions
 
@@ -171,11 +171,11 @@
              // A computation that depends on this avar has been postponed, but
              // that computation will be put back into the queue directly by
              // `run_locally`. In many JS environments, it will be sufficient
-             // for us simply to wait for `loop` to be called again, but I
+             // for us simply to wait for `tick` to be called again, but I
              // am now realizing that some environments *should* run a function
              // here. (My guess is that, if `stay` is called in an environment
              // such as Spidermonkey that lacks an event loop, then it may not
-             // be possible to guarantee that `loop` will ever run. In such an
+             // be possible to guarantee that `tick` will ever run. In such an
              // environment, I can think of very few cases for which using
              // `stay` is a good idea; to fix this edge case may involve the
              // addition of a user-defined integration with the native event
@@ -185,7 +185,7 @@
              // When this arm is chosen, either an error exists in Quanah or
              // else a user is re-programming Quanah's guts; in either case, it
              // may be useful to capture the error. Another possibility is that
-             // a user is trying to trigger `loop` using an obsolete idiom that
+             // a user is trying to trigger `tick` using an obsolete idiom that
              // involved calling `send` without any arguments.
                 that.send('fail', 'Invalid `send` to "' + name + '"');
          */
@@ -204,8 +204,8 @@
              // though, so ... `push` it is.
                 queue.push({'f': state.queue.shift(), 'x': that});
             }
-         // Finally, run `loop` to trigger execution for the main queue.
-            loop();
+         // Finally, run `tick` to trigger execution for the main queue.
+            tick();
             return that;
         };
         that.val = val;
@@ -220,9 +220,9 @@
     };
 
     can_run_remotely = function (task) {
-     // This function exists to keep the abstraction in `loop` as clean and
+     // This function exists to keep the abstraction in `tick` as clean and
      // close to English as possible. It tests for the existence of particular
-     // user-defined functions so that `loop` can decide whether to use local
+     // user-defined functions so that `tick` can decide whether to use local
      // or remote execution for a given task. Note also that the `=== true` is
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
@@ -242,33 +242,6 @@
     };
 
     // `lib` is not defined until the very end.
-
-    loop = function () {
-     // This function contains the execution center for Quanah. It's pretty
-     // simple, really -- it just runs the first available task in its queue
-     // (`queue`) in an execution context appropriate for that particular task.
-     // That's all it does. It makes no attempt to run every task in the queue
-     // every time it is called, because instead it assumes it will be called
-     // repeatedly until the entire program has executed. For example, every
-     // time an avar receives a `send` message, `loop` will run. Because `loop`
-     // only runs a single task from its queue for each invocation, that queue
-     // can be shared safely across multiple execution contexts simultaneously,
-     // and it makes no difference if the separate contexts are due to
-     // recursion or to special objects such as Web Workers. The `loop`
-     // function selects an execution context using conditional tests that
-     // determine whether a given task can be distributed faithfully to
-     // external resources for execution or not; if a task cannot be
-     // distributed faithfully, then it will be executed by the local machine.
-        var task = queue.shift();
-        if (task !== undefined) {
-            if (can_run_remotely(task)) {
-                run_remotely(task);
-            } else {
-                run_locally(task);
-            }
-        }
-        return;
-    };
 
     queue = [];
 
@@ -334,13 +307,13 @@
                  // the probability approaches 1 :-)
                  //
                  // NOTE: Don't push back onto the queue until _after_ sending
-                 // the `stay` message. Invoking `send` also invokes `loop`,
+                 // the `stay` message. Invoking `send` also invokes `tick`,
                  // which consequently exhausts the recursion stack depth limit
                  // immediately if there's only one task to be run.
                     task.x.send('stay', message);
                     queue.push(task);
                     if (is_Function(lib.snooze)) {
-                        lib.snooze(loop);
+                        lib.snooze(tick);
                     }
                     return;
                 }
@@ -501,6 +474,33 @@
             });
         };
         return y;
+    };
+
+    tick = function () {
+     // This function contains the execution center for Quanah. It's pretty
+     // simple, really -- it just runs the first available task in its queue
+     // (`queue`) in an execution context appropriate for that particular task.
+     // That's all it does. It makes no attempt to run every task in the queue
+     // every time it is called, because instead it assumes it will be called
+     // repeatedly until the entire program has executed. For example, every
+     // time an avar receives a `send` message, `tick` will run. Because `tick`
+     // only runs a single task from its queue for each invocation, that queue
+     // can be shared safely across multiple execution contexts simultaneously,
+     // and it makes no difference if the separate contexts are due to
+     // recursion or to special objects such as Web Workers. The `tick`
+     // function selects an execution context using conditional tests that
+     // determine whether a given task can be distributed faithfully to
+     // external resources for execution or not; if a task cannot be
+     // distributed faithfully, then it will be executed by the local machine.
+        var task = queue.shift();
+        if (task !== undefined) {
+            if (can_run_remotely(task)) {
+                run_remotely(task);
+            } else {
+                run_locally(task);
+            }
+        }
+        return;
     };
 
  // Prototype definitions

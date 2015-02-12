@@ -244,9 +244,9 @@
     lib = {
      // This object will be used as a "namespace", but it works more like a
      // Ruby module -- a "bag of functions". Anything added to this object will
-     // be available both inside and outside this anonymous closure. Because
-     // Quanah can delegate to functions that are defined externally to this
-     // closure if they are available, users can adapt the behavior of Quanah's
+     // be available to scopes both inside and outside this anonymous closure.
+     // Because Quanah can delegate dynamically to functions that are defined
+     // externally to this closure, users can adapt the behavior of Quanah's
      // "internal" functions for use with any environment. Additionally, this
      // allows the application developer to control the governance of the
      // definitions. Developers with concerns about a malicious user's ability
@@ -531,7 +531,7 @@
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 
- // Final preparations
+ // Module definitions
 
     lib.avar = avar;
     lib.sync = sync;

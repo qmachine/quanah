@@ -94,7 +94,7 @@
      // This function constructs "asynchronous variables" ("avars"). An avar is
      // a generic container for any other JavaScript type.
         var state, that;
-        state = {'epitaph': null, 'onfail': [], 'queue': [], 'ready': true};
+        state = {'onfail': [], 'queue': [], 'ready': true};
         that = this;
         that.send = function (name, arg) {
          // This function is an instance method for manipulating the internal
@@ -109,7 +109,7 @@
              // the queue, unless this avar has already failed. That unusual
              // (but easily handled) edge case can occur, for example, when an
              // avar fails upstream of a syncpoint.
-                state.ready = (state.epitaph === null);
+                state.ready = (state.hasOwnProperty('epitaph') === false);
             } else if (name === 'fail') {
              // A computation involving this avar has failed, and we will now
              // suspend all computations that depend on it indefinitely by
@@ -117,9 +117,9 @@
              // because JavaScript's garbage collector can't free the memory
              // unless we release these references. We will also try to call an
              // `onfail` listener if one has been provided.
-                if (state.epitaph === null) {
-                 // We don't want to overwrite the original error by accident,
-                 // since that would be an utter nightmare for debugging.
+                if (state.hasOwnProperty('epitaph') === false) {
+                 // We don't want to overwrite the original error message by
+                 // accident, because that would complicate debugging.
                     state.epitaph = arg;
                 }
                 state.queue = [];
@@ -140,7 +140,7 @@
              // already failed in a previous computation. If it has, then the
              // listener is assigned and also immediately invoked.
                 state.onfail.push(arg);
-                if (state.epitaph !== null) {
+                if (state.hasOwnProperty('epitaph')) {
                     arg.call(that, state.epitaph);
                 }
             } else if (name === 'queue') {

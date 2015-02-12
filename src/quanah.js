@@ -536,10 +536,10 @@
      // externally to this closure, users can adapt the behavior of Quanah's
      // "internal" functions for use with any environment. Additionally, this
      // allows the application developer to control the governance of the
-     // definitions. Developers with concerns about a malicious user's ability
-     // to "hijack" a remote context by redefining "low-level" functions can
-     // use `Object.defineProperty` in modern JS environments to prevent their
-     // code from being overwritten, for example.
+     // definitions. Developers with concerns about malicious users' abilities
+     // to "hijack" remote contexts by redefining "low-level" functions can use
+     // `Object.defineProperty` in modern JS environments to prevent their code
+     // from being overwritten, for example.
         'avar': avar,
         'sync': sync
     };

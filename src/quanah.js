@@ -92,7 +92,10 @@
 
     AVar = function AVar(val) {
      // This function constructs "asynchronous variables" ("avars"). An avar is
-     // a generic container for any other JavaScript type.
+     // a generic container for any other JavaScript type. This function is
+     // assigned to a variable reference even though it has a name for several
+     // reasons. The main reasons are to prevent lambda lifting and to ensure
+     // that it looks, acts, and feels like the built-in constructor functions.
         var state, that;
         state = {'onfail': [], 'queue': [], 'ready': true};
         that = this;

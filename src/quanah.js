@@ -100,7 +100,9 @@
          // This function is an instance method for manipulating the internal
          // state of an avar. Its interface was originally inspired by the
          // message-passing style used in Objective-C. Its name and functional
-         // signature were later changed to mimic Ruby's `Object.send`.
+         // signature were later changed to mimic Ruby's `Object.send`. Note
+         // that this function acts almost entirely by side effects.
+            var i;
             if (name === 'exit') {
              // A computation involving this avar has succeeded, and we will
              // now prepare to enable the application of the next transform in
@@ -122,15 +124,9 @@
                 }
                 state.queue = [];
                 state.ready = false;
-                (function () {
-                 // This anonymous closure creates a temporary scope in which
-                 // to iterate over known `onfail` listeners.
-                    var i;
-                    for (i = 0; i < state.onfail.length; i += 1) {
-                        state.onfail[i].call(that, state.epitaph);
-                    }
-                    return;
-                }());
+                for (i = 0; i < state.onfail.length; i += 1) {
+                    state.onfail[i].call(that, state.epitaph);
+                }
             } else if (name === 'onfail') {
              // This arm was originally added as an experiment into supporting
              // an event-driven idiom inspired by Node.js, but "fail" is still
@@ -241,19 +237,7 @@
         return ((typeof f === 'function') && (f instanceof Function));
     };
 
-    lib = {
-     // This object will be used as a "namespace", but it works more like a
-     // Ruby module -- a "bag of functions". Anything added to this object will
-     // be available to scopes both inside and outside this anonymous closure.
-     // Because Quanah can delegate dynamically to functions that are defined
-     // externally to this closure, users can adapt the behavior of Quanah's
-     // "internal" functions for use with any environment. Additionally, this
-     // allows the application developer to control the governance of the
-     // definitions. Developers with concerns about a malicious user's ability
-     // to "hijack" a remote context by redefining "low-level" functions can
-     // use `Object.defineProperty` in modern JS environments to prevent their
-     // code from being overwritten, for example.
-    };
+    // `lib` is not defined until the very end.
 
     loop = function () {
      // This function contains the execution center for Quanah. It's pretty
@@ -531,10 +515,23 @@
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 
- // Module definitions
+ // Module definition
 
-    lib.avar = avar;
-    lib.sync = sync;
+    lib = {
+     // This object will be used as a "namespace", but it works more like a
+     // Ruby module -- a "bag of functions". Anything added to this object will
+     // be available to scopes both inside and outside this anonymous closure.
+     // Because Quanah can delegate dynamically to functions that are defined
+     // externally to this closure, users can adapt the behavior of Quanah's
+     // "internal" functions for use with any environment. Additionally, this
+     // allows the application developer to control the governance of the
+     // definitions. Developers with concerns about a malicious user's ability
+     // to "hijack" a remote context by redefining "low-level" functions can
+     // use `Object.defineProperty` in modern JS environments to prevent their
+     // code from being overwritten, for example.
+        'avar': avar,
+        'sync': sync
+    };
 
  // That's all, folks!
 

@@ -244,7 +244,7 @@
         return ((typeof f === 'function') && (f instanceof Function));
     };
 
-    // `lib` is not defined until the very end.
+    // NOTE: `lib` is not defined until the very end.
 
     queue = [];
 

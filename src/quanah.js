@@ -101,7 +101,9 @@
          // state of an avar. Its interface was originally inspired by the
          // message-passing style used in Objective-C. Its name and functional
          // signature were later changed to mimic Ruby's `Object.send`. Note
-         // that this function acts almost entirely by side effects.
+         // that this function acts almost entirely by side effects. It no
+         // longer calls itself recursively, but because it can call `sync`, it
+         // can still end up recursing indirectly.
             var i;
             if (name === 'exit') {
              // A computation involving this avar has succeeded, and we will

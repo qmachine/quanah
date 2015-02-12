@@ -517,7 +517,9 @@
      // "namespace" for Quanah. Here, it is defined as a chainable prototype
      // method for avars that takes a single input argument. The input argument
      // is expected to be either a monadic (single variable) function or else
-     // an avar with a monadic function as its `val`.
+     // an avar with a monadic function as its `val`. This function can be used
+     // generically via `AVar.prototype.Q.call(x, f)` for arbitrary types, but
+     // it's more fun (and reckless) to assign it to `Object.prototype.Q` ;-)
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 

@@ -98,19 +98,17 @@
         that = this;
         that.send = function (name, arg) {
          // This function is an instance method for manipulating the internal
-         // state of an avar. Its design was originally inspired by the
+         // state of an avar. Its interface was originally inspired by the
          // message-passing style used in Objective-C. Its name and functional
          // signature were later changed to mimic Ruby's `Object.send`.
-            switch (name) {
-            case 'exit':
+            if (name === 'exit') {
              // A computation involving this avar has succeeded, and we will
              // now prepare to enable the application of the next transform in
              // the queue, unless this avar has already failed. That unusual
              // (but easily handled) edge case can occur, for example, when an
              // avar fails upstream of a syncpoint.
                 state.ready = (state.epitaph === null);
-                break;
-            case 'fail':
+            } else if (name === 'fail') {
              // A computation involving this avar has failed, and we will now
              // suspend all computations that depend on it indefinitely by
              // overwriting the queue with a fresh one. This is also important
@@ -133,8 +131,7 @@
                     }
                     return;
                 }());
-                break;
-            case 'onfail':
+            } else if (name === 'onfail') {
              // This arm was originally added as an experiment into supporting
              // an event-driven idiom inspired by Node.js, but "fail" is still
              // the only event available. (Matching "exit" and "stay" events
@@ -150,8 +147,7 @@
                 if (state.epitaph !== null) {
                     arg.call(that, state.epitaph);
                 }
-                break;
-            case 'queue':
+            } else if (name === 'queue') {
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
              // task queue (`queue`). Although `arg` is expected to be either a
@@ -170,8 +166,8 @@
                 } else {
                     state.queue.push(arg);
                 }
-                break;
-            case 'stay':
+         /*
+            } else if (name === 'stay') {
              // A computation that depends on this avar has been postponed, but
              // that computation will be put back into the queue directly by
              // `run_locally`. In many JS environments, it will be sufficient
@@ -185,14 +181,14 @@
              // addition of a user-defined integration with the native event
              // loop.) For consistency with `exit` and `fail`, `stay` accepts
              // a message argument, but right now that argument won't be used.
-                break;
-            default:
+            } else {
              // When this arm is chosen, either an error exists in Quanah or
              // else a user is re-programming Quanah's guts; in either case, it
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `loop` using an obsolete idiom that
              // involved calling `send` without any arguments.
                 that.send('fail', 'Invalid `send` to "' + name + '"');
+         */
             }
          // Now, if the avar is ready for its next transform, "lock" the avar
          // and add a new task to the main task queue (`queue`).

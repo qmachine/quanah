@@ -157,6 +157,8 @@
                      // the given task until both `f` and `x` are ready. The
                      // following line takes the form `f.call(x, signal)`.
                         (arg.val).call(that, signal);
+                     // This line is separate to ensure that the returned value
+                     // is always `undefined`.
                         return;
                     });
                 } else {
@@ -286,7 +288,10 @@
              // methods that send messages to the task's input data, `task.x`,
              // for flow control. Quanah used to store a reference to this
              // object so that users could override the `fail` method, but no
-             // one ever found a reason to do that.
+             // one ever found a reason to do that. Note also that each method
+             // always returns `undefined`, to ensure that `undefined` is
+             // always returned, whether a function exits with `return` or with
+             // `return signal.exit()`, etc.
                 'exit': function (message) {
                  // This function indicates successful completion.
                     task.x.send('exit', message);
@@ -459,7 +464,7 @@
                     count();
                 }
             }
-            y.send('queue', function (signal) {
+            return y.send('queue', function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to delay execution and to run `f` with a
              // modified version of the `signal` argument it will receive. This
@@ -492,7 +497,6 @@
                 });
                 return;
             });
-            return y;
         };
         return y;
     };

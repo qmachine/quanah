@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 11 Feb 2015
+//                                                  ~~ last updated 12 Feb 2015
 
 /* @flow */
 
@@ -351,7 +351,7 @@
      // function which may or may not ever be provided. JS doesn't crash in a
      // situation like this because `can_run_remotely` tests for the existence
      // of the user-defined method before delegating to `run_remotely`. Note
-     // that the lines below should not be simplified into a single line; then
+     // that the lines below should not be simplified into a single line; the
      // current form ensures that `run_remotely` always returns `undefined`,
      // because user-provided definitions may not adhere to the prescribed
      // signature ;-)

@@ -7,7 +7,7 @@
 //  am grateful to him for demonstrating how useful unit tests are :-)
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 11 Feb 2015
+//                                                  ~~ last updated 12 Feb 2015
 
 /* @flow */
 
@@ -23,9 +23,9 @@
     /*jslint indent: 4, maxlen: 80, node: true */
 
     /*properties
-        a, an, avar, be, constructor, error, equal, exit, fail, have, key,
-        length, log, name, nextTick, on, Q, PI, property, prototype, push,
-        random, send, sync, to, toString, val, valueOf
+        a, an, avar, be, call, constructor, error, equal, exit, fail,
+        getPrototypeOf, have, key, length, log, name, nextTick, not, on, own,
+        Q, PI, property, prototype, push, random, send, sync, to, val
     */
 
  // Declarations
@@ -39,38 +39,229 @@
  // Tests
 
     describe('Quanah', function () {
-     // This is the actual specification :-)
 
-        var avar, quanah, sync;
+        var AVar, avar, quanah, sync;
+
         beforeEach(function () {
-         // This function needs documentation.
+            AVar = require('../src/quanah').avar().constructor;
             avar = require('../src/quanah').avar;
             quanah = require('../src/quanah');
             sync = require('../src/quanah').sync;
-            return;
         });
 
-        it('should be awesome', function () {
+        describe('The `AVar` constructor function', function () {
+
+            it('is a function', function () {
+                expect(AVar).to.be.a(Function);
+            });
+
+            it('is named "AVar"', function () {
+                expect(AVar.name).to.equal('AVar');
+            });
+
+            it('accepts a single, optional argument', function () {
+                expect(AVar.length).to.equal(1);
+                expect(new AVar()).to.be.an(AVar);
+            });
+
+        });
+
+        describe('`AVar.prototype`', function () {
+
+            it('is an object', function () {
+                expect(AVar.prototype).to.be.an(Object);
+            });
+
+            it('"inherits" directly from `Object.prototype`', function () {
+                var proto = Object.getPrototypeOf(AVar.prototype);
+                expect(proto).to.equal(Object.prototype);
+            });
+
+            it('provides an `on` method', function () {
+                expect(AVar.prototype).to.have.property('on');
+                expect(AVar.prototype.on).to.be.a(Function);
+            });
+
+            it('provides a `Q` method', function () {
+                expect(AVar.prototype).to.have.own.property('Q');
+                expect(AVar.prototype.Q).to.be.a(Function);
+            });
+
+        });
+
+        describe('The `AVar.prototype.on` method', function () {
+
+            it('accepts two arguments', function () {
+                expect(AVar.prototype.on.length).to.equal(2);
+            });
+
+            it('returns the same avar', function () {
+                var x, y;
+                x = avar();
+                y = x.on('fail', function (message) {
+                 // This is a typical error handler for Node.js.
+                    console.log('Error:', message);
+                    return;
+                });
+                expect(x).to.equal(y);
+            });
+
+        });
+
+        describe('The `AVar.prototype.Q` method', function () {
+
+            it('accepts one argument', function () {
+                expect(AVar.prototype.Q.length).to.equal(1);
+            });
+
+            it('returns the same avar', function () {
+                var x, y;
+                x = avar();
+                y = x.Q(function (signal) {
+                 // This function doesn't do anything; it's just for testing.
+                    return signal.exit();
+                });
+                expect(x).to.equal(y);
+            });
+
+            it('supports generic calls', function () {
+                var x = AVar.prototype.Q.call(null, function (signal) {
+                 // This function doesn't do anything; it's just for testing.
+                    return signal.exit();
+                });
+                expect(x).to.be.an(AVar);
+            });
+
+        });
+
+        describe('The `avar` function', function () {
+
+            it('has the same arity as the `AVar` constructor', function () {
+                expect(avar.length).to.equal(AVar.length);
+            });
+
+        });
+
+        describe('An avar', function () {
+
+            var x;
+
+            beforeEach(function () {
+                x = avar();
+            });
+
+            it('is an instance of `AVar`', function () {
+                expect(x).to.be.an(AVar);
+            });
+
+            it('is an instance of `Object`', function () {
+             // This is a consequence of its prototype chain, but there's no
+             // harm in checking to be sure.
+                expect(x).to.be.an(Object);
+            });
+
+            it('has a `send` instance method', function () {
+                expect(x).to.have.own.property('send');
+                expect(x.send).to.be.a(Function);
+            });
+
+            it('has a `val` instance property', function () {
+                expect(x).to.have.own.property('val');
+                expect(x.val).to.equal(undefined);
+            });
+
+        });
+
+        describe('An avar\'s `send` method', function () {
+
+            var x;
+
+            beforeEach(function () {
+                x = avar();
+            });
+
+            it('accepts two arguments', function () {
+                expect(x.send.length).to.equal(2);
+            });
+
+            it('always returns the same avar', function () {
+                var y = x.send('(name)', '(optional argument)');
+                expect(y).to.equal(x);
+            });
+
+        });
+
+        describe('An avar\'s `val` property', function () {
+
+            it('is the same value provided to the constructor', function () {
+                var x, y;
+                x = Math.random();
+                y = avar(x);
+                expect(x).to.equal(y.val);
+            });
+
+            it('can be another avar', function () {
+             // This test prohibits the old "copy constructor" pattern.
+                var x = avar(avar());
+                expect(x.val).to.be.an(AVar);
+            });
+
+        });
+
+        describe('A syncpoint', function () {
+
+            var x;
+
+            beforeEach(function () {
+                x = sync();
+                return;
+            });
+
+            it('is an instance of `AVar`', function () {
+                expect(x).to.be.an(AVar);
+            });
+
+            it('is an instance of `Object`', function () {
+             // This is a consequence of its prototype chain, but there's no
+             // harm in checking to be sure.
+                expect(x).to.be.an(Object);
+            });
+
+            it('has an array as its `val`', function () {
+                expect(x.val).to.be.an(Array);
+            });
+
+            it('has an instance method `Q`', function () {
+                expect(x).to.have.own.property('Q');
+                expect(x.Q).to.be.a(Function);
+                expect(x.Q).not.to.equal(AVar.prototype.Q);
+            });
+
+        });
+
+     // Behavior tests
+
+        it('is awesome', function () {
             expect(true).to.equal(true);
         });
 
-        it('should be an object', function () {
-            expect(quanah).to.be.an('object');
+        it('is an object', function () {
+            expect(quanah).to.be.an(Object);
         });
 
-        it('should have its own `avar` method', function () {
-            expect(quanah).to.have.property('avar');
-            expect(quanah.avar).to.be.a('function');
+        it('has its own `avar` method', function () {
+            expect(quanah).to.have.own.property('avar');
+            expect(quanah.avar).to.be.a(Function);
             expect(quanah.avar.length).to.equal(1); // check arity
         });
 
-        it('should have its own `sync` method', function () {
-            expect(quanah).to.have.property('sync');
-            expect(quanah.sync).to.be.a('function');
+        it('has its own `sync` method', function () {
+            expect(quanah).to.have.own.property('sync');
+            expect(quanah.sync).to.be.a(Function);
             expect(quanah.sync.length).to.equal(0);
         });
 
-        it('should be able to replace an avar\'s `val`', function (done) {
+        it('can replace an avar\'s `val`', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
@@ -84,7 +275,7 @@
             });
         });
 
-        it('should be able to replace `this.val`', function (done) {
+        it('can replace `this.val`', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
@@ -98,7 +289,7 @@
             });
         });
 
-        it('should survive deliberate failures', function (done) {
+        it('survives deliberate failures', function (done) {
             var x = avar('This test fails deliberately :-)');
             x.Q(function (evt) {
              // This function needs documentation.
@@ -114,7 +305,7 @@
             });
         });
 
-        it('should allow `.on` and `.Q` commutatively', function (done) {
+        it('allows `.on` and `.Q` commutatively', function (done) {
             var x = avar('This test fails deliberately :-)');
             x.Q(function (evt) {
              // This function needs documentation.
@@ -130,7 +321,7 @@
             });
         });
 
-        it('should survive unexpected failures', function (done) {
+        it('survives unexpected failures', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // This fails because `x.val` is not a function, which simulates a
@@ -147,7 +338,7 @@
             });
         });
 
-        it('should wait for "nested avars" to finish', function (done) {
+        it('waits for "nested avars" to finish', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
@@ -169,7 +360,7 @@
             });
         });
 
-        it('should wait for short async operations', function (done) {
+        it('waits for short async operations', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // NOTE: Should we also test `setImmediate`?
@@ -182,7 +373,7 @@
             });
         });
 
-        it('should wait for long[er] async operations', function (done) {
+        it('waits for long[er] async operations', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
@@ -195,7 +386,7 @@
             });
         });
 
-        it('should relay error messages from "nested avars"', function (done) {
+        it('relays error messages from "nested avars"', function (done) {
             var x = avar();
             x.Q(function (evt) {
              // This function needs documentation.
@@ -252,7 +443,7 @@
         });
      */
 
-        it('should support avar functions', function (done) {
+        it('supports avar functions', function (done) {
             var f, x;
             f = avar(function (evt) {
              // This function also happens to be "distributable".
@@ -276,61 +467,6 @@
         });
      */
 
-        describe('An avar', function () {
-         // This function needs documentation.
-            var x;
-            beforeEach(function () {
-             // This function needs documentation.
-                x = avar();
-                return;
-            });
-            it('should have a constructor called "AVar"', function () {
-                expect(x.constructor.name).to.equal('AVar');
-            });
-            it('should have a `send` instance method', function () {
-                expect(x).to.have.property('send');
-                expect(x.send).to.be.a('function');
-            });
-         /*
-            it('should have a `key` instance property', function () {
-                expect(x).to.have.property('key');
-                expect(x.key).to.be.a('string');
-            });
-         */
-            it('should have a `val` instance property', function () {
-                expect(x).to.have.property('val');
-                expect(x.val).to.equal(undefined);
-            });
-            it('should have an `on` prototype method', function () {
-                expect(x.constructor.prototype).to.have.property('on');
-                expect(x.on).to.be.a('function');
-                expect(x.on.length).to.equal(2);
-            });
-            it('should have a `Q` prototype method', function () {
-                expect(x.constructor.prototype).to.have.property('Q');
-                expect(x.constructor.prototype.Q).to.be.a('function');
-                expect(x.constructor.prototype.Q.length).to.equal(1);
-            });
-         /*
-            it('should have a `revive` prototype method', function () {
-                expect(x.constructor.prototype).to.have.property('revive');
-                expect(x.revive).to.be.a('function');
-                expect(x.revive.length).to.equal(0);
-            });
-            it('should have a `toString` prototype method', function () {
-                expect(x.constructor.prototype).to.have.property('toString');
-                expect(x.toString).to.be.a('function');
-                expect(x.toString.length).to.equal(0);
-            });
-            it('should have a `valueOf` prototype method', function () {
-                expect(x.constructor.prototype).to.have.property('valueOf');
-                expect(x.valueOf).to.be.a('function');
-                expect(x.valueOf.length).to.equal(0);
-            });
-         */
-            return;
-        });
-
      /*
         describe('The `AVar.prototype.toString` method', function () {
          // This function needs documentation.
@@ -339,6 +475,9 @@
              // This function needs documentation.
                 x = avar();
                 return;
+            });
+            it('should not have named arguments', function () {
+                expect(x.toString.length).to.equal(0);
             });
             it('should propagate arguments for buffers', function () {
                 x.val = new Buffer('hello');
@@ -352,7 +491,7 @@
         });
      */
 
-        describe('The `sync` method', function () {
+        describe('The `sync` instance method', function () {
          // This function needs documentation.
             var f, fa, x, xa, y, ya, z, za;
             beforeEach(function () {
@@ -378,7 +517,7 @@
                 return;
             });
 
-            it('should work when no vars are given', function (done) {
+            it('works when no arguments are given', function (done) {
                 sync().Q(function (evt) {
                  // This function records the current behavior, but this
                  // behavior may change really soon, because I don't find this

@@ -5,7 +5,9 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 12 Feb 2015
+//                                                  ~~ last updated 13 Feb 2015
+
+/*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
 /* @flow */
 
@@ -230,7 +232,7 @@
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
         return ((is_Function(lib.can_run_remotely)) &&
-                (is_Function(lib.run_remotely))     &&
+                (is_Function(lib.run_remotely)) &&
                 (lib.can_run_remotely(task) === true));
     };
 
@@ -473,7 +475,7 @@
                         return signal.stay(message);
                     }
                 });
-                return;
+                return undefined; // for ESLint (see http://goo.gl/mkHxrM)
             });
         };
         return y;

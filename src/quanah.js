@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 13 Feb 2015
+//                                                  ~~ last updated 14 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -142,7 +142,7 @@
              // enable behavior that was previously impossible.) Note that no
              // typechecking is performed here, because failing silently here
              // for the case when `arg` isn't a function would make debugging
-             // *really* painful. Assuming, then, that a function has been
+             // _really_ painful. Assuming, then, that a function has been
              // provided, Quanah needs to make sure that the avar hasn't
              // already failed in a previous computation. If it has, then the
              // listener is assigned and also immediately invoked.
@@ -177,7 +177,7 @@
              // that computation will be put back into the queue directly by
              // `run_locally`. In many JS environments, it will be sufficient
              // for us simply to wait for `tick` to be called again, but I
-             // am now realizing that some environments *should* run a function
+             // am now realizing that some environments _should_ run a function
              // here. (My guess is that, if `stay` is called in an environment
              // such as Spidermonkey that lacks an event loop, then it may not
              // be possible to guarantee that `tick` will ever run. In such an
@@ -202,7 +202,7 @@
              // The use of `push` here is for consistency with a FIFO ordering,
              // but for a long time `unshift` was used here instead. The reason
              // for using `unshift` was because of a questionable assumption
-             // that, because the new task would *definitely* never have been
+             // that, because the new task would _definitely_ never have been
              // `stay`ed, trying it first before working through the rest of
              // the queue again would require less cycles through the queue in
              // the long term. Performance isn't a primary concern right now,

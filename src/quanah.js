@@ -83,12 +83,28 @@
  // of this approach is that it may eliminate the use of opt-in asm.js, but no
  // functions are strong candidates for that anyway. The entire library is
  // written in a subset of ECMAScript that is so old and well-supported that
- // Quanah actually runs correctly as ActionScript 2.0.
+ // Quanah also runs correctly as ActionScript 2.0.
 
  // Declarations
 
     var AVar, avar, can_run_remotely, is_Function, lib, queue, run_locally,
         run_remotely, sync, tick;
+
+ // Module definition
+
+    lib = {
+     // This object will be used as a "namespace", but it works more like a
+     // Ruby module -- a "bag of functions". Anything added to this object will
+     // be available to scopes both inside and outside this anonymous closure.
+     // Because Quanah can delegate dynamically to functions that are defined
+     // externally to this closure, users can adapt the behavior of Quanah's
+     // "internal" functions for use with any environment. Additionally, this
+     // allows the application developer to control the governance of the
+     // definitions. Developers with concerns about malicious users' abilities
+     // to "hijack" remote contexts by redefining "low-level" functions can use
+     // `Object.defineProperty` in modern JS environments to prevent their code
+     // from being overwritten, for example.
+    };
 
  // Definitions
 
@@ -217,7 +233,7 @@
         return that;
     };
 
-    avar = function (val) {
+    avar = lib.avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
      // useful because object-oriented programming in JS is not typically
      // well-understood by users.
@@ -246,7 +262,7 @@
         return ((typeof f === 'function') && (f instanceof Function));
     };
 
-    // NOTE: `lib` is not defined until the very end.
+    // NOTE: `lib` was already defined at the top of this scope.
 
     queue = [];
 
@@ -344,7 +360,7 @@
         return;
     };
 
-    sync = function () {
+    sync = lib.sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "sync point". The
      // avar returned by this function will have a slightly modified form of
@@ -526,24 +542,6 @@
      // generically via `AVar.prototype.Q.call(x, f)` for arbitrary types, but
      // it's more fun (and reckless) to assign it to `Object.prototype.Q` ;-)
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
-    };
-
- // Module definition
-
-    lib = {
-     // This object will be used as a "namespace", but it works more like a
-     // Ruby module -- a "bag of functions". Anything added to this object will
-     // be available to scopes both inside and outside this anonymous closure.
-     // Because Quanah can delegate dynamically to functions that are defined
-     // externally to this closure, users can adapt the behavior of Quanah's
-     // "internal" functions for use with any environment. Additionally, this
-     // allows the application developer to control the governance of the
-     // definitions. Developers with concerns about malicious users' abilities
-     // to "hijack" remote contexts by redefining "low-level" functions can use
-     // `Object.defineProperty` in modern JS environments to prevent their code
-     // from being overwritten, for example.
-        'avar': avar,
-        'sync': sync
     };
 
  // That's all, folks!

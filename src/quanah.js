@@ -25,10 +25,10 @@
     'use strict';
 
  // This strict anonymous closure is the first of two; this one focuses on
- // exporting the library for use by other programs, while the second one
- // contains the code for the library itself. The primary reason to decompose a
+ // exporting the module for use by other programs, while the second one
+ // contains the code for the module itself. The primary reason to decompose a
  // single closure into two is to "quarantine" all references to the global
- // object into one closure (this one) so that the library code can be written
+ // object into one closure (this one) so that the module code can be written
  // as portably as possible. Unfortunately, detecting which object in the
  // environment should be treated as _the_ global object is much more difficult
  // than it should be -- strict mode disables the `call` method's default
@@ -81,9 +81,9 @@
  // This second strict anonymous closure defines Quanah in a way that is
  // completely sandboxed from the global object. Unfortunately, a disadvantage
  // of this approach is that it may eliminate the use of opt-in asm.js, but no
- // functions are strong candidates for that anyway. The entire library is
- // written in a subset of ECMAScript that is so old and well-supported that
- // Quanah also runs correctly as ActionScript 2.0.
+ // functions are strong candidates for that anyway. All code is written in a
+ // subset of ECMAScript that is so old and well-supported that it also runs
+ // correctly as ActionScript 2.0.
 
  // Declarations
 
@@ -319,13 +319,13 @@
                  // condition is met -- it can be used to write non-blocking
                  // `while` and `until` constructs, for example. Since the
                  // ECMAScript standard lacks anything resembling a package
-                 // manager, the `stay` method also comes in handy for delaying
-                 // execution until an external library has loaded. Of course,
-                 // if execution has been delayed, when will it run again? The
-                 // short answer is unsatisfying: it cannot never be _known_.
-                 // Future publications will detail this idea by explaining why
-                 // leaving execution guarantees to chance is acceptable when
-                 // the probability approaches 1 :-)
+                 // manager, for example, the `stay` method can be used to
+                 // defer execution until an external module has loaded. Of
+                 // course, if execution has been deferred, when will it run
+                 // again? The short answer is unsatisfying: it cannot never be
+                 // _known_. Future publications will detail this idea by
+                 // explaining why leaving execution guarantees to chance is
+                 // acceptable when the probability approaches 1 :-)
                  //
                  // NOTE: Don't push back onto the queue until _after_ sending
                  // the `stay` message. Invoking `send` also invokes `tick`,

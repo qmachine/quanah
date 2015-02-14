@@ -7,26 +7,28 @@
 //  am grateful to him for demonstrating how useful unit tests are :-)
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 12 Feb 2015
+//                                                  ~~ last updated 13 Feb 2015
+
+/*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
+
+/*eslint-env node */
 
 /* @flow */
 
+/*global beforeEach: false, describe: false, it: false */
+
+/*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
+
+/*jslint indent: 4, maxlen: 80, node: true */
+
+/*properties
+    a, an, avar, be, call, constructor, error, equal, exit, fail,
+    getPrototypeOf, have, key, length, log, name, nextTick, not, on, own, Q,
+    PI, property, prototype, push, random, send, sync, to, val
+*/
+
 (function () {
     'use strict';
-
- // Pragmas
-
-    /*global beforeEach: false, describe: false, it: false */
-
-    /*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
-
-    /*jslint indent: 4, maxlen: 80, node: true */
-
-    /*properties
-        a, an, avar, be, call, constructor, error, equal, exit, fail,
-        getPrototypeOf, have, key, length, log, name, nextTick, not, on, own,
-        Q, PI, property, prototype, push, random, send, sync, to, val
-    */
 
  // Declarations
 
@@ -493,7 +495,10 @@
 
         describe('The `sync` instance method', function () {
          // This function needs documentation.
+
+         /*
             var f, fa, x, xa, y, ya, z, za;
+
             beforeEach(function () {
              // This function needs documentation.
                 f = function (evt) {
@@ -516,6 +521,7 @@
                 za = avar(z);
                 return;
             });
+         */
 
             it('works when no arguments are given', function (done) {
                 sync().Q(function (evt) {

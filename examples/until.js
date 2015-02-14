@@ -7,29 +7,29 @@
 //  but the demonstration here is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 11 Feb 2015
+//                                                  ~~ last updated 13 Feb 2015
+
+/*eslint new-cap: 0, quotes: [2, "single"] */
+
+/*eslint-env node */
 
 /* @flow */
+
+/*jshint maxparams: 1, quotmark: single, strict: true */
+
+/*jslint indent: 4, maxlen: 80, node: true */
+
+/*properties
+    avar, call, constructor, error, exit, log, on, nextTick, print, prototype,
+    Q, random, snooze, stay, until, val
+*/
 
 (function () {
     'use strict';
 
- // Pragmas
-
-    /*jshint maxparams: 1, quotmark: single, strict: true */
-
-    /*jslint indent: 4, maxlen: 80, node: true */
-
-    /*properties
-        avar, call, constructor, error, exit, log, on, nextTick, print,
-        prototype, Q, random, snooze, stay, until, val
-    */
-
- // Prerequisites
-
- // Extend definitions for Quanah by providing a `snooze` function, which is
- // analogous to a human who hits the "snooze" button on an alarm clock because
- // it tells Quanah to come back later :-P
+ // First, extend definitions for Quanah by providing a `snooze` function,
+ // which is analogous to a human who hits the "snooze" button on an alarm
+ // clock because it tells Quanah to come back later :-P
 
     require('../').snooze = process.nextTick; // see also: http://goo.gl/8HMpVX
 

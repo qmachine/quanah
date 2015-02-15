@@ -288,7 +288,8 @@
              // always returned, whether a function exits with `return` or with
              // `return signal.exit()`, etc.
                 'exit': function (message) {
-                 // This function indicates successful completion.
+                 // This function indicates successful completion. Note that
+                 // `message` is currently ignored by `send`.
                     task.x.send('exit', message);
                     return;
                 },
@@ -340,7 +341,9 @@
             });
         } catch (err) {
          // Because Quanah never throws exceptions of its own, `err` is assumed
-         // to be a task-level failure.
+         // to be a task-level failure. Do not rely on Quanah to catch thrown
+         // exceptions, however -- especially for callbacks to asynchronous
+         // functions!
             task.x.send('fail', err);
         }
         return;

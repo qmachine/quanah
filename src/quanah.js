@@ -512,7 +512,7 @@
      // function selects an execution context conditionally, and its behavior
      // can be modified by the presence of externally-provided definitions.
         var task = queue.shift();
-        if (task !== undefined) {
+        if (task instanceof Object) {
             if (can_run_remotely(task)) {
                 run_remotely(task);
             } else {

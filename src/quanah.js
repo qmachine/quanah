@@ -65,7 +65,7 @@
      // execute once and therefore will never overwrite "itself".
         module.exports = lib;
     } else if (g.hasOwnProperty('QUANAH') === false) {
-     // Assume browser-inspired "namespace" convention by assigning single
+     // Assume browser-inspired "namespace" convention by assigning a single
      // object to a new all-caps global property. If the target name is already
      // present, assume that Quanah has already been loaded.
         g.QUANAH = lib;
@@ -102,8 +102,8 @@
      // allows the application developer to control the governance of the
      // definitions. Developers with concerns about malicious users' abilities
      // to "hijack" remote contexts by redefining "low-level" functions can use
-     // `Object.defineProperty` in modern JS environments to prevent their code
-     // from being overwritten, for example.
+     // `Object.defineProperty` in modern JavaScript environments to prevent
+     // their code from being overwritten, for example.
     };
 
  // Definitions
@@ -131,7 +131,9 @@
              // now prepare to enable the application of the next transform in
              // the queue, unless this avar has already failed. That unusual
              // (but easily handled) edge case can occur, for example, when an
-             // avar fails upstream of a syncpoint.
+             // avar fails upstream of a syncpoint. Because `fail` accepts an
+             // argument, `exit` also accepts one, but obviously it will not be
+             // used ...
                 state.ready = (state.hasOwnProperty('epitaph') === false);
             } else if (name === 'fail') {
              // A computation involving this avar has failed, and we will now
@@ -191,17 +193,18 @@
             } else if (name === 'stay') {
              // A computation that depends on this avar has been postponed, but
              // that computation will be put back into the queue directly by
-             // `run_locally`. In many JS environments, it will be sufficient
-             // for us simply to wait for `tick` to be called again, but I
-             // am now realizing that some environments _should_ run a function
-             // here. (My guess is that, if `stay` is called in an environment
-             // such as Spidermonkey that lacks an event loop, then it may not
-             // be possible to guarantee that `tick` will ever run. In such an
-             // environment, I can think of very few cases for which using
-             // `stay` is a good idea; to fix this edge case may involve the
-             // addition of a user-defined integration with the native event
-             // loop.) For consistency with `exit` and `fail`, `stay` accepts
-             // a message argument, but right now that argument won't be used.
+             // `run_locally`. In many JavaScript environments, it will be
+             // sufficient for us simply to wait for `tick` to be called again,
+             // but I am now realizing that some environments _should_ run a
+             // function here. (My guess is that, if `stay` is called in an
+             // environment such as Spidermonkey that lacks an event loop, then
+             // it may not be possible to guarantee that `tick` will ever run.
+             // In such an environment, I can think of very few cases for which
+             // using `stay` is a good idea; to fix this edge case may involve
+             // the addition of a user-defined integration with the native
+             // event loop.) For consistency with `exit` and `fail`, `stay`
+             // accepts a message argument, but right now that argument won't
+             // be used.
             } else {
              // When this arm is chosen, either an error exists in Quanah or
              // else a user is re-programming Quanah's guts; in either case, it
@@ -235,8 +238,8 @@
 
     avar = lib.avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
-     // useful because object-oriented programming in JS is not typically
-     // well-understood by users.
+     // useful because object-oriented programming in JavaScript is not
+     // typically well-understood by users.
         return new AVar(val);
     };
 
@@ -300,16 +303,16 @@
                  // are very difficult to capture and return to the invoking
                  // contexts otherwise. Although the name `run_locally` was
                  // chosen to indicate that the invocation and execution occur
-                 // in the same JS context, it does not always imply that the
-                 // local context was the "original context". For example, a
-                 // QMachine volunteer might actually import tasks from other
-                 // machines into its own task queue; in such a case, the
-                 // "original invocation" may have come from a "remote"
-                 // machine, with respect to execution. The `fail` method is
-                 // provided as a means to `throw` exceptions across arbitrary
-                 // contexts. It also provides a clean alternative to error
-                 // catching for asynchronous callback functions, because a
-                 // `try/catch` block like this one cannot catch those errors.
+                 // in the same JavaScript context, it does not always imply
+                 // that the local context was the "original context". For
+                 // example, a QMachine volunteer might actually import tasks
+                 // from other machines into its own task queue; in such a
+                 // case, the "original invocation" may have come from a
+                 // "remote" machine, with respect to execution. The `fail`
+                 // method is provided as a means to `throw` exceptions across
+                 // arbitrary contexts. It also provides a clean alternative to
+                 // error catching for asynchronous callback functions, because
+                 // a `try/catch` block like this cannot catch those errors.
                     task.x.send('fail', message);
                     return;
                 },
@@ -349,13 +352,12 @@
 
     run_remotely = function (task) {
      // This function exists only to forward input arguments to a user-defined
-     // function which may or may not ever be provided. JS doesn't crash in a
-     // situation like this because `can_run_remotely` tests for the existence
-     // of the user-defined method before delegating to `run_remotely`. Note
-     // that the lines below should not be simplified into a single line; the
-     // current form ensures that `run_remotely` always returns `undefined`,
-     // because user-provided definitions may not adhere to the prescribed
-     // signature ;-)
+     // function which may or may not ever be provided. JavaScript will not
+     // crash in a situation like this because `can_run_remotely` tests for the
+     // existence of the user-defined method before calling `run_remotely`.
+     // Note that the lines below should not be simplified into a single line;
+     // these lines ensure that `run_remotely` always returns `undefined`, even
+     // if the user-provided `lib.run_remotely` has an incorrect signature ;-)
         lib.run_remotely(task);
         return;
     };

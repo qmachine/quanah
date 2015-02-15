@@ -113,7 +113,7 @@
      // a generic container for any other JavaScript type. This function is
      // assigned to a variable reference even though it has a name for several
      // reasons. The main reasons are to prevent lambda lifting and to ensure
-     // that it looks, acts, and feels like the built-in constructor functions.
+     // that it looks, acts, and feels like the native constructor functions.
         var state, that;
         state = {'onfail': [], 'queue': [], 'ready': true};
         that = this;
@@ -509,10 +509,8 @@
      // can be shared safely across multiple execution contexts simultaneously,
      // and it makes no difference if the separate contexts are due to
      // recursion or to special objects such as Web Workers. The `tick`
-     // function selects an execution context using conditional tests that
-     // determine whether a given task can be distributed faithfully to
-     // external resources for execution or not; if a task cannot be
-     // distributed faithfully, then it will be executed by the local machine.
+     // function selects an execution context conditionally, and its behavior
+     // can be modified by the presence of externally-provided definitions.
         var task = queue.shift();
         if (task !== undefined) {
             if (can_run_remotely(task)) {

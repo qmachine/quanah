@@ -75,7 +75,7 @@
 
     return;
 
-}, null, this, (function () {
+}, null, this, (function (lib) {
     'use strict';
 
  // This second strict anonymous closure defines Quanah in a way that is
@@ -85,26 +85,24 @@
  // subset of ECMAScript that is so old and well-supported that it also runs
  // correctly as ActionScript 2.0.
 
+ // The input argument to this closure, `lib`, is an object literal, `{}`, and
+ // it will be used as a "namespace" to which methods and properties will be
+ // added within the closure. In Quanah's case, `lib` will end up more like a
+ // Ruby module -- a "bag of functions". Anything added to this object will be
+ // available to scopes both inside and outside this anonymous closure. Because
+ // Quanah can delegate dynamically to functions that are defined externally to
+ // this closure, users can adapt the behavior of Quanah's "internal" functions
+ // for use with any environment. Additionally, this allows the application
+ // developer to control the governance of the definitions. Developers with
+ // concerns about malicious users' abilities to "hijack" remote contexts by
+ // redefining "low-level" functions can use `Object.defineProperty` in modern
+ // JavaScript environments to prevent their code from being overwritten, for
+ // example.
+
  // Declarations
 
-    var AVar, avar, can_run_remotely, is_Function, lib, queue, run_locally,
+    var AVar, avar, can_run_remotely, is_Function, queue, run_locally,
         run_remotely, sync, tick;
-
- // Module definition
-
-    lib = {
-     // This object will be used as a "namespace", but it works more like a
-     // Ruby module -- a "bag of functions". Anything added to this object will
-     // be available to scopes both inside and outside this anonymous closure.
-     // Because Quanah can delegate dynamically to functions that are defined
-     // externally to this closure, users can adapt the behavior of Quanah's
-     // "internal" functions for use with any environment. Additionally, this
-     // allows the application developer to control the governance of the
-     // definitions. Developers with concerns about malicious users' abilities
-     // to "hijack" remote contexts by redefining "low-level" functions can use
-     // `Object.defineProperty` in modern JavaScript environments to prevent
-     // their code from being overwritten, for example.
-    };
 
  // Definitions
 
@@ -264,8 +262,6 @@
      // note that an avar with a function as its `val` will return `false`.
         return ((typeof f === 'function') && (f instanceof Function));
     };
-
-    // NOTE: `lib` was already defined at the top of this scope.
 
     queue = [];
 
@@ -548,6 +544,6 @@
 
     return lib;
 
-}())));
+}({}))));
 
 //- vim:set syntax=javascript:

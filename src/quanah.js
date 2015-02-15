@@ -472,11 +472,11 @@
                     return signal.fail('Failed prerequisite(s) for syncpoint');
                 }
                 if (status === 'waiting') {
-                    return signal.stay('Acquiring "lock" ...');
+                    return signal.stay();
                 }
                 f.call(this, {
-                 // These methods close over the `signal` object in order to
-                 // extend its behavior.
+                 // These methods extend those provided by the `signal` object
+                 // in order to modify the standard behavior.
                     'exit': function (message) {
                      // This function signals successful completion :-)
                         status = 'done';
@@ -487,11 +487,7 @@
                         handle_error();
                         return signal.fail(message);
                     },
-                    'stay': function (message) {
-                     // This function postpones execution temporarily. In such
-                     // a case, nothing needs to be forwarded to other avars.
-                        return signal.stay(message);
-                    }
+                    'stay': signal.stay
                 });
                 return undefined; // for ESLint (see http://goo.gl/mkHxrM)
             });

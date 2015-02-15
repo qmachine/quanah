@@ -7,7 +7,7 @@
 //  am grateful to him for demonstrating how useful unit tests are :-)
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 13 Feb 2015
+//                                                  ~~ last updated 14 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -55,10 +55,6 @@
 
             it('is a function', function () {
                 expect(AVar).to.be.a(Function);
-            });
-
-            it('is named "AVar"', function () {
-                expect(AVar.name).to.equal('AVar');
             });
 
             it('accepts a single, optional argument', function () {

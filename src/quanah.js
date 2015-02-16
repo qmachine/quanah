@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 14 Feb 2015
+//                                                  ~~ last updated 15 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -21,7 +21,7 @@
     queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
 */
 
-(Function.prototype.call.call(function (that, lib) {
+Function.prototype.call.call(function (that, lib) {
     'use strict';
 
  // This strict anonymous closure is the first of two; this one focuses on
@@ -416,10 +416,10 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
+            var block_execution, count, handle_error, j, m, n, status;
             if (f instanceof AVar) {
                 return y.send('queue', f);
             }
-            var block_execution, count, handle_error, j, m, n, status;
             block_execution = function (outer_signal) {
              // This function blocks further progress through an individual
              // avar's queue until a nested avar exits.
@@ -544,6 +544,6 @@
 
     return lib;
 
-}({}))));
+}({})));
 
 //- vim:set syntax=javascript:

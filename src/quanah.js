@@ -286,9 +286,10 @@ Function.prototype.call.call(function (that, lib) {
              // for flow control. Quanah used to store a reference to this
              // object so that users could override the `fail` method, but no
              // one ever found a reason to do that. Note also that each method
-             // always returns `undefined`, to ensure that `undefined` is
-             // always returned, whether a function exits with `return` or with
-             // `return signal.exit()`, etc.
+             // ensures a `return` type of `undefined` explicitly. The reason
+             // for this is because user-provided functions cannot be assumed
+             // to adhere to prescribed signatures, and testing returned types
+             // dynamically is expensive and beyond the scope of Quanah.
                 'exit': function (message) {
                  // This function indicates successful completion. Note that
                  // `message` is currently ignored by `send`.

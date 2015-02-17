@@ -7,7 +7,7 @@
 //  but the demonstration here is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 13 Feb 2015
+//                                                  ~~ last updated 16 Feb 2015
 
 /*eslint new-cap: 0, quotes: [2, "single"] */
 
@@ -47,7 +47,7 @@
 
     AVar.prototype.print = function () {
      // This function is just shorthand that mimics QMachine's browser client.
-        this.Q(function (signal) {
+        return this.Q(function (signal) {
          // This function prints the current `val` to stdout.
             console.log(this.val);
             return signal.exit();
@@ -56,20 +56,18 @@
             console.error('Error:', message);
             return;
         });
-        return this;
     };
 
     AVar.prototype.until = function (f) {
      // This function provides a chainable, non-blocking `until` loop by using
      // a function `f` to represent the body of the loop.
-        this.Q(function (signal) {
+        return this.Q(function (signal) {
          // This function evaluates `f` and repeats if the output is `false`.
             if (f.call(this) === false) {
                 return signal.stay();
             }
             return signal.exit();
         });
-        return this;
     };
 
  // Demonstration

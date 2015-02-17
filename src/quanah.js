@@ -112,7 +112,8 @@ Function.prototype.call.call(function (that, lib) {
      // function was both given a name _and_ assigned to a variable reference,
      // mainly to prevent lambda lifting and to ensure that it had the same
      // look-and-feel of the native constructor functions. The same goals are
-     // probably better achieved by a custom `AVar.toString` method, though.
+     // probably better achieved by custom `toString` methods, though, and thus
+     // the code here has been simplified in order to appease various linters.
         var state, that;
         state = {'onfail': [], 'queue': [], 'ready': true};
         that = this;

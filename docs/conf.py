@@ -142,7 +142,7 @@ man_pages = [
 
 texinfo_documents = [
   ('index', 'Quanah', u'Quanah Documentation', u'Sean Wilkinson', 'Quanah',
-    'A framework for distributing and scheduling computations',
+    'A module for distributing and scheduling computations',
     'Miscellaneous'),
 ]
 

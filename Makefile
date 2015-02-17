@@ -2,7 +2,7 @@
 
 #-  Makefile ~~
 #
-#   This contains live instructions for development on the Quanah library.
+#   This contains live instructions for development on the Quanah module.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
 #                                                   ~~ last updated 16 Feb 2015
@@ -63,10 +63,9 @@ $(PROJECT_ROOT)/node_modules/: $(PROJECT_ROOT)/package.json
 
 ###
 
-#-  NOTE: The following rule is still experimental and should not be used in
-#   production, especially if you are planning to convert the resulting output
-#   back into JavaScript again for deployment. Such files might pass the unit
-#   tests but still contain bugs and/or security vulnerabilities.
+#-  NOTE: The following rule is experimental, but then again, if you're reading
+#   a Makefile, you probably understand the "risks" of using experimental code
+#   in production :-P
 
 %.coffee: %.js
 	@   $(call contingent, js2coffee) $< > $@

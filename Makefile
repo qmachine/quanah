@@ -5,12 +5,13 @@
 #   This contains live instructions for development on the Quanah library.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
-#                                                   ~~ last updated 11 Feb 2015
+#                                                   ~~ last updated 16 Feb 2015
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(PROJECT_ROOT)/share/macros.make
 
+FIND    :=  $(call contingent, find)
 NODE    :=  $(call contingent, nodejs node)
 NPM     :=  $(call contingent, npm)
 RM      :=  $(call contingent, grm rm) -rf
@@ -26,11 +27,11 @@ clean: reset
 	@   cd $(PROJECT_ROOT)/docs/ && $(MAKE) $@
 
 clobber: clean
+	@   $(FIND) $(PROJECT_ROOT) -type f -name '.[dv]8_history' \
+                -exec $(RM) {} +
 
 distclean: clobber
 	@   $(RM) $(addprefix $(PROJECT_ROOT)/, \
-                .d8_history \
-                .v8_history \
                 docs/_static/ \
                 node_modules/ \
                 npm-debug.log \

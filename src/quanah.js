@@ -475,6 +475,9 @@ Function.prototype.call.call(function (that, lib) {
                 if (status === 'waiting') {
                     return signal.stay();
                 }
+             // NOTE: The use of `this` in the following line can be replaced
+             // by `y` instead, but doing so might have major consequences for
+             // downstream applications such as QMachine ...
                 f.call(this, {
                  // These methods extend those provided by the `signal` object
                  // in order to modify the standard behavior.

@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 16 Feb 2015
+//                                                  ~~ last updated 17 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -470,30 +470,30 @@ Function.prototype.call.call(function (that, lib) {
              // function will be put into `y`'s queue, but it will not run
              // until all prerequisites are ready to proceed.
                 if (status === 'failed') {
-                    return signal.fail('Failed prerequisite(s) for syncpoint');
+                    signal.fail('Failed prerequisite(s) for syncpoint');
+                } else if (status === 'waiting') {
+                    signal.stay();
+                } else {
+                 // NOTE: The use of `this` in the following line can be
+                 // replaced by `y` instead, but doing so might have major
+                 // consequences for downstream applications such as QMachine.
+                    f.call(this, {
+                     // These methods extend those provided by the `signal`
+                     // object in order to modify the standard behavior.
+                        'exit': function (message) {
+                         // This function signals successful completion :-)
+                            status = 'done';
+                            return signal.exit(message);
+                        },
+                        'fail': function (message) {
+                         // This function signals a failed execution :-(
+                            handle_error();
+                            return signal.fail(message);
+                        },
+                        'stay': signal.stay
+                    });
                 }
-                if (status === 'waiting') {
-                    return signal.stay();
-                }
-             // NOTE: The use of `this` in the following line can be replaced
-             // by `y` instead, but doing so might have major consequences for
-             // downstream applications such as QMachine ...
-                f.call(this, {
-                 // These methods extend those provided by the `signal` object
-                 // in order to modify the standard behavior.
-                    'exit': function (message) {
-                     // This function signals successful completion :-)
-                        status = 'done';
-                        return signal.exit(message);
-                    },
-                    'fail': function (message) {
-                     // This function signals a failed execution :-(
-                        handle_error();
-                        return signal.fail(message);
-                    },
-                    'stay': signal.stay
-                });
-                return undefined; // for ESLint (see http://goo.gl/mkHxrM)
+                return;
             });
         };
         return y;

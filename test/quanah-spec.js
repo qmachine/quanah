@@ -235,7 +235,7 @@
 
         });
 
-        describe('The `sync` instance method', function () {
+        describe('The `Q` instance method of a syncpoint', function () {
 
             it('works when no arguments are given', function (done) {
                 sync().Q(function (evt) {
@@ -248,7 +248,32 @@
                     return evt.exit();
                 }).on('fail', function (message) {
                     console.error('Error:', message);
-                    return;
+                    return done();
+                });
+            });
+
+            it('puts input arguments into `val` as an array', function (done) {
+                sync(2, 3).Q(function (signal) {
+                    expect(this.val[0] + this.val[1]).to.equal(5);
+                    done();
+                    return signal.exit();
+                }).on('fail', function (message) {
+                    console.error('Error:', message);
+                    return done();
+                });
+            });
+
+
+            it('keeps input arrays separate', function (done) {
+             // This is just to make sure it doesn't accidentally concatenate
+             // arrays, because the internal logic is tricky :-P
+                sync([2], [3]).Q(function (signal) {
+                    expect(this.val[0][0] + this.val[1][0]).to.equal(5);
+                    done();
+                    return signal.exit();
+                }).on('fail', function (message) {
+                    console.error('Error:', message);
+                    return done();
                 });
             });
 

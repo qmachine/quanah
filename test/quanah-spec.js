@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 15 Feb 2015
+//                                                  ~~ last updated 18 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -235,6 +235,25 @@
 
         });
 
+        describe('The `sync` instance method', function () {
+
+            it('works when no arguments are given', function (done) {
+                sync().Q(function (evt) {
+                 // This function records the current behavior, but this
+                 // behavior may change really soon, because I don't find this
+                 // nearly as intuitive now as I did when I first wrote `sync`.
+                    expect(this.val).to.be.an(Array);
+                    expect(this.val.length).to.equal(0);
+                    done();
+                    return evt.exit();
+                }).on('fail', function (message) {
+                    console.error('Error:', message);
+                    return;
+                });
+            });
+
+        });
+
      // Behavior tests
 
         it('is awesome', function () {
@@ -434,26 +453,6 @@
          // a method of `Object.prototype` ...
             var x = {};
             x.Q = 5;
-        });
-
-        describe('The `sync` instance method', function () {
-         // This function needs documentation.
-
-            it('works when no arguments are given', function (done) {
-                sync().Q(function (evt) {
-                 // This function records the current behavior, but this
-                 // behavior may change really soon, because I don't find this
-                 // nearly as intuitive now as I did when I first wrote `sync`.
-                    expect(this.val).to.be.an(Array);
-                    expect(this.val.length).to.equal(0);
-                    done();
-                    return evt.exit();
-                }).on('fail', function (message) {
-                    console.error('Error:', message);
-                    return;
-                });
-            });
-
         });
 
         return;

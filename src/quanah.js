@@ -25,20 +25,21 @@ Function.prototype.call.call(function (that, lib) {
     'use strict';
 
  // This strict anonymous closure is the first of two; this one focuses on
- // exporting the module for use by other programs, while the second one
- // contains the code for the module itself. The primary reason to decompose a
- // single closure into two is to "quarantine" all references to the global
- // object into one closure (this one) so that the module code can be written
- // as portably as possible. Unfortunately, detecting which object in the
- // environment should be treated as _the_ global object is much more difficult
- // than it should be -- strict mode disables the `call` method's default
- // behavior of replacing `null` with the global object. Luckily, we can work
- // around that by passing a reference to the enclosing scope as an argument at
- // the same time and testing to see if strict mode has done its deed. This
- // task is not hard in the usual browser context because we know that the
- // global object is `window`, but CommonJS implementations such as RingoJS
- // confound the issue by modifying the scope chain, running scripts in
- // sandboxed contexts, and using identifiers like `global` carelessly ...
+ // exporting the module for use by other programs, and it will run after the
+ // second closure, which contains the code for the module itself. The primary
+ // reason to decompose a single closure into two is to "quarantine" all
+ // references to the global object into one closure (this one) so that the
+ // module code can be written as independently of its environment as possible.
+ // Unfortunately, detecting which object in the environment should be treated
+ // as _the_ global object is much more difficult than it should be -- strict
+ // mode disables the `call` method's default behavior of replacing `null` with
+ // the global object. Luckily, we can work around that by passing a reference
+ // to the enclosing scope as an argument at the same time and testing to see
+ // if strict mode has done its deed. This task is not hard in the usual
+ // browser context because we know that the global object is `window`, but
+ // CommonJS implementations such as RingoJS confound the issue by modifying
+ // the scope chain, running scripts in sandboxed contexts, and using
+ // identifiers like `global` carelessly ...
 
     /*global global: false, module: false */
 

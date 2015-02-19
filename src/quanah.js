@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 18 Feb 2015
+//                                                  ~~ last updated 19 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -21,7 +21,7 @@
     queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
 */
 
-Function.prototype.call.call(function (that, lib) {
+Function.prototype.call.call(function (that, quanah) {
     'use strict';
 
  // This strict anonymous closure is the first of two; this one focuses on
@@ -64,19 +64,19 @@ Function.prototype.call.call(function (that, lib) {
      // Assume CommonJS-ish conventions are being used. In Node.js, modules are
      // cached when loaded, so we can safely assume that this code will only
      // execute once and therefore will never overwrite "itself".
-        module.exports = lib;
+        module.exports = quanah;
     } else if (g.hasOwnProperty('QUANAH') === false) {
      // Assume browser-inspired "namespace" convention by assigning a single
      // object to a new all-caps global property. If the target name is already
      // present, assume that Quanah has already been loaded.
-        g.QUANAH = lib;
+        g.QUANAH = quanah;
     }
 
  // That's all, folks!
 
     return;
 
-}, null, this, (function (lib) {
+}, null, this, (function (quanah) {
     'use strict';
 
  // This second strict anonymous closure defines Quanah in a way that is
@@ -86,10 +86,10 @@ Function.prototype.call.call(function (that, lib) {
  // subset of ECMAScript that is so old and well-supported that it also runs
  // correctly as ActionScript 2.0.
 
- // The input argument to this closure, `lib`, is an object literal, `{}`, and
- // it will be used as a "namespace" to which methods and properties will be
- // added within the closure. In Quanah's case, `lib` will end up more like a
- // Ruby module -- a "bag of functions". Anything added to this object will be
+ // The input argument to this closure, `quanah`, is an object literal, `{}`,
+ // and it will be used as a "namespace" to which methods and properties will
+ // be added within the closure. Specifically, it will end up more like a Ruby
+ // module -- a "bag of functions". Anything added to this object will be
  // available to scopes both inside and outside this anonymous closure. Because
  // Quanah can delegate dynamically to functions that are defined externally to
  // this closure, users can adapt the behavior of Quanah's "internal" functions
@@ -237,7 +237,7 @@ Function.prototype.call.call(function (that, lib) {
         return that;
     };
 
-    avar = lib.avar = function (val) {
+    avar = quanah.avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
      // useful because object-oriented programming in JavaScript is not
      // typically well-understood by users.
@@ -251,9 +251,9 @@ Function.prototype.call.call(function (that, lib) {
      // or remote execution for a given task. Note also that the `=== true` is
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
-        return ((is_Function(lib.can_run_remotely)) &&
-                (is_Function(lib.run_remotely)) &&
-                (lib.can_run_remotely(task) === true));
+        return ((is_Function(quanah.can_run_remotely)) &&
+                (is_Function(quanah.run_remotely)) &&
+                (quanah.can_run_remotely(task) === true));
     };
 
     is_Function = function (f) {
@@ -337,8 +337,8 @@ Function.prototype.call.call(function (that, lib) {
                  // immediately if there's only one task to be run.
                     task.x.send('stay', message);
                     queue.push(task);
-                    if (is_Function(lib.snooze)) {
-                        lib.snooze(tick);
+                    if (is_Function(quanah.snooze)) {
+                        quanah.snooze(tick);
                     }
                     return;
                 }
@@ -360,12 +360,12 @@ Function.prototype.call.call(function (that, lib) {
      // existence of the user-defined method before calling `run_remotely`.
      // Note that the lines below should not be simplified into a single line;
      // these lines ensure that `run_remotely` always returns `undefined`, even
-     // if the user-provided `lib.run_remotely` has an incorrect signature ;-)
-        lib.run_remotely(task);
+     // if the user-provided `quanah.run_remotely` has an incorrect signature.
+        quanah.run_remotely(task);
         return;
     };
 
-    sync = lib.sync = function () {
+    sync = quanah.sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "syncpoint". The
      // avar returned by this function will have a slightly modified form of
@@ -548,7 +548,7 @@ Function.prototype.call.call(function (that, lib) {
 
  // That's all, folks!
 
-    return lib;
+    return quanah;
 
 }({})));
 

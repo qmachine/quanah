@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 17 Feb 2015
+//                                                  ~~ last updated 18 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -54,7 +54,7 @@ Function.prototype.call.call(function (that, lib) {
         g = (typeof global === 'object') ? global : that;
     } else {
      // Strict mode isn't supported in this environment, and we need to make
-     // sure we don't get fooled by Rhino's `global` function.
+     // sure we don't get fooled by Mozilla Rhino's `global` function.
         g = (typeof this.global === 'object') ? this.global : this;
     }
 

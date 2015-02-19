@@ -141,8 +141,9 @@ Function.prototype.call.call(function (that, quanah) {
              // suspend all computations that depend on it indefinitely by
              // overwriting the queue with a fresh one. This is also important
              // because JavaScript's garbage collector can't free the memory
-             // unless we release these references. We will also try to call an
-             // `onfail` listener if one has been provided.
+             // unless we release these references. We will also call any
+             // `onfail` listeners that have been provided -- these will not be
+             // overwritten.
                 if (state.hasOwnProperty('epitaph') === false) {
                  // We don't want to overwrite the original error message by
                  // accident, because that would complicate debugging.
@@ -161,10 +162,12 @@ Function.prototype.call.call(function (that, quanah) {
              // enable behavior that was previously impossible.) Note that no
              // typechecking is performed here, because failing silently here
              // for the case when `arg` isn't a function would make debugging
-             // _really_ painful. Assuming, then, that a function has been
-             // provided, Quanah needs to make sure that the avar hasn't
-             // already failed in a previous computation. If it has, then the
-             // listener is assigned and also immediately invoked.
+             // _really_ painful. (Note also that `arg` need not even be a real
+             // function; it can be any object for which a `call` method is
+             // available.) Assuming, then, that a function has been provided,
+             // Quanah needs to make sure that the avar hasn't already failed
+             // in a previous computation. If it has, then the listener is
+             // assigned and also immediately invoked.
                 state.onfail.push(arg);
                 if (state.hasOwnProperty('epitaph')) {
                     arg.call(that, state.epitaph);

@@ -422,26 +422,10 @@ Function.prototype.call.call(function (that, quanah) {
         y.Q = function (f) {
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
-            var block_execution, count, handle_error, j, m, n, status;
+            var count, handle_error, j, m, n, status, wait;
             if (f instanceof AVar) {
                 return y.send('queue', f);
             }
-            block_execution = function (outer_signal) {
-             // This function blocks further progress through an individual
-             // avar's queue until a nested avar exits.
-                count();
-                avar().Q(function (inner_signal) {
-                 // This function checks to see if the syncpoint has finished
-                 // executing yet. If so, it releases its "parent" avar, which
-                 // was locked because it was being used by the syncpoint.
-                    if (status === 'running') {
-                        return inner_signal.stay();
-                    }
-                    inner_signal.exit();
-                    return outer_signal.exit();
-                });
-                return;
-            };
             count = function () {
              // This function is a simple counting semaphore that closes over
              // some private state variables in order to delay the execution of
@@ -461,9 +445,25 @@ Function.prototype.call.call(function (that, quanah) {
             m = 0;
             n = x.length;
             status = (m === n) ? 'running' : 'waiting';
+            wait = function (outer_signal) {
+             // This function blocks further progress through an individual
+             // avar's queue until a nested avar exits.
+                count();
+                avar().send('queue', function (inner_signal) {
+                 // This function checks to see if the syncpoint has finished
+                 // executing yet. If so, it releases its "parent" avar, which
+                 // was locked because it was being used by the syncpoint.
+                    if (status === 'running') {
+                        return inner_signal.stay();
+                    }
+                    inner_signal.exit();
+                    return outer_signal.exit();
+                });
+                return;
+            };
             for (j = 0; j < n; j += 1) {
                 if (x[j] instanceof AVar) {
-                    x[j].Q(block_execution).on('fail', handle_error);
+                    x[j].send('onfail', handle_error).send('queue', wait);
                 } else {
                     count();
                 }
@@ -479,10 +479,7 @@ Function.prototype.call.call(function (that, quanah) {
                 } else if (status === 'waiting') {
                     signal.stay();
                 } else {
-                 // NOTE: The use of `this` in the following line can be
-                 // replaced by `y` instead, but doing so might have major
-                 // consequences for downstream applications such as QMachine.
-                    f.call(this, {
+                    f.call(y, {
                      // These methods extend those provided by the `signal`
                      // object in order to modify the standard behavior.
                         'exit': function (message) {

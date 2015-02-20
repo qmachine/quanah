@@ -199,11 +199,11 @@ Function.prototype.call.call(function (that, quanah) {
                 }
          /*
             } else if (name === 'stay') {
-             // A computation that depends on this avar has been postponed, but
+             // A computation that depends on this avar has been deferred, but
              // that computation will be put back into the queue directly by
-             // `run_locally`. For consistency with `exit` and `fail`, `stay`
-             // accepts a message argument, but right now that argument won't
-             // be used.
+             // `run_locally`. For consistency with the "exit" and "fail"
+             // messages, "stay" accepts an argument, but the current code
+             // ignores that argument.
             } else {
              // When this arm is chosen, either an error exists in Quanah or
              // else a user is re-programming Quanah's guts; in either case, it
@@ -277,6 +277,12 @@ Function.prototype.call.call(function (that, quanah) {
      // JavaScript when working with callback functions. Note also that this
      // function acts almost entirely by side effects.
         try {
+         // An interesting consequence of the use of `task.f.call` instead of
+         // `Function.prototype.call(f,` is that the function `task.f` can be
+         // replaced by a "callable object" -- an object with a `call` method.
+         // This idea is already available in languages such as Lua and Ruby,
+         // but JavaScript tends to restrict metaprogramming. A different paper
+         // on this concept's consequences for JavaScript is forthcoming.
             task.f.call(task.x, {
              // This is the object that defines the input argument given to the
              // transformation `f`; it is often called `evt` or `signal`. It is

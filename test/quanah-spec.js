@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 18 Feb 2015
+//                                                  ~~ last updated 20 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -15,7 +15,7 @@
 
 /*global beforeEach: false, describe: false, it: false */
 
-/*jshint es3: true, maxparams: 1, quotmark: single, strict: true */
+/*jshint es3: true, maxparams: 2, quotmark: single, strict: true */
 
 /*jslint indent: 4, maxlen: 80, node: true */
 
@@ -470,6 +470,56 @@
                 }
                 done();
                 return evt.exit();
+            });
+        });
+
+        it('supports "functables"', function (done) {
+            var f, proxy, x;
+            f = function (signal) {
+             // This function will be called indirectly...
+                this.val += 2;
+                return signal.exit();
+            };
+            proxy = {
+                'call': function (that, signal) {
+                 // This function is extremely meta. Details forthcoming.
+                    return f.call(that, signal);
+                }
+            };
+            x = avar(2);
+            x.on('fail', function (message) {
+             // This is weird stuff, man ...
+                throw message;
+            }).Q(proxy).Q(function (signal) {
+             // Did it work?
+                expect(x.val).to.equal(4);
+                done();
+                return signal.exit();
+            });
+        });
+
+        it('supports avar "functables"', function (done) {
+            var f, proxy, x;
+            f = function (signal) {
+             // This function will be called indirectly...
+                this.val += 2;
+                return signal.exit();
+            };
+            proxy = avar({
+                'call': function (that, signal) {
+                 // This function is extremely meta. Details forthcoming.
+                    return f.call(that, signal);
+                }
+            });
+            x = avar(2);
+            x.on('fail', function (message) {
+             // This is weird stuff, man ...
+                throw message;
+            }).Q(proxy).Q(function (signal) {
+             // Did it work?
+                expect(x.val).to.equal(4);
+                done();
+                return signal.exit();
             });
         });
 

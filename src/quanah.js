@@ -197,16 +197,7 @@ Function.prototype.call.call(function (that, quanah) {
             } else if (name === 'stay') {
              // A computation that depends on this avar has been postponed, but
              // that computation will be put back into the queue directly by
-             // `run_locally`. In many JavaScript environments, it will be
-             // sufficient for us simply to wait for `tick` to be called again,
-             // but I am now realizing that some environments _should_ run a
-             // function here. (My guess is that, if `stay` is called in an
-             // environment such as Spidermonkey that lacks an event loop, then
-             // it may not be possible to guarantee that `tick` will ever run.
-             // In such an environment, I can think of very few cases for which
-             // using `stay` is a good idea; to fix this edge case may involve
-             // the addition of a user-defined integration with the native
-             // event loop.) For consistency with `exit` and `fail`, `stay`
+             // `run_locally`. For consistency with `exit` and `fail`, `stay`
              // accepts a message argument, but right now that argument won't
              // be used.
             } else {
@@ -328,16 +319,20 @@ Function.prototype.call.call(function (that, quanah) {
                  // ECMAScript standard lacks anything resembling a package
                  // manager, for example, the `stay` method can be used to
                  // defer execution until an external module has loaded. Of
-                 // course, if execution has been deferred, when will it run
-                 // again? The short answer is unsatisfying: it cannot never be
-                 // _known_. Future publications will detail this idea by
-                 // explaining why leaving execution guarantees to chance is
-                 // acceptable when the probability approaches 1 :-)
+                 // course, if execution has been deferred, _when_ will it run
+                 // again? The short answer is unsatisfying: it can never be
+                 // _known_. In JavaScript environments that lack asynchronous
+                 // functions, using `stay` is a bad idea because there are
+                 // situations in which tasks may get "stuck". Discussion and
+                 // examples are coming soon in an academic manuscript.
                  //
                  // NOTE: Don't push back onto the queue until _after_ sending
-                 // the `stay` message. Invoking `send` also invokes `tick`,
-                 // which consequently exhausts the recursion stack depth limit
-                 // immediately if there's only one task to be run.
+                 // the `stay` message. (When there is only one task to run, it
+                 // causes a problem because `send` invokes `tick`, which means
+                 // that the task would be pushed back onto the queue and then
+                 // immediately run again, where it would `stay` again because
+                 // no other tasks would have run yet; this would result in an
+                 // error for exceeding the recursion stack depth limit.)
                     task.x.send('stay', message);
                     queue.push(task);
                     if (is_Function(quanah.snooze)) {

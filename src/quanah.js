@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 19 Feb 2015
+//                                                  ~~ last updated 20 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -144,6 +144,10 @@ Function.prototype.call.call(function (that, quanah) {
              // unless we release these references. We will also call any
              // `onfail` listeners that have been provided -- these will not be
              // overwritten.
+             //
+             // NOTE: If `onfail` listeners are functions that will never be
+             // removed, how are garbage collection and memory usage affected?
+             //
                 if (state.hasOwnProperty('epitaph') === false) {
                  // We don't want to overwrite the original error message by
                  // accident, because that would complicate debugging.
@@ -333,6 +337,7 @@ Function.prototype.call.call(function (that, quanah) {
                  // immediately run again, where it would `stay` again because
                  // no other tasks would have run yet; this would result in an
                  // error for exceeding the recursion stack depth limit.)
+                 //
                     task.x.send('stay', message);
                     queue.push(task);
                     if (is_Function(quanah.snooze)) {
@@ -366,23 +371,21 @@ Function.prototype.call.call(function (that, quanah) {
     sync = quanah.sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "syncpoint". The
-     // avar returned by this function will have a slightly modified form of
-     // `AVar.prototype.Q` placed directly onto it as an instance method as a
-     // means to provide a nice way of distinguishing a "normal" avar from a
-     // "syncpoint". Any functions that are fed into the `Q` method will wait
-     // for all input arguments' outstanding queues to empty before executing,
-     // and exiting will allow each of the inputs to begin working through its
-     // individual queue again. Also, a syncpoint can still be used as a
-     // prerequisite to execution even when the syncpoint depends on one of
-     // the other prerequisites. (Although the immediate usefulness of this
-     // capability isn't obvious, it turns out to be crucially important for
-     // expressing certain concurrency patterns idiomatically.)
+     // avar returned by this function will have its own `Q` instance method
+     // which will take precedence over the `AVar.prototype.Q` method. The
+     // reason for this is simple: it is a convenience method for a common
+     // problem in concurrent programming, and its purpose is to shield the
+     // user from the ugly business of implementing semaphores et al. Any
+     // functions that are fed into the `Q` method will wait for all input
+     // arguments' outstanding queues to empty before executing, and exiting
+     // will allow each of the inputs to resume processing its individual queue
+     // again. Also, a syncpoint can still be used as a prerequisite even when
+     // the syncpoint depends on one of the other prerequisites. (Although the
+     // immediate usefulness of this capability isn't obvious, it turns out to
+     // be crucially important for expressing certain concurrency patterns
+     // idiomatically.)
      //
-     // NOTE: What happens here if an avar which has already failed is used in
-     // a `sync` statement? Does the `sync` fail immediately, as expected?
-     //
-     // NOTE: The instance method `Q` that gets added to a syncpoint is not
-     // a perfect substitute for the instance `send` method it already has ...
+     // NOTE: Many more unit tests are needed!
      //
         var args, flag, i, temp, x, y;
         args = Array.prototype.slice.call(arguments);
@@ -440,19 +443,22 @@ Function.prototype.call.call(function (that, quanah) {
             m = 0;
             n = x.length;
             status = (m === n) ? 'running' : 'waiting';
-            wait = function (outer_signal) {
+            wait = function (outer) {
              // This function blocks further progress through an individual
              // avar's queue until a nested avar exits.
+             //
+             // NOTE: The next two lines can be combined as `avar(count())` ...
+             //
                 count();
-                avar().send('queue', function (inner_signal) {
+                avar().send('queue', function (inner) {
                  // This function checks to see if the syncpoint has finished
                  // executing yet. If so, it releases its "parent" avar, which
                  // was locked because it was being used by the syncpoint.
                     if (status === 'running') {
-                        return inner_signal.stay();
+                        return inner.stay();
                     }
-                    inner_signal.exit();
-                    return outer_signal.exit();
+                    inner.exit();
+                    return outer.exit();
                 });
                 return;
             };

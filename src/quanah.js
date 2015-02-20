@@ -426,7 +426,7 @@ Function.prototype.call.call(function (that, quanah) {
         y.Q = function (f) {
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
-            var count, handle_error, j, m, n, status, wait;
+            var count, j, m, n, relay, status, wait;
             if (f instanceof AVar) {
                 return y.send('queue', f);
             }
@@ -440,14 +440,14 @@ Function.prototype.call.call(function (that, quanah) {
                 }
                 return;
             };
-            handle_error = function () {
+            m = 0;
+            n = x.length;
+            relay = function () {
              // This function ensures that any failures by upstream avars are
              // communicated to the downstream syncpoint.
                 status = 'failed';
                 return;
             };
-            m = 0;
-            n = x.length;
             status = (m === n) ? 'running' : 'waiting';
             wait = function (outer) {
              // This function blocks further progress through an individual
@@ -470,7 +470,7 @@ Function.prototype.call.call(function (that, quanah) {
             };
             for (j = 0; j < n; j += 1) {
                 if (x[j] instanceof AVar) {
-                    x[j].send('onfail', handle_error).send('queue', wait);
+                    x[j].send('onfail', relay).send('queue', wait);
                 } else {
                     count();
                 }
@@ -496,7 +496,7 @@ Function.prototype.call.call(function (that, quanah) {
                         },
                         'fail': function (message) {
                          // This function signals a failed execution :-(
-                            handle_error();
+                            relay();
                             return signal.fail(message);
                         },
                         'stay': signal.stay
@@ -535,11 +535,11 @@ Function.prototype.call.call(function (that, quanah) {
 
  // Prototype definitions
 
-    AVar.prototype.on = function (event_name, listener) {
+    AVar.prototype.on = function (type, listener) {
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        return this.send('on' + event_name, listener);
+        return this.send('on' + type, listener);
     };
 
     AVar.prototype.Q = function (f) {

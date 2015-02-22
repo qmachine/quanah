@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 21 Feb 2015
+//                                                  ~~ last updated 22 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -73,11 +73,11 @@
     'use strict';
 
  // This second strict anonymous closure defines Quanah in a way that is
- // completely sandboxed from the global object. Unfortunately, a disadvantage
- // of this approach is that it may eliminate the use of opt-in asm.js, but no
- // functions are strong candidates for that anyway. All code is written in a
- // subset of ECMAScript that is so old and well-supported that it also runs
- // correctly as ActionScript 2.0.
+ // completely sandboxed from the global object. One potential disadvantage of
+ // this approach is that it may disable the use of opt-in asm.js, but Quanah
+ // optimizes for simplicity and correctness rather than performance anyway.
+ // Its code is written in a subset of ECMAScript so old and well-supported
+ // that it also runs correctly as ActionScript 2.0.
 
  // The input argument to this closure, `quanah`, is an object literal, `{}`,
  // and it will be used as a "namespace" to which methods and properties will

@@ -21,12 +21,12 @@
     queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
 */
 
-Function.prototype.call.call(function (that, quanah) {
+(function (env, init) {
     'use strict';
 
  // This strict anonymous closure is the first of two; this one focuses on
- // exporting the module for use by other programs, and it will run after the
- // second closure, which contains the code for the module itself. The primary
+ // exporting the module for use by other programs, and it will only run the
+ // second closure, which initializes the module itself, once. The primary
  // reason to decompose a single closure into two is to "quarantine" all
  // references to the global object into one closure (this one) so that the
  // module code can be written as independently of its environment as possible.
@@ -41,13 +41,13 @@ Function.prototype.call.call(function (that, quanah) {
  // the scope chain, running scripts in sandboxed contexts, and using
  // identifiers like `global` carelessly ...
 
-    /*global global: false, module: false */
+    /*global module: false */
 
  // Store a reference to the global object, even though it may not be "correct"
  // or absolutely necessary for this particular environment. More commentary
- // will be provided shortly.
+ // is coming soon.
 
-    var g = (typeof that.global === 'object') ? that.global : that;
+    var global = (typeof env.global === 'object') ? env.global : env;
 
  // Export Quanah as a CommonJS module or as a property of the global object.
 
@@ -57,19 +57,19 @@ Function.prototype.call.call(function (that, quanah) {
      // execute once and therefore will never overwrite "itself". RingoJS will
      // also land here, but thanks to the second condition, the MongoDB shell
      // will not.
-        module.exports = quanah;
-    } else if (g.hasOwnProperty('QUANAH') === false) {
+        module.exports = init({});
+    } else if (global.hasOwnProperty('QUANAH') === false) {
      // Assume browser-inspired "namespace" convention by assigning a single
      // object to a new all-caps global property. If the target name is already
      // present, assume that Quanah has already been loaded.
-        g.QUANAH = quanah;
+        global.QUANAH = init({});
     }
 
  // That's all, folks!
 
     return;
 
-}, null, this, (function (quanah) {
+}(this, function (quanah) {
     'use strict';
 
  // This second strict anonymous closure defines Quanah in a way that is
@@ -546,10 +546,10 @@ Function.prototype.call.call(function (that, quanah) {
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 
- // That's all, folks!
+ // Export the module :-)
 
     return quanah;
 
-}({})));
+}));
 
 //- vim:set syntax=javascript:

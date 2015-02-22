@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 20 Feb 2015
+//                                                  ~~ last updated 21 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -60,10 +60,12 @@ Function.prototype.call.call(function (that, quanah) {
 
  // Export Quanah as a CommonJS module or as a property of the global object.
 
-    if (typeof module === 'object') {
+    if ((typeof module === 'object') && (typeof module.exports === 'object')) {
      // Assume CommonJS-ish conventions are being used. In Node.js, modules are
      // cached when loaded, so we can safely assume that this code will only
-     // execute once and therefore will never overwrite "itself".
+     // execute once and therefore will never overwrite "itself". RingoJS will
+     // also land here, but thanks to the second condition, the MongoDB shell
+     // will not.
         module.exports = quanah;
     } else if (g.hasOwnProperty('QUANAH') === false) {
      // Assume browser-inspired "namespace" convention by assigning a single

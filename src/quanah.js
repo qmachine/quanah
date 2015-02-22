@@ -43,20 +43,11 @@ Function.prototype.call.call(function (that, quanah) {
 
     /*global global: false, module: false */
 
- // Declare a variable to hold a reference to the global object.
+ // Store a reference to the global object, even though it may not be "correct"
+ // or absolutely necessary for this particular environment. More commentary
+ // will be provided shortly.
 
-    var g;
-
- // Store a reference to the global object.
-
-    if (this === null) {
-     // Strict mode has captured us, but we already passed a reference :-)
-        g = (typeof global === 'object') ? global : that;
-    } else {
-     // Strict mode isn't supported in this environment, and we need to make
-     // sure we don't get fooled by Mozilla Rhino's `global` function.
-        g = (typeof this.global === 'object') ? this.global : this;
-    }
+    var g = (typeof that.global === 'object') ? that.global : that;
 
  // Export Quanah as a CommonJS module or as a property of the global object.
 

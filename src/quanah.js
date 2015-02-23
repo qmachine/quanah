@@ -268,7 +268,7 @@
      // indicate the program's logic explicitly even when the program's control
      // is difficult or impossible to predict, as is commonly the case in
      // JavaScript when working with callback functions. Note also that this
-     // function acts almost entirely by side effects.
+     // function acts entirely by side effects.
         try {
          // An interesting consequence of the use of `task.f.call` instead of
          // `Function.prototype.call(f,` is that the function `task.f` can be
@@ -406,6 +406,9 @@
                 Array.prototype.push.apply(args, temp.val);
             } else {
              // This arm ensures that elements are unique.
+             //
+             // NOTE: The following two lines can be combined ...
+             //
                 flag = false;
                 for (i = 0; (flag === false) && (i < x.length); i += 1) {
                     flag = (temp === x[i]);

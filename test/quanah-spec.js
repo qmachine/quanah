@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 22 Feb 2015
+//                                                  ~~ last updated 23 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -464,11 +464,35 @@
             });
         });
 
-     /*
-        it('relays errors downstream to syncpoints', function () {
-         // ...
+        it('relays errors downstream to syncpoints', function (done) {
+
+            var x, y, z;
+
+            x = avar(2);
+            y = avar(2);
+            z = sync(x, y);
+
+            x.Q(function (signal) {
+                this.val += 2;
+                return signal.exit();
+            });
+
+            y.Q(function (signal) {
+                return signal.fail('Failing upstream deliberately ...');
+            });
+
+            z.Q(function (signal) {
+                console.log('This should _NOT_ appear in the output!');
+                return signal.exit();
+            }).on('fail', function (message) {
+                expect(message).to.be('Failed prerequisite(s) for syncpoint');
+                return done();
+            });
+
         });
 
+
+     /*
         it('relays errors upstream from syncpoints', function () {
          // ...
         });

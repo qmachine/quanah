@@ -396,11 +396,10 @@
          // dependencies from the input arguments `args`. Instead, Quanah uses
          // an array along with a `while` loop as a means to avoid recursion,
          // because the recursion depth limit is unpredictable in JavaScript.
-         // The prerequisites of compound avars will be added, but the compound
-         // avars themselves will not be added. Performing this operation is
-         // what allows Quanah to "un-nest" `sync` statements in a single pass
-         // without constructing a directed acyclic graph or preprocessing the
-         // source code :-)
+         // The prerequisites of syncpoints will be added, but the syncpoints
+         // themselves will not be added. Performing this operation is what
+         // allows Quanah to "un-nest" `sync` statements in one pass without
+         // making a directed acyclic graph or preprocessing the source code.
             temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty('Q'))) {
              // This arm "flattens" dependencies for array-based recursion.
@@ -466,6 +465,10 @@
                     count();
                 }
             }
+         // NOTE: In the next line, an `onfail` listener is added to `y`. This
+         // might be a problem for syncpoints that will be reused a lot because
+         // this means that a new listener will be added on every call to the
+         // instance method `Q`.
             return y.on('fail', relay).send('queue', function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to defer execution. This function will be

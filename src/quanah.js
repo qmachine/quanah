@@ -125,8 +125,7 @@
              // the queue, unless this avar has already failed. That unusual
              // (but easily handled) edge case can occur, for example, when an
              // avar fails upstream of a syncpoint. Because `fail` accepts an
-             // argument, `exit` also accepts one, but obviously it will not be
-             // used ...
+             // argument, `exit` also accepts one, but it will not be used.
                 state.ready = (state.hasOwnProperty('epitaph') === false);
             } else if (name === 'fail') {
              // A computation involving this avar has failed, and we will now
@@ -137,8 +136,8 @@
              // `onfail` listeners that have been provided, and we will remove
              // each one after calling it.
                 if (state.hasOwnProperty('epitaph') === false) {
-                 // We don't want to overwrite the original error message by
-                 // accident, because that would complicate debugging.
+                 // Always preserve the original error message because it helps
+                 // to simplify debugging.
                     state.epitaph = arg;
                 }
                 state.queue = [];
@@ -177,7 +176,7 @@
                      // This function allows Quanah to postpone execution of
                      // the given task until both `f` and `x` are ready. The
                      // following line takes the form `f.call(x, signal)`.
-                        (arg.val).call(that, signal);
+                        arg.val.call(that, signal);
                      // This line is separate to ensure that the returned value
                      // is always `undefined`.
                         return;
@@ -198,7 +197,7 @@
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `tick` using an obsolete idiom that
              // involved calling `send` without any arguments.
-                that.send('fail', 'Invalid `send` to "' + name + '"');
+                return that.send('fail', 'Invalid `send`: "' + name + '"');
          */
             }
          // Now, if the avar is ready for its next transform, "lock" the avar
@@ -381,14 +380,14 @@
      //
      // NOTE: Many more unit tests are needed!
      //
-        var args, flag, i, temp, x, y;
+        var args, i, temp, unique, x, y;
         args = Array.prototype.slice.call(arguments);
         x = [];
         y = avar(args.slice());
         while (args.length > 0) {
          // This `while` loop replaces the previous `union` function, which
          // called itself recursively to create an array `x` of unique
-         // dependencies from the input arguments `args`. Instead, Quanah uses
+         // prerequisites from the input arguments `args`. Instead, Quanah uses
          // an array along with a `while` loop as a means to avoid recursion,
          // because the recursion depth limit is unpredictable in JavaScript.
          // The prerequisites of syncpoints will be added, but the syncpoints
@@ -397,20 +396,17 @@
          // making a directed acyclic graph or preprocessing the source code.
             temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty('Q'))) {
-             // This arm "flattens" dependencies for array-based recursion.
+             // This arm "flattens" prerequisites for array-based recursion.
                 Array.prototype.push.apply(args, temp.val);
             } else {
-             // This arm ensures that elements are unique.
-             //
-             // NOTE: The following two lines can be combined ...
-             //
-                flag = false;
-                for (i = 0; (flag === false) && (i < x.length); i += 1) {
-                    flag = (temp === x[i]);
+             // This arm ensures that elements are unique by comparing each
+             // element to be added against all previously added elements. It
+             // would be much more efficient to use `Array.prototype.indexOf`,
+             // but that method wasn't available until ECMAScript 5.
+                for (unique = true, i = 0; unique && (i < x.length); i += 1) {
+                    unique = (temp !== x[i]);
                 }
-                if (flag === false) {
-                    x.push(temp);
-                }
+                Array.prototype.push.apply(x, unique ? [] : [temp]);
             }
         }
         y.Q = function (f) {

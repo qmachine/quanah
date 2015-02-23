@@ -403,7 +403,9 @@
              // This arm ensures that elements are unique by comparing each
              // element to be added against all previously added elements. It
              // would be much more efficient to use `Array.prototype.indexOf`,
-             // but that method wasn't available until ECMAScript 5.
+             // but that method wasn't available until ECMAScript 5. This could
+             // also be replaced by a `for` loop with an empty block, but the
+             // linters would go berserk.
                 for (unique = true, i = 0; unique && (i < x.length); i += 1) {
                     unique = (temp !== x[i]);
                 }
@@ -415,8 +417,8 @@
          // you, don't use it ;-)
             var count, j, pending, relay, status, wait;
             if (f instanceof AVar) {
-             // This line relies on the fact that the "queue" handler will make
-             // a syncpoint internally.
+             // The following line takes advantage of the fact that the
+             // "queue" handler will make a syncpoint internally.
                 return y.send('queue', f);
             }
             count = function () {
@@ -530,7 +532,7 @@
         return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
     };
 
- // Export the module :-)
+ // Finally, return the initialized module :-)
 
     return quanah;
 

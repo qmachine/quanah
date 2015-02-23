@@ -263,7 +263,6 @@
                 });
             });
 
-
             it('keeps input arrays separate', function (done) {
              // This is just to make sure it doesn't accidentally concatenate
              // arrays, because the internal logic is tricky :-P
@@ -491,9 +490,40 @@
 
         });
 
-
      /*
         it('relays errors upstream from syncpoints', function () {
+         // ...
+        });
+
+        it('can "sync" a single avar', function (done) {
+         // ...
+        });
+
+        it('can sync an avar with itself', function (done) {
+         // ...
+        });
+
+        it('can sync an avar with a var', function (done) {
+         // ...
+        });
+
+        it('can sync a syncpoint', function (done) {
+         // ...
+        });
+
+        it('can sync a syncpoint with itself', function (done) {
+         // ...
+        });
+
+        it('can sync an avar with a syncpoint', function (done) {
+         // ...
+        });
+
+        it('can sync a var with a syncpoint', function (done) {
+         // ...
+        });
+
+        it('can sync an avar, a syncpoint, and a var', function (done) {
          // ...
         });
      */

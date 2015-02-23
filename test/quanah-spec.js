@@ -546,7 +546,7 @@
             });
         });
 
-        it('supports "functables"', function (done) {
+        it('supports queueing "functables"', function (done) {
             var f, proxy, x;
             f = function (signal) {
              // This function will be called indirectly...
@@ -571,7 +571,7 @@
             });
         });
 
-        it('supports avar "functables"', function (done) {
+        it('supports queueing avar "functables"', function (done) {
             var f, proxy, x;
             f = function (signal) {
              // This function will be called indirectly...
@@ -595,6 +595,12 @@
                 return signal.exit();
             });
         });
+
+     /*
+        it('supports "functables" as `onfail` listeners', function (done) {
+         // ...
+        });
+     */
 
         return;
 

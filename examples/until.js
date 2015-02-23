@@ -9,13 +9,13 @@
 //                                                      ~~ (c) SRW, 01 Dec 2014
 //                                                  ~~ last updated 23 Feb 2015
 
-/*eslint new-cap: 0, quotes: [2, "single"] */
+/*eslint new-cap: 0 */
 
 /*eslint-env node */
 
 /* @flow */
 
-/*jshint maxparams: 1, quotmark: single, strict: true */
+/*jshint maxparams: 1, quotmark: double, strict: true */
 
 /*jslint indent: 4, maxlen: 80, node: true */
 
@@ -25,16 +25,16 @@
 */
 
 (function () {
-    'use strict';
+    "use strict";
 
  // First, extend definitions for Quanah by providing a `snooze` function,
  // which is analogous to a human who hits the "snooze" button on an alarm
  // clock because it tells Quanah to come back later :-P
 
-    if (global.hasOwnProperty('setImmediate')) {
-        require('../').snooze = global.setImmediate;
-    } else if (process.hasOwnProperty('nextTick')) {
-        require('../').snooze = process.nextTick;   // see http://goo.gl/8HMpVX
+    if (global.hasOwnProperty("setImmediate")) {
+        require("../").snooze = global.setImmediate;
+    } else if (process.hasOwnProperty("nextTick")) {
+        require("../").snooze = process.nextTick;   // see http://goo.gl/8HMpVX
     }
 
  // Declarations
@@ -43,9 +43,9 @@
 
  // Definitions
 
-    AVar = require('../').avar().constructor;
+    AVar = require("../").avar().constructor;
 
-    avar = require('../').avar;
+    avar = require("../").avar;
 
  // Prototype definitions
 
@@ -55,9 +55,9 @@
          // This function prints the current `val` to stdout.
             console.log(this.val);
             return signal.exit();
-        }).on('fail', function (message) {
+        }).on("fail", function (message) {
          // This function prints errors to stderr if anything goes wrong.
-            console.error('Error:', message);
+            console.error("Error:", message);
             return;
         });
     };

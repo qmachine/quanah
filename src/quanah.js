@@ -7,22 +7,22 @@
 //                                                      ~~ (c) SRW, 14 Nov 2012
 //                                                  ~~ last updated 23 Feb 2015
 
-/*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
+/*eslint new-cap: 0 */
 
 /* @flow */
 
-/*jshint es3: true, maxparams: 2, quotmark: single, strict: true */
+/*jshint es3: true, maxparams: 2, quotmark: double, strict: true */
 
 /*jslint indent: 4, maxlen: 80 */
 
 /*properties
-    apply, avar, call, can_run_remotely, epitaph, exit, exports, f, fail,
-    global, hasOwnProperty, length, on, onfail, prototype, push, Q, QUANAH,
-    queue, ready, run_remotely, send, shift, slice, snooze, stay, sync, val, x
+    apply, avar, call, canRunRemotely, epitaph, exit, exports, f, fail, global,
+    hasOwnProperty, length, on, onfail, prototype, push, Q, QUANAH, queue,
+    ready, runRemotely, send, shift, slice, snooze, stay, sync, val, x
 */
 
 (function (env, init) {
-    'use strict';
+    "use strict";
 
  // This strict anonymous closure is the first of two; this one focuses on
  // exporting the module for use by other programs, and it will only run the
@@ -47,18 +47,18 @@
  // or absolutely necessary for this particular environment. More commentary
  // is coming soon.
 
-    var global = (typeof env.global === 'object') ? env.global : env;
+    var global = (typeof env.global === "object") ? env.global : env;
 
  // Export Quanah as a CommonJS module or as a property of the global object.
 
-    if ((typeof module === 'object') && (typeof module.exports === 'object')) {
+    if ((typeof module === "object") && (typeof module.exports === "object")) {
      // Assume CommonJS-ish conventions are being used. In Node.js, modules are
      // cached when loaded, so we can safely assume that this code will only
      // execute once and therefore will never overwrite "itself". RingoJS will
      // also land here, but thanks to the second condition, the MongoDB shell
      // will not.
         module.exports = init({});
-    } else if (global.hasOwnProperty('QUANAH') === false) {
+    } else if (global.hasOwnProperty("QUANAH") === false) {
      // Assume browser-inspired "namespace" convention by assigning a single
      // object to a new all-caps global property. If the target name is already
      // present, assume that Quanah has already been loaded.
@@ -70,7 +70,7 @@
     return;
 
 }(this, function (quanah) {
-    'use strict';
+    "use strict";
 
  // This second strict anonymous closure defines Quanah in a way that is
  // completely sandboxed from the global object. One potential disadvantage of
@@ -95,8 +95,8 @@
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, is_function, queue, run_locally,
-        run_remotely, sync, tick;
+    var AVar, avar, canRunRemotely, isFunction, queue, runLocally, runRemotely,
+        sync, tick;
 
  // Definitions
 
@@ -109,7 +109,7 @@
      // probably better achieved by custom `toString` methods, though, and thus
      // the code here has been simplified in order to appease various linters.
         var state, that;
-        state = {'onfail': [], 'queue': [], 'ready': true};
+        state = {"onfail": [], "queue": [], "ready": true};
         that = this;
         that.send = function (name, arg) {
          // This function is an instance method for manipulating the internal
@@ -119,15 +119,15 @@
          // that this function acts almost entirely by side effects. It no
          // longer calls itself recursively, but because it can call `sync`, it
          // can still end up recursing indirectly.
-            if (name === 'exit') {
+            if (name === "exit") {
              // A computation involving this avar has succeeded, and we will
              // now prepare to enable the application of the next transform in
              // the queue, unless this avar has already failed. That unusual
              // (but easily handled) edge case can occur, for example, when an
              // avar fails upstream of a syncpoint. Because `fail` accepts an
              // argument, `exit` also accepts one, but it will not be used.
-                state.ready = (state.hasOwnProperty('epitaph') === false);
-            } else if (name === 'fail') {
+                state.ready = (state.hasOwnProperty("epitaph") === false);
+            } else if (name === "fail") {
              // A computation involving this avar has failed, and we will now
              // suspend all computations that depend on it indefinitely by
              // overwriting the queue with a fresh one. This is also important
@@ -135,7 +135,7 @@
              // unless we release these references. We will also call any
              // `onfail` listeners that have been provided, and we will remove
              // each one after calling it.
-                if (state.hasOwnProperty('epitaph') === false) {
+                if (state.hasOwnProperty("epitaph") === false) {
                  // Always preserve the original error message because it helps
                  // to simplify debugging.
                     state.epitaph = arg;
@@ -145,7 +145,7 @@
                 while (state.onfail.length > 0) {
                     state.onfail.shift().call(that, state.epitaph);
                 }
-            } else if (name === 'onfail') {
+            } else if (name === "onfail") {
              // This arm was originally added as an experiment into supporting
              // an event-driven idiom inspired by Node.js, but "fail" is still
              // the only event available. (Matching "exit" and "stay" events
@@ -160,17 +160,17 @@
              // in a previous computation. If it has already failed, the newly
              // provided listener will be invoked immediately but not stored.
                 state.onfail.push(arg);
-                if (state.hasOwnProperty('epitaph')) {
+                if (state.hasOwnProperty("epitaph")) {
                     state.onfail.shift().call(that, state.epitaph);
                 }
-            } else if (name === 'queue') {
+            } else if (name === "queue") {
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
              // task queue (`queue`). Although `arg` is expected to be either a
              // function or an avar that will have a function as its `val`,
              // typechecking is not enforced at this time. Instead, the idea
-             // here is to allow type errors to be caught by `run_locally` or
-             // `run_remotely`.
+             // here is to allow type errors to be caught by `runLocally` or
+             // `runRemotely`.
                 if (arg instanceof AVar) {
                     sync(arg, that).Q(function (signal) {
                      // This function allows Quanah to postpone execution of
@@ -185,10 +185,10 @@
                     state.queue.push(arg);
                 }
          /*
-            } else if (name === 'stay') {
+            } else if (name === "stay") {
              // A computation that depends on this avar has been deferred, but
              // that computation will be put back into the queue directly by
-             // `run_locally`. For consistency with the "exit" and "fail"
+             // `runLocally`. For consistency with the "exit" and "fail"
              // messages, "stay" accepts an argument, but the current code
              // ignores that argument.
             } else {
@@ -197,7 +197,7 @@
              // may be useful to capture the error. Another possibility is that
              // a user is trying to trigger `tick` using an obsolete idiom that
              // involved calling `send` without any arguments.
-                return that.send('fail', 'Invalid `send`: "' + name + '"');
+                return that.send("fail", "Invalid `send`: '" + name + "'");
          */
             }
          // Now, if the avar is ready for its next transform, "lock" the avar
@@ -212,7 +212,7 @@
              // the queue again would require less cycles through the queue in
              // the long term. Performance isn't a primary concern right now,
              // though, so ... `push` it is.
-                queue.push({'f': state.queue.shift(), 'x': that});
+                queue.push({"f": state.queue.shift(), "x": that});
             }
          // Finally, run `tick` to trigger execution for the main queue.
             tick();
@@ -229,31 +229,31 @@
         return new AVar(val);
     };
 
-    can_run_remotely = function (task) {
+    canRunRemotely = function (task) {
      // This function exists to keep the abstraction in `tick` as clean and
      // close to English as possible. It tests for the existence of particular
      // user-defined functions so that `tick` can decide whether to use local
      // or remote execution for a given task. Note also that the `=== true` is
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
-        return ((is_function(quanah.can_run_remotely)) &&
-                (is_function(quanah.run_remotely)) &&
-                (quanah.can_run_remotely(task) === true));
+        return ((isFunction(quanah.canRunRemotely)) &&
+                (isFunction(quanah.runRemotely)) &&
+                (quanah.canRunRemotely(task) === true));
     };
 
-    is_function = function (f) {
+    isFunction = function (f) {
      // This function returns `true` only if and only if the input argument
      // `f` is a function. The second condition is necessary to avoid a false
      // positive when `f` is a regular expression. Quanah's priority is always
      // to behave according to the ECMAScript standard, and thus it doesn't try
      // to handle bugs like http://git.io/WcNQEQ or http://git.io/bZIaQw. Also,
      // note that an avar with a function as its `val` will return `false`.
-        return ((typeof f === 'function') && (f instanceof Function));
+        return ((typeof f === "function") && (f instanceof Function));
     };
 
     queue = [];
 
-    run_locally = function (task) {
+    runLocally = function (task) {
      // This function applies the transformation `f` to `x` for method `f` and
      // property `x` of the input object `task`. It calls `f` with `x` as the
      // `this` value, along with an object with methods to control execution as
@@ -282,18 +282,18 @@
              // for this is because user-provided functions cannot be assumed
              // to adhere to prescribed signatures, and testing returned types
              // dynamically is expensive and beyond the scope of Quanah.
-                'exit': function (message) {
+                "exit": function (message) {
                  // This function indicates successful completion. Note that
                  // `message` is currently ignored by `send`.
-                    task.x.send('exit', message);
+                    task.x.send("exit", message);
                     return;
                 },
-                'fail': function (message) {
+                "fail": function (message) {
                  // This function indicates a failure, and it is intended to
                  // replace the `throw new Error(...)` idiom, primarily because
                  // capturing errors that are thrown during remote execution
                  // are very difficult to capture and return to the invoking
-                 // contexts otherwise. Although the name `run_locally` was
+                 // contexts otherwise. Although the name `runLocally` was
                  // chosen to indicate that the invocation and execution occur
                  // in the same JavaScript context, it does not always imply
                  // that the local context was the "original context". For
@@ -305,10 +305,10 @@
                  // arbitrary contexts. It also provides a clean alternative to
                  // error catching for asynchronous callback functions, because
                  // a `try/catch` block like this cannot catch those errors.
-                    task.x.send('fail', message);
+                    task.x.send("fail", message);
                     return;
                 },
-                'stay': function (message) {
+                "stay": function (message) {
                  // This function allows a user to postpone execution, and it
                  // is particularly useful for delaying execution until some
                  // condition is met -- it can be used to write non-blocking
@@ -331,9 +331,9 @@
                  // no other tasks would have run yet; this would result in an
                  // error for exceeding the recursion stack depth limit.)
                  //
-                    task.x.send('stay', message);
+                    task.x.send("stay", message);
                     queue.push(task);
-                    if (is_function(quanah.snooze)) {
+                    if (isFunction(quanah.snooze)) {
                         quanah.snooze(tick);
                     }
                     return;
@@ -344,20 +344,20 @@
          // to be a task-level failure. Do not rely on Quanah to catch thrown
          // exceptions, however -- especially for callbacks to asynchronous
          // functions!
-            task.x.send('fail', err);
+            task.x.send("fail", err);
         }
         return;
     };
 
-    run_remotely = function (task) {
+    runRemotely = function (task) {
      // This function exists only to forward input arguments to a user-defined
      // function which may or may not ever be provided. JavaScript will not
-     // crash in a situation like this because `can_run_remotely` tests for the
-     // existence of the user-defined method before calling `run_remotely`.
-     // Note that the lines below should not be simplified into a single line;
-     // these lines ensure that `run_remotely` always returns `undefined`, even
-     // if the user-provided `quanah.run_remotely` has an incorrect signature.
-        quanah.run_remotely(task);
+     // crash in a situation like this because `canRunRemotely` tests for the
+     // existence of the user-defined method before calling `runRemotely`. Note
+     // that the lines below should not be simplified into a single line; these
+     // lines ensure that `runRemotely` always returns `undefined`, even if the
+     // user-provided `quanah.runRemotely` has an incorrect signature.
+        quanah.runRemotely(task);
         return;
     };
 
@@ -396,7 +396,7 @@
          // without constructing a directed acyclic graph or preprocessing the
          // source code.
             temp = args.shift();
-            if ((temp instanceof AVar) && (temp.hasOwnProperty('Q'))) {
+            if ((temp instanceof AVar) && (temp.hasOwnProperty("Q"))) {
              // This arm "flattens" prerequisites for array-based recursion.
                 Array.prototype.push.apply(args, temp.val);
             } else {
@@ -419,15 +419,15 @@
             if (f instanceof AVar) {
              // The following line takes advantage of the fact that the
              // "queue" handler will make a syncpoint internally.
-                return y.send('queue', f);
+                return y.send("queue", f);
             }
             count = function () {
              // This function is a simple counting semaphore that closes over
              // some private state variables in order to delay the execution of
              // `f` until certain conditions are satisfied.
                 pending -= 1;
-                if ((pending === 0) && (status === 'waiting')) {
-                    status = 'running';
+                if ((pending === 0) && (status === "waiting")) {
+                    status = "running";
                 }
                 return;
             };
@@ -435,18 +435,18 @@
             relay = function () {
              // This function ensures that any failures by upstream avars are
              // communicated to the downstream syncpoint.
-                status = 'failed';
+                status = "failed";
                 return;
             };
-            status = (pending === 0) ? 'running' : 'waiting';
+            status = (pending === 0) ? "running" : "waiting";
             wait = function (outer) {
              // This function blocks further progress through an individual
              // avar's queue until a nested avar exits.
-                avar(count()).send('queue', function (inner) {
+                avar(count()).send("queue", function (inner) {
                  // This function checks to see if the syncpoint has finished
                  // executing yet. If so, it releases its "parent" avar, which
                  // was locked because it was being used by the syncpoint.
-                    if (status === 'running') {
+                    if (status === "running") {
                         return inner.stay();
                     }
                     inner.exit();
@@ -456,7 +456,7 @@
             };
             for (j = 0; j < x.length; j += 1) {
                 if (x[j] instanceof AVar) {
-                    x[j].send('onfail', relay).send('queue', wait);
+                    x[j].send("onfail", relay).send("queue", wait);
                 } else {
                     count();
                 }
@@ -465,22 +465,22 @@
          // might be a problem for syncpoints that will be reused a lot because
          // this means that a new listener will be added on every call to the
          // instance method `Q`, and they will only be removed upon failure.
-            return y.on('fail', relay).send('queue', function (signal) {
+            return y.on("fail", relay).send("queue", function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to defer execution. This function will be
              // put into `y`'s queue, but it will not run until all of the
              // prerequisites are ready.
-                if (status === 'failed') {
-                    signal.fail('Failed prerequisite(s) for syncpoint');
-                } else if (status === 'waiting') {
+                if (status === "failed") {
+                    signal.fail("Failed prerequisite(s) for syncpoint");
+                } else if (status === "waiting") {
                     signal.stay();
                 } else {
                     f.call(y, signal);
                 }
                 return;
-            }).send('queue', function (signal) {
+            }).send("queue", function (signal) {
              // This function releases everything after successful completion.
-                status = 'done';
+                status = "done";
                 return signal.exit();
             });
         };
@@ -503,10 +503,10 @@
      // can be modified by the presence of externally-provided definitions.
         var task = queue.shift();
         if (task instanceof Object) {
-            if (can_run_remotely(task)) {
-                run_remotely(task);
+            if (canRunRemotely(task)) {
+                runRemotely(task);
             } else {
-                run_locally(task);
+                runLocally(task);
             }
         }
         return;
@@ -518,7 +518,7 @@
      // This function's only current use is to allow users to set custom error
      // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
      // am hoping to leave Quanah plenty of room to grow later :-)
-        return this.send('on' + type, listener);
+        return this.send("on" + type, listener);
     };
 
     AVar.prototype.Q = function (f) {
@@ -529,7 +529,7 @@
      // an avar with a monadic function as its `val`. This function can be used
      // generically via `AVar.prototype.Q.call(x, f)` for arbitrary types, but
      // it's more fun (and reckless) to assign it to `Object.prototype.Q` ;-)
-        return ((this instanceof AVar) ? this : avar(this)).send('queue', f);
+        return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
     };
 
  // Finally, return the initialized module :-)

@@ -421,6 +421,8 @@
          // you, don't use it ;-)
             var count, j, m, n, relay, status, wait;
             if (f instanceof AVar) {
+             // This line relies on the fact that the "queue" handler will make
+             // a syncpoint internally.
                 return y.send('queue', f);
             }
             count = function () {
@@ -468,34 +470,23 @@
                     count();
                 }
             }
-            return y.send('queue', function (signal) {
+            return y.on('fail', relay).send('queue', function (signal) {
              // This function uses closure over private state variables and the
-             // input argument `f` to delay execution and to run `f` with a
-             // modified version of the `signal` argument it will receive. This
-             // function will be put into `y`'s queue, but it will not run
-             // until all prerequisites are ready to proceed.
+             // input argument `f` to defer execution. This function will be
+             // put into `y`'s queue, but it will not run until all of the
+             // prerequisites are ready.
                 if (status === 'failed') {
                     signal.fail('Failed prerequisite(s) for syncpoint');
                 } else if (status === 'waiting') {
                     signal.stay();
                 } else {
-                    f.call(y, {
-                     // These methods extend those provided by the `signal`
-                     // object in order to modify the standard behavior.
-                        'exit': function (message) {
-                         // This function signals successful completion :-)
-                            status = 'done';
-                            return signal.exit(message);
-                        },
-                        'fail': function (message) {
-                         // This function signals a failed execution :-(
-                            relay();
-                            return signal.fail(message);
-                        },
-                        'stay': signal.stay
-                    });
+                    f.call(y, signal);
                 }
                 return;
+            }).send('queue', function (signal) {
+             // This function releases everything after successful completion.
+                status = 'done';
+                return signal.exit();
             });
         };
         return y;

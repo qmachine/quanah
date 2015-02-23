@@ -3,11 +3,11 @@
 //- until.js ~~
 //
 //  This program demonstrates an `until` method that provides a chainable,
-//  non-blocking loop for Quanah. The method will work in any JS environment,
-//  but the demonstration here is tailored for Node.js.
+//  non-blocking loop for Quanah. The method definition will work in any JS
+//  environment, but the program as a whole is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 16 Feb 2015
+//                                                  ~~ last updated 23 Feb 2015
 
 /*eslint new-cap: 0, quotes: [2, "single"] */
 
@@ -20,8 +20,8 @@
 /*jslint indent: 4, maxlen: 80, node: true */
 
 /*properties
-    avar, call, constructor, error, exit, log, on, nextTick, print, prototype,
-    Q, random, snooze, stay, until, val
+    avar, call, constructor, error, exit, hasOwnProperty, log, on, nextTick,
+    print, prototype, Q, random, setImmediate, snooze, stay, until, val
 */
 
 (function () {
@@ -31,7 +31,11 @@
  // which is analogous to a human who hits the "snooze" button on an alarm
  // clock because it tells Quanah to come back later :-P
 
-    require('../').snooze = process.nextTick; // see also: http://goo.gl/8HMpVX
+    if (global.hasOwnProperty('setImmediate')) {
+        require('../').snooze = global.setImmediate;
+    } else if (process.hasOwnProperty('nextTick')) {
+        require('../').snooze = process.nextTick;   // see http://goo.gl/8HMpVX
+    }
 
  // Declarations
 

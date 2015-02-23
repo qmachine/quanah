@@ -95,7 +95,7 @@
 
  // Declarations
 
-    var AVar, avar, can_run_remotely, is_Function, queue, run_locally,
+    var AVar, avar, can_run_remotely, is_function, queue, run_locally,
         run_remotely, sync, tick;
 
  // Definitions
@@ -236,12 +236,12 @@
      // or remote execution for a given task. Note also that the `=== true` is
      // meaningful here because it requires the user-defined function to return
      // a boolean `true` rather than a truthy value like `[]`.
-        return ((is_Function(quanah.can_run_remotely)) &&
-                (is_Function(quanah.run_remotely)) &&
+        return ((is_function(quanah.can_run_remotely)) &&
+                (is_function(quanah.run_remotely)) &&
                 (quanah.can_run_remotely(task) === true));
     };
 
-    is_Function = function (f) {
+    is_function = function (f) {
      // This function returns `true` only if and only if the input argument
      // `f` is a function. The second condition is necessary to avoid a false
      // positive when `f` is a regular expression. Quanah's priority is always
@@ -333,7 +333,7 @@
                  //
                     task.x.send('stay', message);
                     queue.push(task);
-                    if (is_Function(quanah.snooze)) {
+                    if (is_function(quanah.snooze)) {
                         quanah.snooze(tick);
                     }
                     return;

@@ -447,11 +447,7 @@
             wait = function (outer) {
              // This function blocks further progress through an individual
              // avar's queue until a nested avar exits.
-             //
-             // NOTE: The next two lines can be combined as `avar(count())` ...
-             //
-                count();
-                avar().send('queue', function (inner) {
+                avar(count()).send('queue', function (inner) {
                  // This function checks to see if the syncpoint has finished
                  // executing yet. If so, it releases its "parent" avar, which
                  // was locked because it was being used by the syncpoint.

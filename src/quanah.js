@@ -119,7 +119,6 @@
          // that this function acts almost entirely by side effects. It no
          // longer calls itself recursively, but because it can call `sync`, it
          // can still end up recursing indirectly.
-            var i;
             if (name === 'exit') {
              // A computation involving this avar has succeeded, and we will
              // now prepare to enable the application of the next transform in
@@ -135,12 +134,8 @@
              // overwriting the queue with a fresh one. This is also important
              // because JavaScript's garbage collector can't free the memory
              // unless we release these references. We will also call any
-             // `onfail` listeners that have been provided -- these will not be
-             // overwritten.
-             //
-             // NOTE: If `onfail` listeners are functions that will never be
-             // removed, how are garbage collection and memory usage affected?
-             //
+             // `onfail` listeners that have been provided, and we will remove
+             // each one after calling it.
                 if (state.hasOwnProperty('epitaph') === false) {
                  // We don't want to overwrite the original error message by
                  // accident, because that would complicate debugging.
@@ -148,8 +143,8 @@
                 }
                 state.queue = [];
                 state.ready = false;
-                for (i = 0; i < state.onfail.length; i += 1) {
-                    state.onfail[i].call(that, state.epitaph);
+                while (state.onfail.length > 0) {
+                    state.onfail.shift().call(that, state.epitaph);
                 }
             } else if (name === 'onfail') {
              // This arm was originally added as an experiment into supporting
@@ -163,11 +158,11 @@
              // function; it can be any object for which a `call` method is
              // available.) Assuming, then, that a function has been provided,
              // Quanah needs to make sure that the avar hasn't already failed
-             // in a previous computation. If it has, then the listener is
-             // assigned and also immediately invoked.
+             // in a previous computation. If it has already failed, the newly
+             // provided listener will be invoked immediately but not stored.
                 state.onfail.push(arg);
                 if (state.hasOwnProperty('epitaph')) {
-                    arg.call(that, state.epitaph);
+                    state.onfail.shift().call(that, state.epitaph);
                 }
             } else if (name === 'queue') {
              // The next transformation to be applied to this avar will be put
@@ -470,7 +465,7 @@
          // NOTE: In the next line, an `onfail` listener is added to `y`. This
          // might be a problem for syncpoints that will be reused a lot because
          // this means that a new listener will be added on every call to the
-         // instance method `Q`.
+         // instance method `Q`, and they will only be removed upon failure.
             return y.on('fail', relay).send('queue', function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to defer execution. This function will be

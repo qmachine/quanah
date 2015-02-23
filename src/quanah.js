@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 22 Feb 2015
+//                                                  ~~ last updated 23 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -392,8 +392,9 @@
          // because the recursion depth limit is unpredictable in JavaScript.
          // The prerequisites of syncpoints will be added, but the syncpoints
          // themselves will not be added. Performing this operation is what
-         // allows Quanah to "un-nest" `sync` statements in one pass without
-         // making a directed acyclic graph or preprocessing the source code.
+         // allows Quanah to "un-nest" `sync` statements in one pass at runtime
+         // without constructing a directed acyclic graph or preprocessing the
+         // source code.
             temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty('Q'))) {
              // This arm "flattens" prerequisites for array-based recursion.
@@ -406,7 +407,7 @@
                 for (unique = true, i = 0; unique && (i < x.length); i += 1) {
                     unique = (temp !== x[i]);
                 }
-                Array.prototype.push.apply(x, unique ? [] : [temp]);
+                Array.prototype.push.apply(x, unique ? [temp] : []);
             }
         }
         y.Q = function (f) {

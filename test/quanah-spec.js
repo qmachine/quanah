@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 20 Feb 2015
+//                                                  ~~ last updated 22 Feb 2015
 
 /*eslint camelcase: 0, new-cap: 0, quotes: [2, "single"] */
 
@@ -301,6 +301,15 @@
             expect(quanah.sync.length).to.equal(0);
         });
 
+     /*
+        it('does not affect assignment to a `Q` property', function () {
+         // This test isn't relevant anymore, now that "Method Q" is no longer
+         // a method of `Object.prototype` ...
+            var x = {};
+            x.Q = 5;
+        });
+     */
+
         it('can replace an avar\'s `val`', function (done) {
             var x = avar();
             x.Q(function (evt) {
@@ -455,6 +464,16 @@
             });
         });
 
+     /*
+        it('relays errors downstream to syncpoints', function () {
+         // ...
+        });
+
+        it('relays errors upstream from syncpoints', function () {
+         // ...
+        });
+     */
+
         it('supports avar functions', function (done) {
             var f, x;
             f = avar(function (evt) {
@@ -521,13 +540,6 @@
                 done();
                 return signal.exit();
             });
-        });
-
-        it('should not affect assignment to a `Q` property', function () {
-         // This test isn't relevant anymore, now that "Method Q" is no longer
-         // a method of `Object.prototype` ...
-            var x = {};
-            x.Q = 5;
         });
 
         return;

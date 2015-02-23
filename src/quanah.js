@@ -418,7 +418,7 @@
         y.Q = function (f) {
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
-            var count, j, m, n, relay, status, wait;
+            var count, j, pending, relay, status, wait;
             if (f instanceof AVar) {
              // This line relies on the fact that the "queue" handler will make
              // a syncpoint internally.
@@ -428,21 +428,20 @@
              // This function is a simple counting semaphore that closes over
              // some private state variables in order to delay the execution of
              // `f` until certain conditions are satisfied.
-                m += 1;
-                if ((m === n) && (status === 'waiting')) {
+                pending -= 1;
+                if ((pending === 0) && (status === 'waiting')) {
                     status = 'running';
                 }
                 return;
             };
-            m = 0;
-            n = x.length;
+            pending = x.length;
             relay = function () {
              // This function ensures that any failures by upstream avars are
              // communicated to the downstream syncpoint.
                 status = 'failed';
                 return;
             };
-            status = (m === n) ? 'running' : 'waiting';
+            status = (pending === 0) ? 'running' : 'waiting';
             wait = function (outer) {
              // This function blocks further progress through an individual
              // avar's queue until a nested avar exits.
@@ -458,7 +457,7 @@
                 });
                 return;
             };
-            for (j = 0; j < n; j += 1) {
+            for (j = 0; j < x.length; j += 1) {
                 if (x[j] instanceof AVar) {
                     x[j].send('onfail', relay).send('queue', wait);
                 } else {

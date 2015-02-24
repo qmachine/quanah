@@ -238,17 +238,17 @@
         describe("The `Q` instance method of a syncpoint", function () {
 
             it("works when no arguments are given", function (done) {
-                sync().Q(function (evt) {
+                sync().Q(function (signal) {
                  // This function records the current behavior, but this
                  // behavior may change really soon, because I don't find this
                  // nearly as intuitive now as I did when I first wrote `sync`.
                     expect(this.val).to.be.an(Array);
                     expect(this.val.length).to.equal(0);
                     done();
-                    return evt.exit();
+                    return signal.exit();
                 }).on("fail", function (message) {
                     console.error("Error:", message);
-                    return done();
+                    return;
                 });
             });
 
@@ -311,57 +311,57 @@
 
         it("can replace an avar's `val`", function (done) {
             var x = avar();
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // This function needs documentation.
                 x.val = Math.PI;
-                return evt.exit();
-            }).Q(function (evt) {
+                return signal.exit();
+            }).Q(function (signal) {
              // This function needs documentation.
                 expect(this.val).to.equal(Math.PI);
                 done();
-                return evt.exit();
+                return signal.exit();
             });
         });
 
         it("can replace `this.val`", function (done) {
             var x = avar();
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // This function needs documentation.
                 this.val = Math.PI;
-                return evt.exit();
-            }).Q(function (evt) {
+                return signal.exit();
+            }).Q(function (signal) {
              // This function needs documentation.
                 expect(x.val).to.equal(Math.PI);
                 done();
-                return evt.exit();
+                return signal.exit();
             });
         });
 
         it("survives deliberate failures", function (done) {
             var x = avar("This test fails deliberately :-)");
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // This function needs documentation.
-                return evt.fail(x.val);
+                return signal.fail(x.val);
             }).on("fail", function (message) {
              // This function needs documentation.
                 expect(message).to.equal(x.val);
                 return done();
-            }).Q(function (evt) {
+            }).Q(function (signal) {
              // This function needs documentation.
                 console.log("This should _NOT_ appear in the output!");
-                return evt.exit();
+                return signal.exit();
             });
         });
 
         it("allows `.on` and `.Q` commutatively", function (done) {
             var x = avar("This test fails deliberately :-)");
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // This function needs documentation.
-                return evt.fail(x.val);
-            }).Q(function (evt) {
+                return signal.fail(x.val);
+            }).Q(function (signal) {
              // This function needs documentation.
                 console.log("This should _NOT_ appear in the output!");
-                return evt.exit();
+                return signal.exit();
             }).on("fail", function (message) {
              // This function needs documentation.
                 expect(message).to.equal(x.val);
@@ -371,15 +371,15 @@
 
         it("survives unexpected failures", function (done) {
             var x = avar();
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // This fails because `x.val` is not a function, which simulates a
              // programming error (as opposed to an uncaught `throw`).
                 x.val("Hi mom!");
-                return evt.exit();
-            }).Q(function (evt) {
+                return signal.exit();
+            }).Q(function (signal) {
              // This function needs documentation.
                 console.log("This should _NOT_ appear in the output!");
-                return evt.exit();
+                return signal.exit();
             }).on("fail", function () {
              // This function needs documentation.
                 return done();
@@ -410,27 +410,27 @@
 
         it("waits for short async operations", function (done) {
             var x = avar();
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // NOTE: Should we also test `setImmediate`?
-                process.nextTick(evt.exit);
+                process.nextTick(signal.exit);
                 return;
-            }).Q(function (evt) {
+            }).Q(function (signal) {
              // This function needs documentation.
                 done();
-                return evt.exit();
+                return signal.exit();
             });
         });
 
         it("waits for long[er] async operations", function (done) {
             var x = avar();
-            x.Q(function (evt) {
+            x.Q(function (signal) {
              // This function needs documentation.
-                setTimeout(evt.exit, 0);
+                setTimeout(signal.exit, 0);
                 return;
-            }).Q(function (evt) {
+            }).Q(function (signal) {
              // This function needs documentation.
                 done();
-                return evt.exit();
+                return signal.exit();
             });
         });
 
@@ -530,19 +530,17 @@
 
         it("supports avar functions", function (done) {
             var f, x;
-            f = avar(function (evt) {
+            f = avar(function (signal) {
              // This function also happens to be "distributable".
                 this.val += 2;
-                return evt.exit();
+                return signal.exit();
             });
             x = avar(2);
-            x.Q(f).Q(function (evt) {
+            x.Q(f).Q(function (signal) {
              // This function needs documentation.
-                if (this.val !== 4) {
-                    return evt.fail("Computed result was not 4.");
-                }
+                expect(this.val).to.equal(4);
                 done();
-                return evt.exit();
+                return signal.exit();
             });
         });
 

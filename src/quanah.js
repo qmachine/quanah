@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 23 Feb 2015
+//                                                  ~~ last updated 24 Feb 2015
 
 /*eslint new-cap: 0 */
 
@@ -465,7 +465,7 @@
          // might be a problem for syncpoints that will be reused a lot because
          // this means that a new listener will be added on every call to the
          // instance method `Q`, and they will only be removed upon failure.
-            return y.on("fail", relay).send("queue", function (signal) {
+            return y.send("onfail", relay).send("queue", function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to defer execution. This function will be
              // put into `y`'s queue, but it will not run until all of the
@@ -500,7 +500,7 @@
      // and it makes no difference if the separate contexts are due to
      // recursion or to special objects such as Web Workers. The `tick`
      // function selects an execution context conditionally, and its behavior
-     // can be modified by the presence of externally-provided definitions.
+     // can be modified (indirectly) by the presence of external definitions.
         var task = queue.shift();
         if (task instanceof Object) {
             if (canRunRemotely(task)) {

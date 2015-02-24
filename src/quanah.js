@@ -82,16 +82,15 @@
  // The input argument to this closure, `quanah`, is an object literal, `{}`,
  // and it will be used as a "namespace" to which methods and properties will
  // be added within the closure. Specifically, it will end up more like a Ruby
- // module -- a "bag of functions". Anything added to this object will be
- // available to scopes both inside and outside of this anonymous closure.
- // Because Quanah can delegate dynamically to functions that are defined
- // externally to this closure, users can adapt the behavior of Quanah's
- // "internal" functions for use with any environment. Additionally, this
- // allows the application developer to control the governance of the
- // definitions. Developers with concerns about malicious users' abilities to
- // "hijack" remote contexts by redefining "low-level" functions can use
- // `Object.defineProperty` in modern JavaScript environments to prevent their
- // code from being overwritten, for example.
+ // module -- a "bag of functions". All methods and properties added to the
+ // module will be available in-scope both inside and outside of this anonymous
+ // closure. Because Quanah can delegate dynamically to functions that are
+ // defined externally to this closure, users can modify Quanah's behavior for
+ // use with any environment. As a bonus, this design enables users to control
+ // the governance of the definitions. Developers with concerns about malicious
+ // users' abilities to "hijack" remote contexts by redefining "low-level"
+ // functions can use `Object.defineProperty` in modern JavaScript environments
+ // to prevent their code from being overwritten, for example.
 
  // Declarations
 
@@ -214,7 +213,7 @@
              // though, so ... `push` it is.
                 queue.push({"f": state.queue.shift(), "x": that});
             }
-         // Finally, run `tick` to trigger execution for the main queue.
+         // Finally, call `tick` to trigger execution for the main queue.
             tick();
             return that;
         };

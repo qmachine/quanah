@@ -357,6 +357,13 @@
      // that the lines below should not be simplified into a single line; these
      // lines ensure that `runRemotely` always returns `undefined`, even if the
      // user-provided `quanah.runRemotely` has an incorrect signature.
+     //
+     // NOTE: Would it be easier to understand if `quanah.runRemotely(task)`
+     // were just inlined directly into `tick`? The argument for separating it
+     // into its own function is for consistency in `tick`, but the argument
+     // for inlining it is that it would show clearly that the behavior of
+     // Quanah can be modified externally to this closure ...
+     //
         quanah.runRemotely(task);
         return;
     };
@@ -468,7 +475,7 @@
             return y.send("onfail", relay).send("queue", function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to defer execution. This function will be
-             // put into `y`'s queue, but it will not run until all of the
+             // put into `y`'s queue, and it will not run until all of the
              // prerequisites are ready.
                 if (status === "failed") {
                     signal.fail("Failed prerequisite(s) for syncpoint");

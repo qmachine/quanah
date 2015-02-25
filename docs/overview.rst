@@ -20,7 +20,7 @@ How it works
 How to use it
 -------------
 
-(coming soon)
+See :doc:`how-to-use-it`.
 
 
 How to contribute

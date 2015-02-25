@@ -7,6 +7,7 @@ Quanah
     :maxdepth: 2
 
     overview
+    how-to-use-it
     source-code
 
 

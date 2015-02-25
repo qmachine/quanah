@@ -16,6 +16,15 @@ Adobe / Mozilla Tamarin shell
 (coming soon)
 
 
+ArangoDB shell
+~~~~~~~~~~~~~~
+
+.. code-block:: javascript
+
+    var quanah = require("quanah");
+    console.log(quanah.avar);
+
+
 CouchDB
 ~~~~~~~
 
@@ -25,7 +34,11 @@ CouchDB
 Google D8 / V8 shells
 ~~~~~~~~~~~~~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    load("quanah.js");
+    var quanah = QUANAH;
+    print(quanah.avar);
 
 
 io.js
@@ -37,49 +50,78 @@ io.js
 JavaScriptCore shell
 ~~~~~~~~~~~~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    load("quanah.js");
+    var quanah = QUANAH;
+    print(quanah.avar);
 
 
 jrunscript
 ~~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    load("quanah.js");
+    var quanah = QUANAH;
+    print(quanah.avar);
 
 
 MongoDB shell
 ~~~~~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    load("quanah.js");
+    var quanah = QUANAH;
+    print(quanah.avar);
 
 
 Mozilla Rhino
 ~~~~~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    load("quanah.js");
+    var quanah = QUANAH;
+    print(quanah.avar);
 
 
 Mozilla Spidermonkey shell
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    load("quanah.js");
+    var quanah = QUANAH;
+    print(quanah.avar);
 
 
 Node.js
 ~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    var quanah = require("./quanah");
+    console.log(quanah.avar);
 
 
 PhantomJS
 ~~~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    var quanah = require('./quanah');
+    console.log(quanah.avar);
 
 
 RingoJS
 ~~~~~~~
 
-(coming soon)
+.. code-block:: javascript
+
+    var quanah = require("./quanah");
+    console.log(quanah.avar);
 
 
 Web browsers

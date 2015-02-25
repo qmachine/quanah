@@ -521,20 +521,22 @@
  // Prototype definitions
 
     AVar.prototype.on = function (type, listener) {
-     // This function's only current use is to allow users to set custom error
-     // handlers, but by mimicking the same idiom used by jQuery and Node.js, I
-     // am hoping to leave Quanah plenty of room to grow later :-)
+     // This method provides an idiom for event-driven programming that will be
+     // familiar to anyone who has ever used jQuery or Node.js. Currently, the
+     // only valid `type` is "fail", but more event types may be added in the
+     // future.
         return this.send("on" + type, listener);
     };
 
     AVar.prototype.Q = function (f) {
-     // This function is the infamous "Method Q" that once doubled as the
-     // "namespace" for Quanah. Here, it is defined as a chainable prototype
-     // method for avars that takes a single input argument. The input argument
-     // is expected to be either a monadic (single variable) function or else
-     // an avar with a monadic function as its `val`. This function can be used
-     // generically via `AVar.prototype.Q.call(x, f)` for arbitrary types, but
-     // it's more fun (and reckless) to assign it to `Object.prototype.Q` ;-)
+     // "Method Q" provides syntactic sugar for "queue"ing new tasks for a
+     // given avar. It is a chainable prototype method that expects a single
+     // input argument which should be either a monadic (single variable)
+     // function or else an avar with a monadic function as its `val` property.
+     // Unlike the `AVar.prototype.on` method, this method supports generic use
+     // for arbitrary types. There is no _need_ for generic support; rather, it
+     // remains because of the (admittedly reckless) entertainment that results
+     // from assigning Method Q to `Object.prototype.Q` :-)
         return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
     };
 

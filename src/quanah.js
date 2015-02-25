@@ -49,7 +49,8 @@
 
     var global = (typeof env.global === "object") ? env.global : env;
 
- // Export Quanah as a CommonJS module or as a property of the global object.
+ // Export Quanah as a CommonJS module or as a property of the global object,
+ // but avoid repeating the initialization process if possible.
 
     if ((typeof module === "object") && (typeof module.exports === "object")) {
      // Assume CommonJS-ish conventions are being used. In Node.js, modules are

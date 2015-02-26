@@ -92,6 +92,10 @@ Mozilla Spidermonkey shell
 Node.js
 ~~~~~~~
 
+Node.js_ is a server-side JavaScript environment for writing high-performance
+networking applications, and it is arguably the greatest recent source for
+innovation in asynchronous programming outside of the web browser.
+
 .. code-block:: javascript
 
     var quanah = require("./quanah");

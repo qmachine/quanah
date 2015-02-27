@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 25 Feb 2015
+//                                                  ~~ last updated 26 Feb 2015
 
 /*eslint new-cap: 0 */
 
@@ -24,6 +24,9 @@
 (function (env, init) {
     "use strict";
 
+ // Giant anonymous closure #1
+ // ==========================
+ //
  // This strict anonymous closure is the first of two; this one focuses on
  // exporting the module for use by other programs, and it will only run the
  // second closure, which initializes the module itself, once. The primary
@@ -43,16 +46,15 @@
  // but avoid repeating the initialization process if possible.
 
     if ((typeof module === "object") && (typeof module.exports === "object")) {
-     // Assume CommonJS-ish conventions are being used. In Node.js, modules are
-     // cached when loaded, so we can safely assume that this code will only
-     // execute once and therefore will never overwrite "itself". RingoJS will
-     // also land here, but thanks to the second condition, the MongoDB shell
-     // will not.
+     // Assume CommonJS conventions. In Node.js, modules are cached when they
+     // are loaded, which allows the assumption that the `init` code will only
+     // run once. RingoJS will also choose this branch, but thanks to the
+     // second condition, the MongoDB shell will not.
         module.exports = init({});
     } else if (global.hasOwnProperty("QUANAH") === false) {
      // Assume browser-inspired "namespace" convention by assigning a single
-     // object to a new all-caps global property. If the target name is already
-     // present, assume that Quanah has already been loaded.
+     // object to a new all-caps global property. The `init` code will only run
+     // once because this branch can only run once by construction.
         global.QUANAH = init({});
     }
 
@@ -63,13 +65,16 @@
 }(this, function (quanah) {
     "use strict";
 
+ // Giant anonymous closure #2
+ // ==========================
+ //
  // This second strict anonymous closure defines Quanah in a way that is
  // completely sandboxed from the global object. One potential disadvantage of
  // this approach is that it may disable the use of opt-in asm.js, but Quanah
  // optimizes for simplicity and correctness rather than performance anyway.
  // Its code is written in a subset of ECMAScript so old and well-supported
  // that it also runs correctly as ActionScript 2.0.
-
+ //
  // The input argument to this closure, `quanah`, is an object literal, `{}`,
  // and it will be used as a "namespace" to which methods and properties will
  // be added within the closure. Specifically, it will end up more like a Ruby
@@ -83,21 +88,31 @@
  // functions can use `Object.defineProperty` in modern JavaScript environments
  // to prevent their code from being overwritten, for example.
 
- // Declarations
+ // Variable declarations
+ // ---------------------
+ //
+ // JavaScript uses function-level scope, instead of block-level scope, which
+ // can be confusing for programmers coming from languages like C. There are
+ // some distinct advantages to declaring variables sooner rather than later in
+ // JavaScript, and thus the standard convention is to declare variables at the
+ // beginning of the scope -- the first line of the function itself.
 
     var AVar, avar, canRunRemotely, isFunction, queue, runLocally, runRemotely,
         sync, tick;
 
- // Definitions
+ // Variable definitions
+ // --------------------
+ //
+ // Definitions are separated from declarations deliberately in order to avoid
+ // certain problems that occur when functions use undefined references. The
+ // definitions are sorted alphabetically because it is convenient and natural.
 
     AVar = function (val) {
      // This function constructs "asynchronous variables" ("avars"). An avar is
-     // a generic container for any other JavaScript type. In the past, this
-     // function was both given a name _and_ assigned to a variable reference,
-     // mainly to prevent lambda lifting and to ensure that it had the same
-     // look-and-feel of the native constructor functions. The same goals are
-     // probably better achieved by custom `toString` methods, though, and thus
-     // the code here has been simplified in order to appease various linters.
+     // a generic container for any other JavaScript type. The constructors for
+     // native types use named functions, but there is no language requirement
+     // for this; in fact, linting tools developed by the open-source community
+     // support the current anonymous design instead.
         var state, that;
         state = {"onfail": [], "queue": [], "ready": true};
         that = this;
@@ -510,6 +525,15 @@
     };
 
  // Prototype definitions
+ // ---------------------
+ //
+ // In JavaScript, object-oriented programming is based on prototypes rather
+ // than classes. Objects inherit methods and properties _dynamically_ based on
+ // the functions used to construct them, and instance methods take precedence
+ // over prototype methods with the same name. Internally, Quanah uses instance
+ // methods as a "private API" when manipulating avars, but it is expected that
+ // users will rely almost exclusively on Quanah's "public API", which is based
+ // on the following prototype methods.
 
     AVar.prototype.on = function (type, listener) {
      // This method provides an idiom for event-driven programming that will be

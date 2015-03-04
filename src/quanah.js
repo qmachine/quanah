@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 26 Feb 2015
+//                                                  ~~ last updated 04 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -20,6 +20,8 @@
     hasOwnProperty, length, on, onfail, prototype, push, Q, QUANAH, queue,
     ready, runRemotely, send, shift, slice, snooze, stay, sync, val, x
 */
+
+/*! Quanah | (c) Sean Wilkinson | http://www.apache.org/licenses/LICENSE-2.0 */
 
 (function (env, init) {
     "use strict";

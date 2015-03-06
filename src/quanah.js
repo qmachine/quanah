@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 04 Mar 2015
+//                                                  ~~ last updated 05 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -77,18 +77,18 @@
  // Its code is written in a subset of ECMAScript so old and well-supported
  // that it also runs correctly as ActionScript 2.0.
  //
- // The input argument to this closure, `quanah`, is an object literal, `{}`,
- // and it will be used as a "namespace" to which methods and properties will
- // be added within the closure. Specifically, it will end up more like a Ruby
- // module -- a "bag of functions". All methods and properties added to the
- // module will be available in-scope both inside and outside of this anonymous
- // closure. Because Quanah can delegate dynamically to functions that are
- // defined externally to this closure, users can modify Quanah's behavior for
- // use with any environment. As a bonus, this design enables users to control
- // the governance of the definitions. Developers with concerns about malicious
- // users' abilities to "hijack" remote contexts by redefining "low-level"
- // functions can use `Object.defineProperty` in modern JavaScript environments
- // to prevent their code from being overwritten, for example.
+ // The input argument to this closure, `quanah`, will be an object to which
+ // methods will be added as a "namespace". Specifically, the result will be
+ // more like a Ruby module -- a "bag of functions". All methods and properties
+ // added to the module will be available in-scope both inside and outside of
+ // this anonymous closure. Because Quanah delegates dynamically to functions
+ // that are defined externally to this closure, users can modify and optimize
+ // the behavior of Quanah for different environments. As a bonus, this design
+ // enables users to control the governance of the definitions. Developers with
+ // concerns about malicious users' abilities to "hijack" remote contexts by
+ // redefining "low-level" functions can use `Object.defineProperty` in modern
+ // JavaScript environments to prevent their code from being overwritten, for
+ // example.
 
  // Variable declarations
  // ---------------------

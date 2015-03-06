@@ -431,8 +431,8 @@
          // you, don't use it ;-)
             var count, j, pending, relay, status, wait;
             if (f instanceof AVar) {
-             // The following line takes advantage of the fact that the
-             // "queue" handler will make a syncpoint internally.
+             // The following line takes advantage of the fact that the "queue"
+             // handler will make a syncpoint internally.
                 return y.send("queue", f);
             }
             count = function () {
@@ -509,12 +509,12 @@
      // every time it is called, because instead it assumes it will be called
      // repeatedly until the entire program has executed. For example, every
      // time an avar receives a `send` message, `tick` will run. Because `tick`
-     // only runs a single task from its queue for each invocation, that queue
-     // can be shared safely across multiple execution contexts simultaneously,
-     // and it makes no difference if the separate contexts are due to
-     // recursion or to special objects such as Web Workers. The `tick`
-     // function selects an execution context conditionally, and its behavior
-     // can be modified (indirectly) by the presence of external definitions.
+     // only runs a single task from its queue for each invocation, execution
+     // is re-entrant. In other words, access to the queue can be shared safely
+     // by multiple execution contexts simultaneously, without any need to make
+     // a distinction between recursing contexts or platform features like Web
+     // Workers. The `tick` function selects an execution context based on the
+     // presence or absence of external function definitions.
         var task = queue.shift();
         if (task instanceof Object) {
             if (canRunRemotely(task)) {

@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 06 Mar 2015
+//                                                  ~~ last updated 07 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -267,10 +267,12 @@
     isFunction = function (f) {
      // This function returns `true` only if and only if the input argument
      // `f` is a function. The second condition is necessary to avoid a false
-     // positive when `f` is a regular expression. Quanah's priority is always
-     // to behave according to the ECMAScript standard, and thus it doesn't try
-     // to handle bugs like http://git.io/WcNQEQ or http://git.io/bZIaQw. Also,
-     // note that an avar with a function as its `val` will return `false`.
+     // positive when `f` is a regular expression in older browsers. Quanah's
+     // priority is always to behave according to the ECMAScript standard, but
+     // the ES3.1 standard neglected this part -- see http://goo.gl/C5F8Wh for
+     // discussion. Quanah doesn't try to handle bugs like http://git.io/WcNQEQ
+     // or http://git.io/bZIaQw. Also, note that an avar with a function as its
+     // `val` will return `false`.
         return ((typeof f === "function") && (f instanceof Function));
     };
 

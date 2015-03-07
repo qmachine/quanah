@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 05 Mar 2015
+//                                                  ~~ last updated 06 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -29,23 +29,39 @@
  // Giant anonymous closure #1
  // ==========================
  //
- // This strict anonymous closure is the first of two; this one focuses on
- // exporting the module for use by other programs, and it will only run the
- // second closure, which initializes the module itself, once. The primary
- // reason to decompose a single closure into two is to "quarantine" all
- // references to the global object into one closure (this one) so that the
- // module code can be written as independently of its environment as possible.
+ // This strict anonymous closure is the first of two, in order of appearance
+ // as well as order of execution. Its sole purpose is to export the module for
+ // the current environment so Quanah can be used by other JavaScript programs.
 
     /*global module: false */
 
- // First, store a reference to the global object, even though it may not be
- // "correct" or absolutely necessary for this particular environment. More
- // commentary is coming soon.
+ // "Approximate" reference to global object
+ // ----------------------------------------
+ //
+ // The first step is to attempt to store a reference to the global object, but
+ // not to obsess over the details too much. The "strict mode" environments
+ // that first appeared in ECMAScript 5 make it challenging to reference the
+ // global object directly from within this closure, and the easiest solution
+ // is to feed `this` from the invoking scope into this closure as the `env`
+ // input argument. Of course, `this` may not actually reference the global
+ // object, because some JavaScript environments -- RingoJS, for example -- use
+ // non-standard scope chains. Fortunately, all of the "difficult" cases will
+ // use the CommonJS module loading convention instead, and thus there is no
+ // reason to stress out _too_ much :-)
 
     var global = (typeof env.global === "object") ? env.global : env;
 
- // Export Quanah as a CommonJS module or as a property of the global object,
- // but avoid repeating the initialization process if possible.
+ // Initialize and export the module
+ // --------------------------------
+ //
+ // The rest of this closure initializes and exports Quanah as a module if and
+ // only if it has not already been loaded. The second argument to the closure,
+ // `init`, is the second closure that was mentioned in the introduction, and
+ // it contains the code necessary to add methods and properties to an object
+ // in order to create the Quanah module. The primary reason to decompose a
+ // single closure into two is to "quarantine" all references to the global
+ // object into one closure (this one) so that the module code can be written
+ // as independently of its environment as possible.
 
     if ((typeof module === "object") && (typeof module.exports === "object")) {
      // Assume CommonJS conventions. In Node.js, modules are cached when they
@@ -546,14 +562,17 @@
     };
 
     AVar.prototype.Q = function (f) {
-     // "Method Q" provides syntactic sugar for "queue"ing new tasks for a
-     // given avar. It is a chainable prototype method that expects a single
-     // input argument which should be either a monadic (single variable)
-     // function or else an avar with a monadic function as its `val` property.
-     // Unlike the `AVar.prototype.on` method, this method supports generic use
-     // for arbitrary types. There is no _need_ for generic support; rather, it
-     // remains because of the (admittedly reckless) entertainment that results
-     // from assigning Method Q to `Object.prototype.Q` :-)
+     // This function, affectionately called "Method Q", provides syntactic
+     // sugar for "queue"-ing new tasks for a given avar. It is a chainable
+     // prototype method that expects a single input argument which should be
+     // either a monadic (single variable) function or else an avar with a
+     // monadic function as its `val` property. Unlike the `AVar.prototype.on`
+     // method, this method supports generic use for arbitrary types. There is
+     // no _need_ for generic support, but it remains for fellow "safety third"
+     // individuals like the author, who enjoyed the convenience of assigning
+     // it to `Object.prototype.Q`. That practice is considered "reckless" and
+     // has been known to cause weird errors with jQuery, but then again, using
+     // the capital letter "Q" irritates some folks. #yolo
         return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
     };
 

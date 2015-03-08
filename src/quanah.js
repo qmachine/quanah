@@ -565,7 +565,7 @@
 
     AVar.prototype.Q = function (f) {
      // This function, affectionately called "Method Q", provides syntactic
-     // sugar for "queue"-ing new tasks for a given avar. It is a chainable
+     // sugar for "queue"-ing new tasks to transform data. It is a chainable
      // prototype method that expects a single input argument which should be
      // either a monadic (single variable) function or else an avar with a
      // monadic function as its `val` property. Unlike the `AVar.prototype.on`

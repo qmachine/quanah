@@ -513,7 +513,9 @@
                 }
                 return;
             }).send("queue", function (signal) {
-             // This function releases everything after successful completion.
+             // This function indirectly "releases" everything upon successful
+             // completion by updating shared state in such a way that each of
+             // the prerequisite avars will naturally resume execution.
                 status = "done";
                 return signal.exit();
             });

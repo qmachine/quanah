@@ -26,12 +26,13 @@
 (function (env, init) {
     "use strict";
 
- // Giant anonymous closure #1
- // ==========================
+ // Anonymous closure #1
+ // ====================
  //
  // This strict anonymous closure is the first of two, in order of appearance
- // as well as order of execution. Its sole purpose is to export the module for
- // the current environment so Quanah can be used by other JavaScript programs.
+ // as well as in order of execution. Its sole purpose is to export the module
+ // for the current environment so Quanah can be used by other JavaScript
+ // programs.
 
     /*global module: false */
 
@@ -83,8 +84,8 @@
 }(this, function (quanah) {
     "use strict";
 
- // Giant anonymous closure #2
- // ==========================
+ // Anonymous closure #2
+ // ====================
  //
  // This second strict anonymous closure defines Quanah in a way that is
  // completely sandboxed from the global object. One potential disadvantage of

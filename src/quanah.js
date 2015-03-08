@@ -499,6 +499,8 @@
          // might be a problem for syncpoints that will be reused a lot because
          // this means that a new listener will be added on every call to the
          // instance method `Q`, and they will only be removed upon failure.
+         // This could also induce memory bloat because the listeners close
+         // over the other variables in this scope.
             return y.send("onfail", relay).send("queue", function (signal) {
              // This function uses closure over private state variables and the
              // input argument `f` to defer execution. This function will be

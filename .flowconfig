@@ -1,4 +1,8 @@
 [ignore]
+./bower_components
+./docs
+./man
+./node_modules
 
 [include]
 

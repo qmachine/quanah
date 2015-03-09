@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 07 Mar 2015
+//                                                  ~~ last updated 09 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -270,7 +270,7 @@
      // `f` is a function. The second condition is necessary to avoid a false
      // positive when `f` is a regular expression in older browsers. Quanah's
      // priority is always to behave according to the ECMAScript standard, but
-     // the ES3.1 standard neglected this part -- see http://goo.gl/C5F8Wh for
+     // the ES3.1 standard neglected this part; see http://goo.gl/C5F8Wh for
      // discussion. Quanah doesn't try to handle bugs like http://git.io/WcNQEQ
      // or http://git.io/bZIaQw. Also, note that an avar with a function as its
      // `val` will return `false`.
@@ -337,7 +337,7 @@
                 "stay": function (message) {
                  // This function allows a user to postpone execution, and it
                  // is particularly useful for delaying execution until some
-                 // condition is met -- it can be used to write non-blocking
+                 // condition is met; it can be used to write non-blocking
                  // `while` and `until` constructs, for example. Since the
                  // ECMAScript standard lacks anything resembling a package
                  // manager, for example, the `stay` method can be used to
@@ -527,7 +527,7 @@
 
     tick = function () {
      // This function contains the execution center for Quanah. It's pretty
-     // simple, really -- it just runs the first available task in its queue
+     // simple, really; it just runs the first available task in its queue
      // (`queue`) in an execution context appropriate for that particular task.
      // That's all it does. It makes no attempt to run every task in the queue
      // every time it is called, because instead it assumes it will be called

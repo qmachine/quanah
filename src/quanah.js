@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 09 Mar 2015
+//                                                  ~~ last updated 11 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -246,7 +246,7 @@
         return that;
     };
 
-    avar = quanah.avar = function (val) {
+    quanah.avar = avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
      // useful because object-oriented programming in JavaScript is not
      // typically well-understood by users.
@@ -394,7 +394,7 @@
         return;
     };
 
-    sync = quanah.sync = function () {
+    quanah.sync = sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "syncpoint". The
      // avar returned by this function will have its own `Q` instance method

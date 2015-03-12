@@ -488,7 +488,9 @@
                 });
                 return;
             };
-            for (j = 0; j < x.length; j += 1) {
+         // NOTE: The reason for checking `status` as a condition for the `for`
+         // loop is to avoid memory bloat from adding unneeded event listeners.
+            for (j = 0; (j < x.length) && (status !== "failed"); j += 1) {
                 if (x[j] instanceof AVar) {
                     x[j].send("onfail", relay).send("queue", wait);
                 } else {

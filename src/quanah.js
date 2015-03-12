@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 11 Mar 2015
+//                                                  ~~ last updated 12 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -246,7 +246,7 @@
         return that;
     };
 
-    quanah.avar = avar = function (val) {
+    avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
      // useful because object-oriented programming in JavaScript is not
      // typically well-understood by users.
@@ -394,7 +394,7 @@
         return;
     };
 
-    quanah.sync = sync = function () {
+    sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "syncpoint". The
      // avar returned by this function will have its own `Q` instance method
@@ -584,7 +584,23 @@
         return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
     };
 
- // Finally, return the initialized module :-)
+ // Module initialization
+ // ---------------------
+ //
+ // Finally, add the `avar` and `sync` methods to the `quanah` "namespace"
+ // object before returning it to the invoking scope. For reference, function
+ // signatures are shown in comments for the three methods that can be provided
+ // externally to this closure.
+
+    quanah.avar = avar;
+
+    //quanah.canRunRemotely = function (task) { ... };
+
+    //quanah.runRemotely = function (task) { ... };
+
+    //quanah.snooze = function (tick) { ... };
+
+    quanah.sync = sync;
 
     return quanah;
 

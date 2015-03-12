@@ -431,7 +431,7 @@
             temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty("Q"))) {
              // This arm "flattens" prerequisites for array-based recursion by
-             // appending the `val`s of other syncpoints.
+             // appending the `val` arrays of other syncpoints.
                 Array.prototype.push.apply(args, temp.val);
             } else {
              // This arm ensures that elements are unique by comparing each

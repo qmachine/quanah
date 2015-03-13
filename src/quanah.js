@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 12 Mar 2015
+//                                                  ~~ last updated 13 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -52,8 +52,8 @@
 
     var global = (typeof env.global === "object") ? env.global : env;
 
- // Initialize and export the module
- // --------------------------------
+ // Module export
+ // -------------
  //
  // The rest of this closure initializes and exports Quanah as a module if and
  // only if it has not already been loaded. The second argument to the closure,

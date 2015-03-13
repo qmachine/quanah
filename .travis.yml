@@ -2,13 +2,9 @@
 
 #-  .travis.yml ~~
 #                                                       ~~ (c) SRW, 15 Jul 2013
-#                                                   ~~ last updated 06 Mar 2015
+#                                                   ~~ last updated 13 Mar 2015
 
 language: node_js
-
-matrix:
-  allow_failures:
-    - node_js: iojs
 
 node_js:
   - '0.12'

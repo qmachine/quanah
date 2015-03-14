@@ -417,35 +417,6 @@
         args = Array.prototype.slice.call(arguments);
         x = [];
         y = avar(args.slice());
-        while (args.length > 0) {
-         // This `while` loop replaces the previous `union` function, which
-         // called itself recursively to create an array `x` of unique
-         // prerequisites from the input arguments `args`. Instead, Quanah uses
-         // an array along with a `while` loop as a means to avoid recursion,
-         // because the recursion depth limit is unpredictable in JavaScript.
-         // The prerequisites of syncpoints will be added, but the syncpoints
-         // themselves will not be added. Performing this operation is what
-         // allows Quanah to "un-nest" `sync` statements in one pass at runtime
-         // without constructing a directed acyclic graph or preprocessing the
-         // source code.
-            temp = args.shift();
-            if ((temp instanceof AVar) && (temp.hasOwnProperty("Q"))) {
-             // This arm "flattens" prerequisites for array-based recursion by
-             // appending the `val` arrays of other syncpoints.
-                Array.prototype.push.apply(args, temp.val);
-            } else {
-             // This arm ensures that elements are unique by comparing each
-             // element to be added against all previously added elements. It
-             // would be much more efficient to use `Array.prototype.indexOf`,
-             // but that method wasn't available until ECMAScript 5. This could
-             // also be replaced by a `for` loop with an empty block, but the
-             // linters would go berserk.
-                for (unique = true, i = 0; unique && (i < x.length); i += 1) {
-                    unique = (temp !== x[i]);
-                }
-                Array.prototype.push.apply(x, unique ? [temp] : []);
-            }
-        }
         y.Q = function (f) {
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
@@ -524,6 +495,35 @@
                 return signal.exit();
             });
         };
+        while (args.length > 0) {
+         // This `while` loop replaces the previous `union` function, which
+         // called itself recursively to create an array `x` of unique
+         // prerequisites from the input arguments `args`. Instead, Quanah uses
+         // an array along with a `while` loop as a means to avoid recursion,
+         // because the recursion depth limit is unpredictable in JavaScript.
+         // The prerequisites of syncpoints will be added, but the syncpoints
+         // themselves will not be added. Performing this operation is what
+         // allows Quanah to "un-nest" `sync` statements in one pass at runtime
+         // without constructing a directed acyclic graph or preprocessing the
+         // source code.
+            temp = args.shift();
+            if ((temp instanceof AVar) && (temp.hasOwnProperty("Q"))) {
+             // This arm "flattens" prerequisites for array-based recursion by
+             // appending the `val` arrays of other syncpoints.
+                Array.prototype.push.apply(args, temp.val);
+            } else {
+             // This arm ensures that elements are unique by comparing each
+             // element to be added against all previously added elements. It
+             // would be much more efficient to use `Array.prototype.indexOf`,
+             // but that method wasn't available until ECMAScript 5. This could
+             // also be replaced by a `for` loop with an empty block, but the
+             // linters would go berserk.
+                for (unique = true, i = 0; unique && (i < x.length); i += 1) {
+                    unique = (temp !== x[i]);
+                }
+                Array.prototype.push.apply(x, unique ? [temp] : []);
+            }
+        }
         return y;
     };
 
@@ -597,12 +597,10 @@
  /*
 
     interface AVar {
-     // Instance methods and properties
-        send(name: string, arg?: any): AVar;
-        val: any;
-     // Prototype methods
         on(name: string, listener: Listener): AVar;
         Q(f: AVar | Transform): AVar;
+        send(name: string, arg?: any): AVar;
+        val: any;
     }
 
     interface Listener {
@@ -610,13 +608,11 @@
     }
 
     interface Quanah {
-     // Module-provided methods
         avar(val?: any): AVar;
-        sync(... any): AVar;
-     // User-provided methods
         canRunRemotely(task: Task): boolean;
         runRemotely(task: Task): void;
         snooze(tick: () => void): any;
+        sync(... any): AVar;
     }
 
     interface Task {

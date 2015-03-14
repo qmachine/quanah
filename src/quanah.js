@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 13 Mar 2015
+//                                                  ~~ last updated 14 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -590,18 +590,51 @@
  // ---------------------
  //
  // Finally, add the `avar` and `sync` methods to the `quanah` "namespace"
- // object before returning it to the invoking scope. For reference, function
- // signatures are shown in comments for the three methods that can be provided
- // externally to this closure.
+ // object before returning it to the invoking scope. For reference, the public
+ // interfaces for Quanah are specified in comments using TypeScript, including
+ // the three methods that can be provided externally to this closure.
+
+ /*
+
+    interface AVar {
+     // Instance methods and properties
+        send(name: string, arg?: any): AVar;
+        val: any;
+     // Prototype methods
+        on(name: string, listener: Listener): AVar;
+        Q(f: AVar | Transform): AVar;
+    }
+
+    interface Listener {
+        (message?: any): void;
+    }
+
+    interface Quanah {
+     // Module-provided methods
+        avar(val?: any): AVar;
+        sync(... any): AVar;
+     // User-provided methods
+        canRunRemotely(task: Task): boolean;
+        runRemotely(task: Task): void;
+        snooze(tick: () => void): any;
+    }
+
+    interface Task {
+        f: Transform;
+        x: AVar;
+    }
+
+    interface Transform {
+        call(that: AVar, signal: {
+            exit: Listener;
+            fail: Listener;
+            stay: Listener;
+        }): void;
+    }
+
+ */
 
     quanah.avar = avar;
-
-    //quanah.canRunRemotely = function (task) { ... };
-
-    //quanah.runRemotely = function (task) { ... };
-
-    //quanah.snooze = function (tick) { ... };
-
     quanah.sync = sync;
 
     return quanah;

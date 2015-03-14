@@ -591,44 +591,8 @@
  //
  // Finally, add the `avar` and `sync` methods to the `quanah` "namespace"
  // object before returning it to the invoking scope. For reference, the public
- // interfaces for Quanah are specified in comments using TypeScript, including
- // the three methods that can be provided externally to this closure.
-
- /*
-
-    interface AVar {
-        on(name: string, listener: Listener): AVar;
-        Q(f: AVar | Transform): AVar;
-        send(name: string, arg?: any): AVar;
-        val: any;
-    }
-
-    interface Listener {
-        (message?: any): void;
-    }
-
-    interface Quanah {
-        avar(val?: any): AVar;
-        canRunRemotely(task: Task): boolean;
-        runRemotely(task: Task): void;
-        snooze(tick: () => void): any;
-        sync(... any): AVar;
-    }
-
-    interface Task {
-        f: Transform;
-        x: AVar;
-    }
-
-    interface Transform {
-        call(that: AVar, signal: {
-            exit: Listener;
-            fail: Listener;
-            stay: Listener;
-        }): void;
-    }
-
- */
+ // interfaces for Quanah are specified with TypeScript; see "src/quanah.d.ts"
+ // in the project repository.
 
     quanah.avar = avar;
     quanah.sync = sync;

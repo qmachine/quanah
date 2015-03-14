@@ -17,10 +17,12 @@ server-side applications. Thus, this repository integrates with both
     $ bower install quanah
     $ npm install quanah
 
-There are several "mirrors" available on
-[Bitbucket](https://bitbucket.org/wilkinson/quanah),
-[GitHub](https://github.com/qmachine/quanah), and
-[Google Code](https://quanah.googlecode.com). Various project statistics are
+Mirrors of this repository are available on
+[Bitbucket](https://bitbucket.org/wilkinson/quanah) and
+[GitHub](https://github.com/qmachine/quanah), but sadly, the
+[original](https://quanah.googlecode.com/) will not be available much longer,
+because [Google Code is shutting down](http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html).
+Various project statistics are
 available on [Codacy](https://www.codacy.com/public/qmachine/quanah/dashboard),
 [GitHub](https://github.com/qmachine/quanah/graphs) and
 [Open Hub](https://www.openhub.net/p/quanah), too.

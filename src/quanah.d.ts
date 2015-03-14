@@ -22,9 +22,9 @@ interface Listener {
 
 interface Quanah {
     avar(val?: any): AVar;
-    canRunRemotely(task: Task): boolean;
-    runRemotely(task: Task): void;
-    snooze(tick: () => void): any;
+    canRunRemotely?(task: Task): boolean;
+    runRemotely?(task: Task): void;
+    snooze?(tick: () => void): any;
     sync(... any): AVar;
 }
 

@@ -5,7 +5,7 @@
 #   This contains live instructions for development on the Quanah module.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
-#                                                   ~~ last updated 16 Feb 2015
+#                                                   ~~ last updated 16 Mar 2015
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -68,7 +68,8 @@ $(PROJECT_ROOT)/node_modules/: $(PROJECT_ROOT)/package.json
 #   in production :-P
 
 %.coffee: %.js
-	@   $(call contingent, js2coffee) $< > $@
+	@   $(call contingent, js2coffee) $< > $@                       ;   \
+            echo '#- vim:set syntax=coffee:' >> $@
 
 ###
 

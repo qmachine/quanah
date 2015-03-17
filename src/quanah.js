@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 14 Mar 2015
+//                                                  ~~ last updated 17 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -509,7 +509,9 @@
             temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty("Q"))) {
              // This arm "flattens" prerequisites for array-based recursion by
-             // appending the `val` arrays of other syncpoints.
+             // appending the `val` arrays of other syncpoints. It also assumes
+             // that users will not add instance methods named "Q" to avars, so
+             // that it may assume `val` will be an array.
                 Array.prototype.push.apply(args, temp.val);
             } else {
              // This arm ensures that elements are unique by comparing each

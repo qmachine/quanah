@@ -29,15 +29,11 @@ declare module "quanah" {
         }): void;
     }
 
-    export function avar(val?: any): AVar;
-
-    export function canRunRemotely(task: Task): boolean;    // user-provided
-
-    export function runRemotely(task: Task): void;          // user-provided
-
-    export function snooze(tick: () => void): any;          // user-provided
-
-    export function sync(... any): AVar;
+    function avar(val?: any): AVar;
+    function canRunRemotely(task: Task): boolean;           // user-provided
+    function runRemotely(task: Task): void;                 // user-provided
+    function snooze(tick: () => void): any;                 // user-provided
+    function sync(... any): AVar;
 
 }
 

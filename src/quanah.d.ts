@@ -10,14 +10,10 @@
 declare module "quanah" {
 
     interface AVar {
-        on(name: string, listener: Listener): AVar;
+        on(name: string, listener: (message?: any) => void): AVar;
         Q(f: AVar | Transform): AVar;
-        send(name: string, arg?: any): AVar;
+        send(name: string, arg: any): AVar;
         val: any;
-    }
-
-    interface Listener {
-        (message?: any): void;
     }
 
     interface Task {
@@ -27,9 +23,9 @@ declare module "quanah" {
 
     interface Transform {
         call(that: AVar, signal: {
-            exit: Listener;
-            fail: Listener;
-            stay: Listener;
+            exit: (message?: any) => void;
+            fail: (message?: any) => void;
+            stay: (message?: any) => void;
         }): void;
     }
 

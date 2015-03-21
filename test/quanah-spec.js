@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 23 Feb 2015
+//                                                  ~~ last updated 20 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -183,6 +183,12 @@
             it("always returns the same avar", function () {
                 var y = x.send("(name)", "(optional argument)");
                 expect(y).to.equal(x);
+            });
+
+            it("forwards `fail` when given an unknown `name`", function (done) {
+                x.send("ooga", "booga").on("fail", function () {
+                    done();
+                });
             });
 
         });

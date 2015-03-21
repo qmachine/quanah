@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 17 Mar 2015
+//                                                  ~~ last updated 20 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -215,14 +215,15 @@
              // `runLocally`. For consistency with the "exit" and "fail"
              // messages, "stay" accepts an argument, but the current code
              // ignores that argument.
-            } else {
-             // When this arm is chosen, either an error exists in Quanah or
-             // else a user is re-programming Quanah's guts; in either case, it
-             // may be useful to capture the error. Another possibility is that
-             // a user is trying to trigger `tick` using an obsolete idiom that
-             // involved calling `send` without any arguments.
-                return that.send("fail", "Invalid `send`: '" + name + "'");
          */
+            } else if (name !== "stay") {
+             // This arm corresponds to a typical `else` arm, but it has a
+             // guard because there is no arm to handle the `name === "stay"`
+             // case. (It would be an empty block, and that would irritate the
+             // linters.) A common way to end up here occurs when a seasoned
+             // JavaScripter tries to write `x.on("error", listener)` instead
+             // of `x.on("fail", listener)`.
+                return that.send("fail", "Invalid `send`: '" + name + "'");
             }
          // Now, if the avar is ready for its next transform, "lock" the avar
          // and add a new task to the main task queue (`queue`).

@@ -7,7 +7,7 @@
 //  environment, but the program as a whole is tailored for Node.js.
 //
 //                                                      ~~ (c) SRW, 01 Dec 2014
-//                                                  ~~ last updated 23 Feb 2015
+//                                                  ~~ last updated 20 Mar 2015
 
 /*eslint new-cap: 0 */
 
@@ -24,7 +24,7 @@
     print, prototype, Q, random, setImmediate, snooze, stay, until, val
 */
 
-(function () {
+(function (quanah) {
     "use strict";
 
  // First, extend definitions for Quanah by providing a `snooze` function,
@@ -32,9 +32,9 @@
  // clock because it tells Quanah to come back later :-P
 
     if (global.hasOwnProperty("setImmediate")) {
-        require("../").snooze = global.setImmediate;
+        quanah.snooze = global.setImmediate;
     } else if (process.hasOwnProperty("nextTick")) {
-        require("../").snooze = process.nextTick;   // see http://goo.gl/8HMpVX
+        quanah.snooze = process.nextTick;   // see http://goo.gl/8HMpVX
     }
 
  // Declarations
@@ -43,9 +43,9 @@
 
  // Definitions
 
-    AVar = require("../").avar().constructor;
+    AVar = quanah.avar().constructor;
 
-    avar = require("../").avar;
+    avar = quanah.avar;
 
  // Prototype definitions
 
@@ -74,6 +74,22 @@
         });
     };
 
+ // Out-of-scope definitions
+
+    quanah.snooze = function (tick) {
+     // This function, which has been added to the Quanah module externally, is
+     // analogous to a human who hits the "snooze" button on an alarm clock
+     // because it tells Quanah to come back later and try again (to resume
+     // execution).
+        if (global.hasOwnProperty("setImmediate")) {
+            global.setImmediate(tick);
+        } else if (process.hasOwnProperty("nextTick")) {
+         // See http://goo.gl/8HMpVX.
+            process.nextTick(tick);
+        }
+        return;
+    };
+
  // Demonstration
 
     avar(2).until(function () {
@@ -87,6 +103,6 @@
 
     return;
 
-}());
+}(require("../")));
 
 //- vim:set syntax=javascript:

@@ -5,7 +5,7 @@
 //  This file defines Quanah as an "ambient external module" for TypeScript :-)
 //
 //                                                      ~~ (c) SRW, 13 Mar 2015
-//                                                  ~~ last updated 16 Mar 2015
+//                                                  ~~ last updated 20 Mar 2015
 
 declare module "quanah" {
 
@@ -32,7 +32,7 @@ declare module "quanah" {
     function avar(val?: any): AVar;
     function canRunRemotely(task: Task): boolean;           // user-provided
     function runRemotely(task: Task): void;                 // user-provided
-    function snooze(tick: () => void): any;                 // user-provided
+    function snooze(tick: () => void): void;                // user-provided
     function sync(... any): AVar;
 
 }

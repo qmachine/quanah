@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 20 Mar 2015
+//                                                  ~~ last updated 03 Apr 2015
 
 /*eslint new-cap: 0 */
 
@@ -120,6 +120,7 @@
                 expect(x).to.equal(y);
             });
 
+         /*
             it("supports generic calls", function () {
                 var x = AVar.prototype.Q.call(null, function (signal) {
                  // This function doesn't do anything; it's just for testing.
@@ -127,6 +128,7 @@
                 });
                 expect(x).to.be.an(AVar);
             });
+         */
 
         });
 
@@ -534,6 +536,7 @@
         });
      */
 
+     /*
         it("supports avar functions", function (done) {
             var f, x;
             f = avar(function (signal) {
@@ -549,6 +552,7 @@
                 return signal.exit();
             });
         });
+     */
 
         it("supports queueing 'functables'", function (done) {
             var f, proxy, x;
@@ -575,6 +579,7 @@
             });
         });
 
+     /*
         it("supports queueing avar 'functables'", function (done) {
             var f, proxy, x;
             f = function (signal) {
@@ -599,6 +604,7 @@
                 return signal.exit();
             });
         });
+     */
 
      /*
         it("supports 'functables' as `onfail` listeners", function (done) {

@@ -5,13 +5,13 @@
 //  This file defines Quanah as an "ambient external module" for TypeScript :-)
 //
 //                                                      ~~ (c) SRW, 13 Mar 2015
-//                                                  ~~ last updated 20 Mar 2015
+//                                                  ~~ last updated 03 Apr 2015
 
 declare module "quanah" {
 
     interface AVar {
         on(name: string, listener: (message?: any) => void): AVar;
-        Q(f: AVar | Transform): AVar;
+        Q(f: Transform): AVar;
         send(name: string, arg: any): AVar;
         val: any;
     }

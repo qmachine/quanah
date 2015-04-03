@@ -5,9 +5,9 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 20 Mar 2015
+//                                                  ~~ last updated 03 Apr 2015
 
-/*eslint new-cap: 0 */
+/*eslint */
 
 /* @flow */
 
@@ -116,8 +116,7 @@
  // JavaScript, and thus the standard convention is to declare variables at the
  // beginning of the scope -- the first line of the function itself.
 
-    var AVar, avar, canRunRemotely, isFunction, queue, runLocally, runRemotely,
-        sync, tick;
+    var AVar, canRunRemotely, isFunction, queue, runLocally, runRemotely, tick;
 
  // Variable definitions
  // --------------------
@@ -195,6 +194,7 @@
              // typechecking is not enforced at this time. Instead, the idea
              // here is to allow type errors to be caught by `runLocally` or
              // `runRemotely`.
+             /*
                 if (arg instanceof AVar) {
                     sync(arg, that).Q(function (signal) {
                      // This function allows Quanah to postpone execution of
@@ -208,6 +208,8 @@
                 } else {
                     state.queue.push(arg);
                 }
+             */
+                state.queue.push(arg);
          /*
             } else if (name === "stay") {
              // A computation that depends on this avar has been deferred, but
@@ -245,13 +247,6 @@
         };
         that.val = val;
         return that;
-    };
-
-    avar = function (val) {
-     // This function enables the user to avoid the `new` keyword, which is
-     // useful because object-oriented programming in JavaScript is not
-     // typically well-understood by users.
-        return new AVar(val);
     };
 
     canRunRemotely = function (task) {
@@ -395,7 +390,81 @@
         return;
     };
 
-    sync = function () {
+    tick = function () {
+     // This function contains the execution center for Quanah. It's pretty
+     // simple, really; it just runs the first available task in its queue
+     // (`queue`) in an execution context appropriate for that particular task.
+     // That's all it does. It makes no attempt to run every task in the queue
+     // every time it is called, because instead it assumes it will be called
+     // repeatedly until the entire program has executed. For example, every
+     // time an avar receives a `send` message, `tick` will run. Because `tick`
+     // only runs a single task from its queue for each invocation, execution
+     // is re-entrant. In other words, access to the queue can be shared safely
+     // by multiple execution contexts simultaneously, without any need to make
+     // a distinction between recursing contexts or platform features like Web
+     // Workers. The `tick` function selects an execution context based on the
+     // presence or absence of external function definitions.
+        var task = queue.shift();
+        if (task instanceof Object) {
+            if (canRunRemotely(task)) {
+                runRemotely(task);
+            } else {
+                runLocally(task);
+            }
+        }
+        return;
+    };
+
+ // Prototype definitions
+ // ---------------------
+ //
+ // In JavaScript, object-oriented programming is based on prototypes rather
+ // than classes. Objects inherit methods and properties _dynamically_ based on
+ // the functions used to construct them, and instance methods take precedence
+ // over prototype methods with the same name. Internally, Quanah uses instance
+ // methods as a "private API" when manipulating avars, but it is expected that
+ // users will rely almost exclusively on Quanah's "public API", which is based
+ // on the following prototype methods.
+
+    AVar.prototype.on = function (type, listener) {
+     // This method provides an idiom for event-driven programming that will be
+     // familiar to anyone who has ever used jQuery or Node.js. Currently, the
+     // only valid `type` is "fail", but more event types may be added in the
+     // future.
+        return this.send("on" + type, listener);
+    };
+
+    AVar.prototype.Q = function (f) {
+     // This function, affectionately called "Method Q", provides syntactic
+     // sugar for "queue"-ing new tasks to transform data. It is a chainable
+     // prototype method that expects a single input argument which should be
+     // either a monadic (single variable) function or else an avar with a
+     // monadic function as its `val` property. Unlike the `AVar.prototype.on`
+     // method, this method supports generic use for arbitrary types. There is
+     // no _need_ for generic support, but it remains for fellow "safety third"
+     // individuals like the author, who enjoyed the convenience of assigning
+     // it to `Object.prototype.Q`. That practice is considered "reckless" and
+     // has been known to cause weird errors with jQuery, but then again, using
+     // the capital letter "Q" irritates some folks. #yolo
+        return this.send("queue", f);
+    };
+
+ // Module initialization
+ // ---------------------
+ //
+ // Finally, add the `avar` and `sync` methods to the `quanah` "namespace"
+ // object before returning it to the invoking scope. For reference, the public
+ // interfaces for Quanah are specified with TypeScript; see "src/quanah.d.ts"
+ // in the project repository.
+
+    quanah.avar = function (val) {
+     // This function enables the user to avoid the `new` keyword, which is
+     // useful because object-oriented programming in JavaScript is not
+     // typically well-understood by users.
+        return new AVar(val);
+    };
+
+    quanah.sync = function () {
      // This function takes any number of arguments, any number of which may
      // be avars, and it outputs a new avar which acts as a "syncpoint". The
      // avar returned by this function will have its own `Q` instance method
@@ -417,16 +486,18 @@
         var args, i, temp, unique, x, y;
         args = Array.prototype.slice.call(arguments);
         x = [];
-        y = avar(args.slice());
+        y = new AVar(args.slice());
         y.Q = function (f) {
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
             var count, j, pending, relay, status, wait;
+         /*
             if (f instanceof AVar) {
              // The following line takes advantage of the fact that the "queue"
              // handler will make a syncpoint internally.
                 return y.send("queue", f);
             }
+         */
             count = function () {
              // This function is a simple counting semaphore that closes over
              // some private state variables in order to delay the execution of
@@ -448,7 +519,8 @@
             wait = function (outer) {
              // This function blocks further progress through an individual
              // avar's queue until a nested avar exits.
-                avar(count()).send("queue", function (inner) {
+                var nested = new AVar(count());
+                nested.send("queue", function (inner) {
                  // This function checks to see if the syncpoint has finished
                  // executing yet. If so, it releases its "parent" avar, which
                  // was locked because it was being used by the syncpoint.
@@ -529,76 +601,6 @@
         }
         return y;
     };
-
-    tick = function () {
-     // This function contains the execution center for Quanah. It's pretty
-     // simple, really; it just runs the first available task in its queue
-     // (`queue`) in an execution context appropriate for that particular task.
-     // That's all it does. It makes no attempt to run every task in the queue
-     // every time it is called, because instead it assumes it will be called
-     // repeatedly until the entire program has executed. For example, every
-     // time an avar receives a `send` message, `tick` will run. Because `tick`
-     // only runs a single task from its queue for each invocation, execution
-     // is re-entrant. In other words, access to the queue can be shared safely
-     // by multiple execution contexts simultaneously, without any need to make
-     // a distinction between recursing contexts or platform features like Web
-     // Workers. The `tick` function selects an execution context based on the
-     // presence or absence of external function definitions.
-        var task = queue.shift();
-        if (task instanceof Object) {
-            if (canRunRemotely(task)) {
-                runRemotely(task);
-            } else {
-                runLocally(task);
-            }
-        }
-        return;
-    };
-
- // Prototype definitions
- // ---------------------
- //
- // In JavaScript, object-oriented programming is based on prototypes rather
- // than classes. Objects inherit methods and properties _dynamically_ based on
- // the functions used to construct them, and instance methods take precedence
- // over prototype methods with the same name. Internally, Quanah uses instance
- // methods as a "private API" when manipulating avars, but it is expected that
- // users will rely almost exclusively on Quanah's "public API", which is based
- // on the following prototype methods.
-
-    AVar.prototype.on = function (type, listener) {
-     // This method provides an idiom for event-driven programming that will be
-     // familiar to anyone who has ever used jQuery or Node.js. Currently, the
-     // only valid `type` is "fail", but more event types may be added in the
-     // future.
-        return this.send("on" + type, listener);
-    };
-
-    AVar.prototype.Q = function (f) {
-     // This function, affectionately called "Method Q", provides syntactic
-     // sugar for "queue"-ing new tasks to transform data. It is a chainable
-     // prototype method that expects a single input argument which should be
-     // either a monadic (single variable) function or else an avar with a
-     // monadic function as its `val` property. Unlike the `AVar.prototype.on`
-     // method, this method supports generic use for arbitrary types. There is
-     // no _need_ for generic support, but it remains for fellow "safety third"
-     // individuals like the author, who enjoyed the convenience of assigning
-     // it to `Object.prototype.Q`. That practice is considered "reckless" and
-     // has been known to cause weird errors with jQuery, but then again, using
-     // the capital letter "Q" irritates some folks. #yolo
-        return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
-    };
-
- // Module initialization
- // ---------------------
- //
- // Finally, add the `avar` and `sync` methods to the `quanah` "namespace"
- // object before returning it to the invoking scope. For reference, the public
- // interfaces for Quanah are specified with TypeScript; see "src/quanah.d.ts"
- // in the project repository.
-
-    quanah.avar = avar;
-    quanah.sync = sync;
 
     return quanah;
 

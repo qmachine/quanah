@@ -15,8 +15,7 @@
 /*jslint indent: 4, maxlen: 80, node: true */
 
 /*properties
-    avar, constructor, error, exit, hasOwnProperty, log, on, nextTick, print,
-    prototype, Q, send, setImmediate, snooze, val
+    avar, constructor, error, exit, log, on, print, prototype, Q, send, val
 */
 
 (function (quanah) {
@@ -55,22 +54,6 @@
      // Google Visualization. Of course, using a capital letter "Q" irritates
      // some folks ... #yolo
         return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
-    };
-
- // Out-of-scope definitions
-
-    quanah.snooze = function (tick) {
-     // This function, which has been added to the Quanah module externally, is
-     // analogous to a human who hits the "snooze" button on an alarm clock
-     // because it tells Quanah to come back later and try again (to resume
-     // execution).
-        if (global.hasOwnProperty("setImmediate")) {
-            global.setImmediate(tick);
-        } else if (process.hasOwnProperty("nextTick")) {
-         // See http://goo.gl/8HMpVX.
-            process.nextTick(tick);
-        }
-        return;
     };
 
  // Demonstration

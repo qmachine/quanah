@@ -190,25 +190,10 @@
              // The next transformation to be applied to this avar will be put
              // into an instance-specific queue before it ends up in the main
              // task queue (`queue`). Although `arg` is expected to be either a
-             // function or an avar that will have a function as its `val`,
-             // typechecking is not enforced at this time. Instead, the idea
-             // here is to allow type errors to be caught by `runLocally` or
-             // `runRemotely`.
-             /*
-                if (arg instanceof AVar) {
-                    sync(arg, that).Q(function (signal) {
-                     // This function allows Quanah to postpone execution of
-                     // the given task until both `f` and `x` are ready. The
-                     // following line takes the form `f.call(x, signal)`.
-                        arg.val.call(that, signal);
-                     // This line is separate to ensure that the returned value
-                     // is always `undefined`.
-                        return;
-                    });
-                } else {
-                    state.queue.push(arg);
-                }
-             */
+             // function or an object that will respond to a `call` method as
+             // if it were a function, typechecking is not enforced right here.
+             // Instead, the idea is to allow type errors to be caught by
+             // `runLocally` or `runRemotely`.
                 state.queue.push(arg);
          /*
             } else if (name === "stay") {
@@ -485,13 +470,6 @@
          // This function is an instance-specific "Method Q". If that bothers
          // you, don't use it ;-)
             var count, j, pending, relay, status, wait;
-         /*
-            if (f instanceof AVar) {
-             // The following line takes advantage of the fact that the "queue"
-             // handler will make a syncpoint internally.
-                return y.send("queue", f);
-            }
-         */
             count = function () {
              // This function is a simple counting semaphore that closes over
              // some private state variables in order to delay the execution of

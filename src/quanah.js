@@ -438,14 +438,8 @@
      // This function, affectionately called "Method Q", provides syntactic
      // sugar for "queue"-ing new tasks to transform data. It is a chainable
      // prototype method that expects a single input argument which should be
-     // either a monadic (single variable) function or else an avar with a
-     // monadic function as its `val` property. Unlike the `AVar.prototype.on`
-     // method, this method supports generic use for arbitrary types. There is
-     // no _need_ for generic support, but it remains for fellow "safety third"
-     // individuals like the author, who enjoyed the convenience of assigning
-     // it to `Object.prototype.Q`. That practice is considered "reckless" and
-     // has been known to cause weird errors with jQuery, but then again, using
-     // the capital letter "Q" irritates some folks. #yolo
+     // either a monadic (single variable) function or else a "callable object"
+     // that responds to a `call` method in exactly the same way.
         return this.send("queue", f);
     };
 

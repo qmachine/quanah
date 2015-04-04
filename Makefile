@@ -5,7 +5,7 @@
 #   This contains live instructions for development on the Quanah module.
 #
 #                                                       ~~ (c) SRW, 17 Nov 2012
-#                                                   ~~ last updated 16 Mar 2015
+#                                                   ~~ last updated 03 Apr 2015
 
 PROJECT_ROOT    :=  $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
@@ -52,6 +52,7 @@ run: check
 
 check: $(PROJECT_ROOT)/node_modules/
 	@   $(NPM) test
+	@   $(NODE) $(PROJECT_ROOT)/examples/method-q.js
 	@   $(NODE) $(PROJECT_ROOT)/examples/until.js
 
 test: check

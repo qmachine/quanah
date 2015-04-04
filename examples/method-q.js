@@ -1,15 +1,10 @@
 //- JavaScript source code
 
-//- until.js ~~
-//
-//  This program demonstrates an `until` method that provides a chainable,
-//  non-blocking loop for Quanah. The method definition will work in any JS
-//  environment, but the program as a whole is tailored for Node.js.
-//
-//                                                      ~~ (c) SRW, 01 Dec 2014
+//- method-q.js ~~
+//                                                      ~~ (c) SRW, 03 Apr 2015
 //                                                  ~~ last updated 03 Apr 2015
 
-/*eslint new-cap: 0 */
+/*eslint new-cap: 0, no-extend-native: 0 */
 
 /*eslint-env node */
 
@@ -20,8 +15,8 @@
 /*jslint indent: 4, maxlen: 80, node: true */
 
 /*properties
-    avar, call, constructor, error, exit, hasOwnProperty, log, on, nextTick,
-    print, prototype, Q, random, setImmediate, snooze, stay, until, val
+    avar, constructor, error, exit, hasOwnProperty, log, on, nextTick, print,
+    prototype, Q, send, setImmediate, snooze, val
 */
 
 (function (quanah) {
@@ -52,16 +47,14 @@
         });
     };
 
-    AVar.prototype.until = function (f) {
-     // This function provides a chainable, non-blocking `until` loop by using
-     // a function `f` to represent the body of the loop.
-        return this.Q(function (signal) {
-         // This function evaluates `f` and repeats if the output is `false`.
-            if (f.call(this) === false) {
-                return signal.stay();
-            }
-            return signal.exit();
-        });
+    Object.prototype.Q = function (f) {
+     // This function adds a Method Q for all variables that are neither `null`
+     // nor `undefined`. It is based on early versions of Quanah's API, which
+     // the author found convenient and highly entertaining even though it was
+     // eventually shown to cause weird errors with libraries like jQuery and
+     // Google Visualization. Of course, using a capital letter "Q" irritates
+     // some folks ... #yolo
+        return ((this instanceof AVar) ? this : avar(this)).send("queue", f);
     };
 
  // Out-of-scope definitions
@@ -82,11 +75,11 @@
 
  // Demonstration
 
-    avar(2).until(function () {
-     // This function will be treated like the block of a `while` loop, but
-     // the loop will run asynchronously :-)
-        this.val += Math.random();
-        return (this.val > 5);
+    (2).Q(function (signal) {
+     // This function simply adds `2` to the avar that is created on-the-fly
+     // by `Object.prototype.Q`.
+        this.val += 2;
+        return signal.exit();
     }).print();
 
  // That's all, folks!

@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 03 Apr 2015
+//                                                  ~~ last updated 04 Apr 2015
 
 /*eslint new-cap: 0 */
 
@@ -120,15 +120,19 @@
                 expect(x).to.equal(y);
             });
 
-         /*
-            it("supports generic calls", function () {
-                var x = AVar.prototype.Q.call(null, function (signal) {
-                 // This function doesn't do anything; it's just for testing.
-                    return signal.exit();
-                });
-                expect(x).to.be.an(AVar);
+            it("no longer supports generic calls", function () {
+                var x;
+                try {
+                    x = AVar.prototype.Q.call(null, function (signal) {
+                     // This function doesn't do anything ...
+                        return signal.exit();
+                    });
+                } catch (err) {
+                    x = err;
+                }
+                expect(x).not.to.be.an(AVar);
+                expect(x).to.be.an(Error);
             });
-         */
 
         });
 
@@ -308,14 +312,12 @@
             expect(quanah.sync.length).to.equal(0);
         });
 
-     /*
         it("does not affect assignment to a `Q` property", function () {
-         // This test isn't relevant anymore, now that "Method Q" is no longer
-         // a method of `Object.prototype` ...
+         // Even though "Method Q" is no longer an `Object.prototype` method,
+         // it doesn't hurt anything to run this test.
             var x = {};
             x.Q = 5;
         });
-     */
 
         it("can replace an avar's `val`", function (done) {
             var x = avar();

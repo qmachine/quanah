@@ -142,6 +142,66 @@
                 expect(avar.length).to.equal(AVar.length);
             });
 
+            it("works when no arguments were given", function (done) {
+                avar().Q(function (signal) {
+                 // This function records the current behavior.
+                    expect(this.val).to.be(undefined);
+                    done();
+                    return signal.exit();
+                }).on("fail", function (message) {
+                    console.error("Error:", message);
+                    return;
+                });
+            });
+
+        });
+
+        describe("The `sync` function", function () {
+
+            it("returns an avar", function () {
+                expect(sync(1, 2, 3)).to.be.an(AVar);
+            });
+
+            it("puts input arguments into `val` as an array", function (done) {
+                sync(2, 3).Q(function (signal) {
+                    expect(this.val).to.be.an(Array);
+                    expect(this.val[0] + this.val[1]).to.equal(5);
+                    done();
+                    return signal.exit();
+                }).on("fail", function (message) {
+                    console.error("Error:", message);
+                    return done();
+                });
+            });
+
+            it("works when no arguments were given", function (done) {
+                sync().Q(function (signal) {
+                 // This function records the current behavior, but this
+                 // behavior may change really soon, because I don't find this
+                 // nearly as intuitive now as I did when I first wrote `sync`.
+                    expect(this.val).to.be.an(Array);
+                    expect(this.val.length).to.equal(0);
+                    done();
+                    return signal.exit();
+                }).on("fail", function (message) {
+                    console.error("Error:", message);
+                    return;
+                });
+            });
+
+            it("keeps input arrays separate", function (done) {
+             // This is just to make sure it doesn't accidentally concatenate
+             // arrays, because the internal logic is tricky :-P
+                sync([2], [3]).Q(function (signal) {
+                    expect(this.val[0][0] + this.val[1][0]).to.equal(5);
+                    done();
+                    return signal.exit();
+                }).on("fail", function (message) {
+                    console.error("Error:", message);
+                    return done();
+                });
+            });
+
         });
 
         describe("An avar", function () {
@@ -243,45 +303,6 @@
                 expect(x).to.have.own.property("Q");
                 expect(x.Q).to.be.a(Function);
                 expect(x.Q).not.to.equal(AVar.prototype.Q);
-            });
-
-            it("puts input arguments into `val` as an array", function (done) {
-                sync(2, 3).Q(function (signal) {
-                    expect(this.val[0] + this.val[1]).to.equal(5);
-                    done();
-                    return signal.exit();
-                }).on("fail", function (message) {
-                    console.error("Error:", message);
-                    return done();
-                });
-            });
-
-            it("works when no arguments were given", function (done) {
-                sync().Q(function (signal) {
-                 // This function records the current behavior, but this
-                 // behavior may change really soon, because I don't find this
-                 // nearly as intuitive now as I did when I first wrote `sync`.
-                    expect(this.val).to.be.an(Array);
-                    expect(this.val.length).to.equal(0);
-                    done();
-                    return signal.exit();
-                }).on("fail", function (message) {
-                    console.error("Error:", message);
-                    return;
-                });
-            });
-
-            it("keeps input arrays separate", function (done) {
-             // This is just to make sure it doesn't accidentally concatenate
-             // arrays, because the internal logic is tricky :-P
-                sync([2], [3]).Q(function (signal) {
-                    expect(this.val[0][0] + this.val[1][0]).to.equal(5);
-                    done();
-                    return signal.exit();
-                }).on("fail", function (message) {
-                    console.error("Error:", message);
-                    return done();
-                });
             });
 
         });

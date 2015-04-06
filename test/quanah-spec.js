@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 05 Apr 2015
+//                                                  ~~ last updated 06 Apr 2015
 
 /*eslint new-cap: 0 */
 
@@ -245,11 +245,18 @@
                 expect(x.Q).not.to.equal(AVar.prototype.Q);
             });
 
-        });
+            it("puts input arguments into `val` as an array", function (done) {
+                sync(2, 3).Q(function (signal) {
+                    expect(this.val[0] + this.val[1]).to.equal(5);
+                    done();
+                    return signal.exit();
+                }).on("fail", function (message) {
+                    console.error("Error:", message);
+                    return done();
+                });
+            });
 
-        describe("The `Q` instance method of a syncpoint", function () {
-
-            it("works when no arguments are given", function (done) {
+            it("works when no arguments were given", function (done) {
                 sync().Q(function (signal) {
                  // This function records the current behavior, but this
                  // behavior may change really soon, because I don't find this
@@ -264,17 +271,6 @@
                 });
             });
 
-            it("puts input arguments into `val` as an array", function (done) {
-                sync(2, 3).Q(function (signal) {
-                    expect(this.val[0] + this.val[1]).to.equal(5);
-                    done();
-                    return signal.exit();
-                }).on("fail", function (message) {
-                    console.error("Error:", message);
-                    return done();
-                });
-            });
-
             it("keeps input arrays separate", function (done) {
              // This is just to make sure it doesn't accidentally concatenate
              // arrays, because the internal logic is tricky :-P
@@ -286,6 +282,14 @@
                     console.error("Error:", message);
                     return done();
                 });
+            });
+
+        });
+
+        describe("The `Q` instance method of a syncpoint", function () {
+
+            it("accepts one argument", function () {
+                expect(sync().Q.length).to.equal(1);
             });
 
         });

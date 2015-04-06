@@ -168,7 +168,7 @@
                 expect(avar.length).to.equal(AVar.length);
             });
 
-            it("works when no arguments were given", function (done) {
+            it("works when no arguments are given", function (done) {
                 avar().Q(function (signal) {
                  // This function records the current behavior.
                     expect(this.val).to.be(undefined);
@@ -207,7 +207,7 @@
                 });
             });
 
-            it("works when no arguments were given", function (done) {
+            it("works when no arguments are given", function (done) {
                 sync().Q(function (signal) {
                  // This function records the current behavior, but this
                  // behavior may change really soon, because I don't find this

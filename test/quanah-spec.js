@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 04 Apr 2015
+//                                                  ~~ last updated 05 Apr 2015
 
 /*eslint new-cap: 0 */
 
@@ -538,42 +538,20 @@
         });
      */
 
-     /*
-        it("supports avar functions", function (done) {
-            var f, x;
-            f = avar(function (signal) {
-             // This function also happens to be "distributable".
-                this.val += 2;
-                return signal.exit();
-            });
-            x = avar(2);
-            x.Q(f).Q(function (signal) {
-             // This function needs documentation.
-                expect(this.val).to.equal(4);
-                done();
-                return signal.exit();
-            });
-        });
-     */
-
         it("supports queueing 'functables'", function (done) {
-            var f, proxy, x;
-            f = function (signal) {
-             // This function will be called indirectly...
-                this.val += 2;
-                return signal.exit();
-            };
-            proxy = {
+            var functable, x;
+            functable = {
                 "call": function (that, signal) {
                  // This function is extremely meta. Details forthcoming.
-                    return f.call(that, signal);
+                    that.val += 2;
+                    return signal.exit();
                 }
             };
             x = avar(2);
             x.on("fail", function (message) {
              // This is weird stuff, man ...
                 throw message;
-            }).Q(proxy).Q(function (signal) {
+            }).Q(functable).Q(function (signal) {
              // Did it work?
                 expect(x.val).to.equal(4);
                 done();
@@ -581,38 +559,23 @@
             });
         });
 
-     /*
-        it("supports queueing avar 'functables'", function (done) {
-            var f, proxy, x;
-            f = function (signal) {
-             // This function will be called indirectly...
-                this.val += 2;
-                return signal.exit();
-            };
-            proxy = avar({
-                "call": function (that, signal) {
-                 // This function is extremely meta. Details forthcoming.
-                    return f.call(that, signal);
-                }
-            });
-            x = avar(2);
-            x.on("fail", function (message) {
-             // This is weird stuff, man ...
-                throw message;
-            }).Q(proxy).Q(function (signal) {
-             // Did it work?
-                expect(x.val).to.equal(4);
-                done();
-                return signal.exit();
-            });
-        });
-     */
-
-     /*
         it("supports 'functables' as `onfail` listeners", function (done) {
-         // ...
+            var onfail, x;
+            onfail = {
+                "call": function (that, message) {
+                 // This function is extremely meta. Details forthcoming.
+                    expect(that).to.be(x);
+                    expect(message).to.equal(x.val);
+                    done();
+                    return;
+                }
+            };
+            x = avar("The struggle is real.");
+            x.on("fail", onfail).Q(function (signal) {
+             // This function is expected to fail, btw.
+                return signal.fail(x.val);
+            });
         });
-     */
 
         return;
 

@@ -102,12 +102,28 @@
                 expect(x).to.equal(y);
             });
 
+            it("cannot be called as a function", function () {
+                var x;
+                try {
+                    x = AVar.prototype.on();
+                } catch (err) {
+                    x = err;
+                }
+                expect(x).to.be.an(Error);
+            });
+
         });
 
         describe("The `AVar.prototype.Q` method", function () {
 
             it("accepts one argument", function () {
                 expect(AVar.prototype.Q.length).to.equal(1);
+            });
+
+            it("`fail`s the avar when no argument is given", function (done) {
+                avar().Q().on("fail", function () {
+                    done();
+                });
             });
 
             it("returns the same avar", function () {
@@ -120,7 +136,17 @@
                 expect(x).to.equal(y);
             });
 
-            it("no longer supports generic calls", function () {
+            it("cannot be called as a function", function () {
+                var x;
+                try {
+                    x = AVar.prototype.Q();
+                } catch (err) {
+                    x = err;
+                }
+                expect(x).to.be.an(Error);
+            });
+
+            it("does not support generic calls", function () {
                 var x;
                 try {
                     x = AVar.prototype.Q.call(null, function (signal) {
@@ -153,6 +179,13 @@
                     return;
                 });
             });
+
+         /*
+            it("cannot be used as a method", function () {
+             // What I mean here is that `avar.call(this, val)` is exactly the
+             // same as `avar(val)`, for all possible values of `this` ...
+            });
+         */
 
         });
 
@@ -202,6 +235,13 @@
                 });
             });
 
+         /*
+            it("cannot be used as a method", function () {
+             // What I mean here is that `sync.call(this, val)` is exactly the
+             // same as `sync(val)`, for all possible values of `this` ...
+            });
+         */
+
         });
 
         describe("An avar", function () {
@@ -249,6 +289,12 @@
             it("always returns the same avar", function () {
                 var y = x.send("(name)", "(optional argument)");
                 expect(y).to.equal(x);
+            });
+
+            it("forwards `fail` when no arguments are given", function (done) {
+                x.send().on("fail", function () {
+                    done();
+                });
             });
 
             it("forwards `fail` when given an unknown `name`", function (done) {

@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 03 Apr 2015
+//                                                  ~~ last updated 06 Apr 2015
 
 /*eslint */
 
@@ -431,10 +431,10 @@
  // Module initialization
  // ---------------------
  //
- // Finally, add the `avar` and `sync` methods to the `quanah` "namespace"
- // object before returning it to the invoking scope. For reference, the public
- // interfaces for Quanah are specified with TypeScript; see "src/quanah.d.ts"
- // in the project repository.
+ // Add the `avar` and `sync` methods to the `quanah` "namespace" object as the
+ // last step before returning it to the invoking scope. For reference, the
+ // public interfaces for Quanah are specified in TypeScript in another file,
+ // "src/quanah.d.ts", in the project repository.
 
     quanah.avar = function (val) {
      // This function enables the user to avoid the `new` keyword, which is
@@ -459,9 +459,6 @@
      // immediate usefulness of this capability isn't obvious, it turns out to
      // be crucially important for expressing certain concurrency patterns
      // idiomatically.)
-     //
-     // NOTE: Many more unit tests are needed!
-     //
         var args, i, temp, unique, x, y;
         args = Array.prototype.slice.call(arguments);
         x = [];
@@ -554,9 +551,9 @@
             temp = args.shift();
             if ((temp instanceof AVar) && (temp.hasOwnProperty("Q"))) {
              // This arm "flattens" prerequisites for array-based recursion by
-             // appending the `val` arrays of other syncpoints. It also assumes
-             // that users will not add instance methods named "Q" to avars, so
-             // that it may assume `val` will be an array.
+             // appending copies of the `val` arrays of other syncpoints. It
+             // also assumes that users will not add instance methods named "Q"
+             // to avars, so that it may assume `val` will be an array.
                 Array.prototype.push.apply(args, temp.val);
             } else {
              // This arm ensures that elements are unique by comparing each
@@ -573,6 +570,12 @@
         }
         return y;
     };
+
+ // Exit anonymous closure #2
+ // -------------------------
+ //
+ // Finally, having transformed the input object into a module that implements
+ // Quanah's interfaces, return the module back to anonymous closure #1.
 
     return quanah;
 

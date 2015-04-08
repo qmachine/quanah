@@ -2,13 +2,14 @@ Quanah
 ======
 
 
-[Quanah](https://qmachine.github.io/quanah/) is a JavaScript (JS) module for
-writing concurrent programs that still run correctly in serial execution
-environments. [QMachine](https://www.qmachine.org/), for example, uses Quanah
-extensively to build a World Wide Computer that can use web browsers as
-computational nodes. Currently, [documentation](https://quanah.readthedocs.org)
-is sparse because [I](http://seanwilkinson.info) am writing several papers and
-a PhD thesis about Quanah and applications that use it.
+[Quanah](https://qmachine.github.io/quanah/) is an extensible JavaScript (JS)
+module for data-centric concurrency, and it can be used to construct a variety
+of distributed systems. [QMachine](https://www.qmachine.org/), for example,
+uses Quanah extensively to build a World Wide Computer that can use web
+browsers as computational nodes. Currently, the
+[documentation](https://quanah.readthedocs.org) is sparse because
+[I](http://seanwilkinson.info) am writing several papers and a PhD thesis about
+Quanah and applications that use it.
 
 Because Quanah is written in pure JS, it can be used in both client- and
 server-side applications. Thus, this repository integrates with both

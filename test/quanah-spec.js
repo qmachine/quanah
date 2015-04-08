@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 06 Apr 2015
+//                                                  ~~ last updated 07 Apr 2015
 
 /*eslint new-cap: 0 */
 
@@ -357,6 +357,22 @@
 
             it("accepts one argument", function () {
                 expect(sync().Q.length).to.equal(1);
+            });
+
+            it("`fail`s the avar when no argument is given", function (done) {
+                sync().Q().on("fail", function () {
+                    done();
+                });
+            });
+
+            it("returns the same avar", function () {
+                var x, y;
+                x = sync();
+                y = x.Q(function (signal) {
+                 // This function doesn't do anything; it's just for testing.
+                    return signal.exit();
+                });
+                expect(x).to.equal(y);
             });
 
         });

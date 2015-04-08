@@ -6,7 +6,7 @@
     },
     "bugs": "https://github.com/qmachine/quanah/issues",
     "dependencies": {},
-    "description": "A module for distributing and scheduling computations",
+    "description": "A module for data-centric concurrency",
     "devDependencies": {
         "expect.js": ">=0.2.0",
         "mocha": ">=1.9.0"

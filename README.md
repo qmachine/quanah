@@ -19,8 +19,9 @@ server-side applications. Thus, this repository integrates with both
     $ npm install quanah
 
 Mirrors of this repository are available on
-[Bitbucket](https://bitbucket.org/wilkinson/quanah) and
-[GitHub](https://github.com/qmachine/quanah), but sadly, the
+[Bitbucket](https://bitbucket.org/wilkinson/quanah),
+[GitHub](https://github.com/qmachine/quanah), and
+[GitLab](https://gitlab.com/qmachine/quanah), but sadly, the
 [original](https://quanah.googlecode.com/) will not be available much longer,
 because [Google Code is shutting down](http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html).
 Various project statistics are

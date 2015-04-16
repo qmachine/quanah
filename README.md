@@ -26,7 +26,7 @@ Mirrors of this repository are available on
 because [Google Code is shutting down](http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html).
 Various project statistics are
 available on [Codacy](https://www.codacy.com/public/qmachine/quanah/dashboard),
-[GitHub](https://github.com/qmachine/quanah/graphs) and
+[GitHub](https://github.com/qmachine/quanah/graphs), and
 [Open Hub](https://www.openhub.net/p/quanah), too.
 
 ===

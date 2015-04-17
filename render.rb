@@ -2,7 +2,7 @@
 
 #-  render.rb ~~
 #                                                       ~~ (c) SRW, 18 Aug 2012
-#                                                   ~~ last updated 23 Dec 2014
+#                                                   ~~ last updated 17 Apr 2015
 
 require 'date'
 require 'github/markdown'
@@ -42,7 +42,7 @@ File::open(filename, 'w') do |f|
       open your browser's developer console and experiment without even leaving
       this page :-)
     </p>
-    <script defer src="//quanah.googlecode.com/git/src/quanah.js"></script>
+    <script src="//rawgithub.com/qmachine/quanah/master/src/quanah.js"></script>
   </body>
 </html>
 EOF

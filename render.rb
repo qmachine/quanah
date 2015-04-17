@@ -42,7 +42,7 @@ File::open(filename, 'w') do |f|
       open your browser's developer console and experiment without even leaving
       this page :-)
     </p>
-    <script src="//rawgithub.com/qmachine/quanah/master/src/quanah.js"></script>
+    <script src="//rawgit.com/qmachine/quanah/master/src/quanah.js"></script>
   </body>
 </html>
 EOF

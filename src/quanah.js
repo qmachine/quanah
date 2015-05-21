@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 06 Apr 2015
+//                                                  ~~ last updated 21 May 2015
 
 /*eslint */
 
@@ -388,7 +388,9 @@
      // by multiple execution contexts simultaneously, without any need to make
      // a distinction between recursing contexts or platform features like Web
      // Workers. The `tick` function selects an execution context based on the
-     // presence or absence of external function definitions.
+     // presence or absence of external function definitions. Note that the
+     // check that `task` is an object checks indirectly that `queue` was
+     // non-empty, and it also provides type hints for tools like Flow.
         var task = queue.shift();
         if (task instanceof Object) {
             if (canRunRemotely(task)) {

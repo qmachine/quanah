@@ -11,7 +11,7 @@
 #   control -- always execute your commits manually!
 #
 #                                                       ~~ (c) SRW, 08 Sep 2012
-#                                                   ~~ last updated 11 Feb 2015
+#                                                   ~~ last updated 29 May 2015
 
 #-  CouchApp configuration files -- these may contain passwords!
 .couchapprc
@@ -45,7 +45,8 @@ docs/_static/
 #-  Twitter Bower stuff
 bower_components/
 
-#-  Vim files (taken from http://git.io/qmQqxA)
+#-  Vim files (adapted from http://git.io/qmQqxA)
+.swp
 .*.s[a-w][a-z]
 *.un~
 Session.vim

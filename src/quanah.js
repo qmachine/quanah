@@ -5,7 +5,7 @@
 //  See https://quanah.readthedocs.org/en/latest/ for more information.
 //
 //                                                      ~~ (c) SRW, 14 Nov 2012
-//                                                  ~~ last updated 21 May 2015
+//                                                  ~~ last updated 31 May 2015
 
 /*eslint */
 
@@ -339,9 +339,18 @@
                  // error for exceeding the recursion stack depth limit.)
                  //
                     task.x.send("stay", message);
-                    queue.push(task);
                     if (isFunction(quanah.snooze)) {
-                        quanah.snooze(tick);
+                        quanah.snooze(function () {
+                         // This function defers pushing back onto the queue
+                         // when possible because it helps avoid errors with
+                         // the call stack depth limit that occur when avars
+                         // are nested in very particular ways.
+                            queue.push(task);
+                            tick();
+                            return;
+                        });
+                    } else {
+                        queue.push(task);
                     }
                     return;
                 }

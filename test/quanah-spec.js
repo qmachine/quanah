@@ -5,7 +5,7 @@
 //  These tests will likely be completely reworked in the near future ...
 //
 //                                                      ~~ (c) SRW, 17 Nov 2012
-//                                                  ~~ last updated 07 Apr 2015
+//                                                  ~~ last updated 31 May 2015
 
 /*eslint new-cap: 0 */
 
@@ -22,7 +22,8 @@
 /*properties
     a, an, avar, be, call, constructor, error, equal, exit, fail,
     getPrototypeOf, have, key, length, log, name, nextTick, not, on, own, Q,
-    PI, property, prototype, push, random, send, sync, to, val
+    PI, property, prototype, push, random, send, snooze, stay, sync, timeout,
+    to, val
 */
 
 (function () {
@@ -662,6 +663,34 @@
              // This function is expected to fail, btw.
                 return signal.fail(x.val);
             });
+        });
+
+        it("survives infinite loops", function (done) {
+            this.timeout(60 * 1000);
+            quanah.snooze = function (tick) {
+                if (typeof setImmediate === "function") {
+                    setImmediate(tick);
+                } else {
+                    setTimeout(tick, 0);
+                }
+                return;
+            };
+            avar(0).Q(function (outer) {
+                this.val += 1;
+                if (this.val === 1e4) {
+                    done();
+                    return;
+                }
+                avar().Q(function (inner) {
+                    inner.exit();
+                    return outer.stay("Looping ...");
+                }).on("fail", function (err) {
+                    console.error("Error: " + err);
+                    return outer.stay("Looping ...");
+                });
+                return;
+            });
+            return;
         });
 
         return;
